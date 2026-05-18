@@ -1,1270 +1,1152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Yuvox — Voices of Young India</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/><style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:16px}
-:root{
-  --ink:#0C0C0D;
-  --ink-2:#151515;
-  --ink-3:#1C1C1C;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yuvox — Voices of Young India</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px
+        }
+        :root {
+            --ink: #0C0C0D;
+            --ink-2: #151515;
+            --ink-3: #1C1C1C;
+            --cream: #F4F3EF;
+            --cream-2: #ECE9E1;
+            --paper: #FAF8F3;
+            --blue: #1D4ED8;
+            --blue-soft: #DCE7FF;
+            --text: #121212;
+            --text-soft: #5A5A5A;
+            --wire: rgba(255, 255, 255, 0.06);
+            --wire-dark: rgba(0, 0, 0, 0.08);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+        body {
+            letter-spacing: -0.01em;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--ink);
+            color: #fff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .display {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.03em;
+        }
+        ::-webkit-scrollbar {
+            width: 3px
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--ink)
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--blue);
+            border-radius: 4px
+        }
+        .nav {
+            background: rgba(12, 12, 13, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--wire);
+        }
+        .hero-mesh {
+            background: radial-gradient(circle 700px at 20% 50%, rgba(29, 78, 216, 0.12) 0%, transparent 70%),
+                radial-gradient(circle 500px at 80% 30%, rgba(255, 255, 255, 0.04) 0%, transparent 60%),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.55)),
+                var(--ink);
+        }
+        .grain::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: .025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(4rem, 9vw, 7.5rem);
+            font-weight: 700;
+            line-height: .92;
+            letter-spacing: -0.04em;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 5vw, 4.5rem);
+            line-height: 1.08;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .label-dark {
+            color: rgba(0, 0, 0, .4)
+        }
+        .rule {
+            border: none;
+            border-top: 1px solid var(--wire)
+        }
+        .rule-dark {
+            border: none;
+            border-top: 1px solid var(--wire-dark)
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--blue);
+            color: #fff;
+            padding: 13px 28px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            border: none;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+        }
+        .btn-primary:hover {
+            background: #1a44b8;
+            transform: translateY(-1px)
+        }
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: #fff;
+            padding: 13px 28px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            border: 1px solid var(--wire);
+            cursor: pointer;
+            transition: border-color .2s, background .2s, transform .15s;
+        }
+        .btn-ghost:hover {
+            border-color: rgba(255, 255, 255, .25);
+            background: rgba(255, 255, 255, .05);
+            transform: translateY(-1px)
+        }
+        .btn-dark {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--ink);
+            color: #fff;
+            padding: 13px 28px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            border: none;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .btn-dark:hover {
+            background: #1a1a1f
+        }
+        .btn-outline-dark {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: var(--ink);
+            padding: 13px 28px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+        }
+        .btn-outline-dark:hover {
+            border-color: var(--blue);
+            background: rgba(29, 78, 216, 0.04);
+        }
+        .story-card {
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: #ffffff;
+            transition: border-color .35s cubic-bezier(.16, 1, .3, 1),
+                transform .45s cubic-bezier(.16, 1, .3, 1),
+                box-shadow .45s cubic-bezier(.16, 1, .3, 1);
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+        .story-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-top: 2px solid transparent;
+            transition: border-color .4s ease;
+        }
+        .story-card:hover {
+            border-color: rgba(29, 78, 216, .18);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.10),
+                0 5px 18px rgba(0, 0, 0, 0.04);
+        }
+        .story-card:hover::before {
+            border-top-color: #1D4ED8;
+        }
+        .story-card:hover .story-thumb {
+            transform: scale(1.06);
+        }
+        .story-thumb {
+            transition: transform .8s cubic-bezier(.16, 1, .3, 1);
+            will-change: transform;
+        }
+        .benefit-card {
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: white;
+            padding: 40px 34px;
+            transition: all .35s cubic-bezier(.16, 1, .3, 1);
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+        .benefit-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(29, 78, 216, .2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        }
+        .benefit-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            line-height: 1;
+            color: rgba(0, 0, 0, .08);
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        .event-card {
+            border: 1px solid var(--wire);
+            background: var(--ink-2);
+            transition: border-color .3s, transform .3s cubic-bezier(.16, 1, .3, 1);
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .event-card:hover {
+            border-color: rgba(255, 255, 255, .15);
+            transform: translateY(-3px)
+        }
+        .field {
+            width: 100%;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--wire);
+            color: #fff;
+            padding: 14px 18px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            transition: border-color .2s;
+        }
+        .field:focus {
+            outline: none;
+            border-color: rgba(29, 78, 216, .6)
+        }
+        .field::placeholder {
+            color: rgba(255, 255, 255, .22)
+        }
+        .field option {
+            background: var(--ink-2);
+            color: #fff
+        }
+        .ticker-track {
+            display: flex;
+            animation: ticker 30s linear infinite;
+            width: max-content
+        }
+        @keyframes ticker {
+            from {
+                transform: translateX(0)
+            }
+            to {
+                transform: translateX(-50%)
+            }
+        }
+        .ticker-wrap:hover .ticker-track {
+            animation-play-state: paused
+        }
+        .stat-val {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -.03em;
+            line-height: 1;
+        }
+        .pull-quote {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.4rem, 3vw, 2.2rem);
+            line-height: 1.35;
+            font-style: italic;
+            font-weight: 400;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity .7s ease, transform .7s cubic-bezier(.16, 1, .3, 1)
+        }
+        .reveal.in {
+            opacity: 1;
+            transform: none
+        }
+        .reveal-r {
+            opacity: 0;
+            transform: translateX(18px);
+            transition: opacity .7s ease, transform .7s cubic-bezier(.16, 1, .3, 1)
+        }
+        .reveal-r.in {
+            opacity: 1;
+            transform: none
+        }
+        .d1 {
+            transition-delay: .06s
+        }
+        .d2 {
+            transition-delay: .12s
+        }
+        .d3 {
+            transition-delay: .18s
+        }
+        .d4 {
+            transition-delay: .24s
+        }
+        .d5 {
+            transition-delay: .30s
+        }
+        .d6 {
+            transition-delay: .36s
+        }
+        @keyframes livepulse {
+            0%,
+            100% {
+                opacity: 1
+            }
+            50% {
+                opacity: 0
+            }
+        }
+        .live-dot {
+            animation: livepulse 1.6s step-end infinite
+        }
+        #mob-menu {
+            transition: transform .35s cubic-bezier(.16, 1, .3, 1)
+        }
+        .badge {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+        }
+        .badge-blue {
+            background: rgba(29, 78, 216, .2);
+            color: #93b4ff
+        }
+        .badge-orange {
+            background: rgba(234, 88, 12, .2);
+            color: #fdba74
+        }
+        .badge-green {
+            background: rgba(16, 185, 129, .18);
+            color: #6ee7b7
+        }
+        .badge-purple {
+            background: rgba(124, 58, 237, .2);
+            color: #c4b5fd
+        }
+        .blue-strip {
+            background: linear-gradient(135deg, #1D4ED8 0%, #1a44b8 100%)
+        }
+        .index-line::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 3px;
+            height: 0;
+            background: var(--blue);
+            transition: height .4s cubic-bezier(.16, 1, .3, 1);
+            transform: translateY(-50%);
+        }
+        .index-line:hover::before {
+            height: 100%
+        }
+        @media(max-width:768px) {
+            .hide-sm {
+                display: none !important
+            }
+        }
 
-  --cream:#F4F3EF;
-  --cream-2:#ECE9E1;
-  --paper:#FAF8F3;
+        /* ── Section Backgrounds ── */
+        .section-light {
+            background: #F4F3EF;
+            color: #0C0C0D;
+        }
+        .section-light .section-title {
+            color: #0C0C0D;
+        }
+        .section-light .label {
+            color: rgba(0, 0, 0, 0.4);
+        }
+        .section-light p {
+            color: #3a3a3a;
+        }
+        .section-light .text-zinc-600 {
+            color: #4a4a4a;
+        }
+        .section-light .text-zinc-500 {
+            color: #5a5a5a;
+        }
+        .section-light .text-zinc-400 {
+            color: #6a6a6a;
+        }
+        .section-light .text-zinc-800 {
+            color: #1a1a1a;
+        }
+        .section-light .border-black\/10 {
+            border-color: rgba(0, 0, 0, 0.08);
+        }
 
-  --blue:#1D4ED8;
-  --blue-soft:#DCE7FF;
+        .section-cream {
+            background: #FAF8F3;
+            color: #0C0C0D;
+        }
+        .section-cream .section-title {
+            color: #0C0C0D;
+        }
+        .section-cream .label {
+            color: rgba(0, 0, 0, 0.4);
+        }
+        .section-cream p {
+            color: #3a3a3a;
+        }
+        .section-cream .text-zinc-600 {
+            color: #4a4a4a;
+        }
+        .section-cream .text-zinc-500 {
+            color: #5a5a5a;
+        }
+        .section-cream .text-zinc-400 {
+            color: #6a6a6a;
+        }
+        .section-cream .text-zinc-800 {
+            color: #1a1a1a;
+        }
 
-  --text:#121212;
-  --text-soft:#5A5A5A;
+        /* ── Trending List ── */
+        .trending-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .trending-item:last-child {
+            border-bottom: none;
+        }
+        .trending-item:hover {
+            padding-left: 8px;
+            border-color: rgba(29, 78, 216, 0.15);
+        }
+        .trending-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.08);
+            width: 48px;
+            flex-shrink: 0;
+            text-align: right;
+        }
+        .trending-item h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: #0C0C0D;
+        }
 
-  --wire:rgba(255,255,255,0.06);
-  --wire-dark:rgba(0,0,0,0.08);
+        /* ── Spotlight Cards ── */
+        .spotlight-card {
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: white;
+            padding: 32px 28px;
+            transition: all .35s cubic-bezier(.16, 1, .3, 1);
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            text-align: center;
+        }
+        .spotlight-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(29, 78, 216, .2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        }
+        .spotlight-card .emoji-big {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .spotlight-card h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #0C0C0D;
+            margin-bottom: 6px;
+        }
+        .spotlight-card p {
+            font-size: 0.85rem;
+            color: #5a5a5a;
+        }
 
-  --shadow:0 10px 30px rgba(0,0,0,0.04);
-}
-body{
-  letter-spacing:-0.01em;
-  font-family:'DM Sans',sans-serif;
-  background:var(--ink);
-  color:#fff;
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-.serif{
-  font-family:'Playfair Display',serif;
-}
-
-.display{
-  font-family:'Playfair Display',serif;
-  letter-spacing:-0.03em;
-}
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:var(--ink)}
-::-webkit-scrollbar-thumb{background:var(--blue);border-radius:4px}
-
-/* ── NAV ── */
-.nav{
-  background:rgba(12,12,13,0.75);
-  backdrop-filter:blur(20px) saturate(180%);
-  border-bottom:1px solid var(--wire);
-}
-
-/* ── HERO ── */
-.hero-mesh{
-  background:
-    radial-gradient(circle 700px at 20% 50%, rgba(29,78,216,0.12) 0%, transparent 70%),
-    radial-gradient(circle 500px at 80% 30%, rgba(255,255,255,0.04) 0%, transparent 60%),
-    linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.55)),
-    var(--ink);
-}
-
-/* ── GRAIN ── */
-.grain::after{
-  content:'';position:absolute;inset:0;pointer-events:none;opacity:.025;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-}
-
-/* ── TYPOGRAPHY ── */
-.hero-title{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(4rem,9vw,7.5rem);
-  font-weight:700;
-  line-height:.92;
-  letter-spacing:-0.04em;
-}
-.section-title{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(2.4rem,5vw,4.5rem);
-  line-height:1.08;
-  font-weight:600;
-  color:var(--text);
-}
-.label{
-  font-family:'DM Sans',sans-serif;
-  font-size:11px;font-weight:500;
-  letter-spacing:.14em;text-transform:uppercase;
-  color:var(--stone-2);
-}
-.label-dark{color:rgba(0,0,0,.4)}
-
-/* ── LINES ── */
-.rule{border:none;border-top:1px solid var(--wire)}
-.rule-dark{border:none;border-top:1px solid var(--wire-dark)}
-
-/* ── BUTTONS ── */
-.btn-primary{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--blue);color:#fff;
-  padding:13px 28px;font-size:13px;font-weight:600;
-  letter-spacing:.04em;
-  border:none;cursor:pointer;
-  transition:background .2s,transform .15s;
-}
-.btn-primary:hover{background:#1a44b8;transform:translateY(-1px)}
-
-.btn-ghost{
-  display:inline-flex;align-items:center;gap:8px;
-  background:transparent;color:#fff;
-  padding:13px 28px;font-size:13px;font-weight:600;
-  letter-spacing:.04em;
-  border:1px solid var(--wire);cursor:pointer;
-  transition:border-color .2s,background .2s,transform .15s;
-}
-.btn-ghost:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.05);transform:translateY(-1px)}
-
-.btn-dark{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--ink);color:#fff;
-  padding:13px 28px;font-size:13px;font-weight:600;
-  letter-spacing:.04em;
-  border:none;cursor:pointer;
-  transition:background .2s;
-}
-.btn-dark:hover{background:#1a1a1f}
-
-/* ── STORY CARDS ── */
-.story-card{
-  border:1px solid rgba(0,0,0,0.08);
-  background:#ffffff;
-  transition:
-    border-color .35s cubic-bezier(.16,1,.3,1),
-    transform .45s cubic-bezier(.16,1,.3,1),
-    box-shadow .45s cubic-bezier(.16,1,.3,1);
-  overflow:hidden;
-  cursor:pointer;
-  position:relative;
-  box-shadow:0 10px 30px rgba(0,0,0,0.04);
-}
-
-.story-card::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  border-top:2px solid transparent;
-  transition:border-color .4s ease;
-}
-
-.story-card:hover{
-  border-color:rgba(29,78,216,.18);
-  transform:translateY(-8px);
-  box-shadow:
-    0 25px 60px rgba(0,0,0,0.10),
-    0 5px 18px rgba(0,0,0,0.04);
-}
-
-.story-card:hover::before{
-  border-top-color:#1D4ED8;
-}
-
-.story-card:hover .story-thumb{
-  transform:scale(1.06);
-}
-
-.story-thumb{
-  transition:transform .8s cubic-bezier(.16,1,.3,1);
-  will-change:transform;
-}
-/* ── BENEFIT CARDS ── */
-.benefit-card{
-  border:1px solid rgba(0,0,0,0.08);
-  background:white;
-  padding:40px 34px;
-  transition:all .35s cubic-bezier(.16,1,.3,1);
-  cursor:pointer;
-  box-shadow:0 10px 30px rgba(0,0,0,0.04);
-}
-
-.benefit-card:hover{
-  transform:translateY(-6px);
-  border-color:rgba(29,78,216,.2);
-  box-shadow:0 20px 50px rgba(0,0,0,0.08);
-}
-
-.benefit-num{
-  font-family:'Playfair Display',serif;
-  font-size:3.5rem;
-  line-height:1;
-  color:rgba(0,0,0,.08);
-  font-weight:500;
-  margin-bottom:16px;
-}
-/* ── EVENT CARDS ── */
-.event-card{
-  border:1px solid var(--wire);
-  background:var(--ink-2);
-  transition:border-color .3s,transform .3s cubic-bezier(.16,1,.3,1);
-  cursor:pointer;overflow:hidden;
-}
-.event-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-3px)}
-
-/* ── FORM ── */
-.field{
-  width:100%;
-  background:rgba(255,255,255,.05);
-  border:1px solid var(--wire);
-  color:#fff;
-  padding:14px 18px;
-  font-family:'DM Sans',sans-serif;
-  font-size:14px;
-  transition:border-color .2s;
-}
-.field:focus{outline:none;border-color:rgba(29,78,216,.6)}
-.field::placeholder{color:rgba(255,255,255,.22)}
-.field option{background:var(--ink-2);color:#fff}
-
-/* ── TICKER ── */
-.ticker-track{display:flex;animation:ticker 30s linear infinite;width:max-content}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.ticker-wrap:hover .ticker-track{animation-play-state:paused}
-
-/* ── STAT ── */
-.stat-val{
-  font-family:'Syne',sans-serif;
-  font-size:clamp(2rem,4vw,3.2rem);
-  font-weight:800;letter-spacing:-.03em;line-height:1;
-}
-
-/* ── QUOTE ── */
-.pull-quote{
-  font-family:'Instrument Serif',serif;
-  font-size:clamp(1.4rem,3vw,2.2rem);
-  line-height:1.35;
-  font-style:italic;
-  font-weight:400;
-}
-
-/* ── REVEAL ANIMATIONS ── */
-.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1)}
-.reveal.in{opacity:1;transform:none}
-.reveal-r{opacity:0;transform:translateX(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1)}
-.reveal-r.in{opacity:1;transform:none}
-.d1{transition-delay:.06s}.d2{transition-delay:.12s}.d3{transition-delay:.18s}
-.d4{transition-delay:.24s}.d5{transition-delay:.30s}.d6{transition-delay:.36s}
-
-/* ── LIVE DOT ── */
-@keyframes livepulse{0%,100%{opacity:1}50%{opacity:0}}
-.live-dot{animation:livepulse 1.6s step-end infinite}
-
-/* ── MOBILE MENU ── */
-#mob-menu{transition:transform .35s cubic-bezier(.16,1,.3,1)}
-
-/* ── CARD BADGE ── */
-.badge{
-  font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
-  padding:4px 10px;
-}
-.badge-blue{background:rgba(29,78,216,.2);color:#93b4ff}
-.badge-orange{background:rgba(234,88,12,.2);color:#fdba74}
-.badge-green{background:rgba(16,185,129,.18);color:#6ee7b7}
-.badge-purple{background:rgba(124,58,237,.2);color:#c4b5fd}
-
-/* ── BLUE STRIP ── */
-.blue-strip{background:linear-gradient(135deg,#1D4ED8 0%,#1a44b8 100%)}
-
-/* ── FLOATING INDEX LINE ── */
-.index-line::before{
-  content:'';position:absolute;left:0;top:50%;
-  width:3px;height:0;background:var(--blue);
-  transition:height .4s cubic-bezier(.16,1,.3,1);
-  transform:translateY(-50%);
-}
-.index-line:hover::before{height:100%}
-
-@media(max-width:768px){
-  .hide-sm{display:none!important}
-}
-</style>
+        /* ── Movement CTA ── */
+        .movement-cta {
+            background: linear-gradient(135deg, #0C0C0D 0%, #1a1a1f 100%);
+            border-radius: 0;
+            padding: 64px 48px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .movement-cta h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.6rem, 6vw, 4.2rem);
+            font-weight: 600;
+            line-height: 1.08;
+            color: #fff;
+        }
+        .movement-cta p {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 1.1rem;
+            max-width: 560px;
+            margin: 0 auto 32px;
+            font-weight: 300;
+        }
+    </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-  NAV
-═══════════════════════════════════════════ -->
-<header class="nav fixed top-0 left-0 right-0 z-50">
-  <div class="max-w-screen-xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
+    <!-- ═══════════════════════════════════════════
+    NAV
+    ═══════════════════════════════════════════ -->
+    <header class="nav fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-screen-xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
 
-    <!-- Logo -->
-    <a href="#" class="flex items-center gap-2.5 flex-shrink-0">
-      <div class="w-7 h-7 bg-blue-700 flex items-center justify-center">
-        <span class="display text-white font-bold text-sm">Y</span>
-      </div>
-      <span class="display font-bold text-white tracking-tight text-lg">Yuvox</span>
-    </a>
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2.5 flex-shrink-0">
+                <div class="w-7 h-7 bg-blue-700 flex items-center justify-center">
+                    <span class="display text-white font-bold text-sm">Y</span>
+                </div>
+                <span class="display font-bold text-white tracking-tight text-lg">Yuvox</span>
+            </a>
 
-    <!-- Center links -->
-    <nav class="hidden md:flex items-center gap-8">
-      <a href="#about" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">About</a>
-      <a href="#stories" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Stories</a>
-      <a href="#community" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Community</a>
-      <a href="#campus" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Campus</a>
-      <a href="#events" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Events</a>
-    </nav>
+            <!-- Center links -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#more" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">More Than Media</a>
+                <a href="#trending" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Trending</a>
+                <a href="#community" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Community</a>
+                <a href="#spotlight" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Spotlight</a>
+                <a href="join.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Join</a>
+            </nav>
 
-    <!-- Right -->
-    <div class="flex items-center gap-3">
-      <a href="#campus" class="btn-primary hide-sm" style="padding:9px 20px;font-size:12px">Join Movement</a>
-      <button id="ham" onclick="toggleMob()" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5">
-        <span class="block w-5 h-px bg-white transition-all" id="h1"></span>
-        <span class="block w-5 h-px bg-white transition-all" id="h2"></span>
-        <span class="block w-3.5 h-px bg-white transition-all self-start" id="h3"></span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<!-- Mobile menu -->
-<div id="mob-menu" class="fixed inset-0 bg-[#0C0C0D] z-40 flex flex-col items-center justify-center gap-7 transform translate-x-full md:hidden">
-  <a href="#about" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">About</a>
-  <a href="#stories" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Stories</a>
-  <a href="#community" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Community</a>
-  <a href="#campus" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Campus</a>
-  <a href="#events" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Events</a>
-  <a href="#campus" onclick="toggleMob()" class="btn-primary mt-4" style="font-size:14px;padding:14px 36px">Join Movement</a>
-</div>
-
-
-<!-- ═══════════════════════════════════════════
-  HERO
-═══════════════════════════════════════════ -->
-<section class="hero-mesh grain relative min-h-screen flex flex-col pt-16 overflow-hidden">
-
-  <!-- Grid decoration -->
-  <div class="absolute inset-0 pointer-events-none" style="background-image:linear-gradient(var(--wire) 1px,transparent 1px),linear-gradient(90deg,var(--wire) 1px,transparent 1px);background-size:72px 72px;opacity:.5"></div>
-
-  <!-- Photo -->
-  <div class="absolute inset-0 pointer-events-none" style="mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.15) 30%,rgba(0,0,0,.15) 70%,transparent 100%)">
-    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=60&w=1800" class="w-full h-full object-cover" style="filter:grayscale(1);opacity:.12" alt=""/>
-  </div>
-  <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(to bottom, transparent 60%, var(--ink) 100%)"></div>
-
-  <!-- Content -->
-  <div class="relative z-10 flex-1 flex items-center">
-    <div class="max-w-screen-xl mx-auto w-full px-6 py-24">
-
-      <div class="max-w-4xl">
-        <!-- Eyebrow -->
-        <div class="reveal flex items-center gap-3 mb-10">
-          <span class="live-dot w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
-          <span class="label" style="color:#5b85f5;letter-spacing:.2em">India's Youth Media Network · Est. 2024</span>
-        </div>
-
-        <!-- Headline -->
-        <h1 class="hero-title reveal d1 mb-8">
-          Voices<br>
-          <span class="serif" style="color:#5b85f5;font-weight:400;font-size:.95em;letter-spacing:-.01em;font-style:italic">of Young</span><br>
-          India.
-        </h1>
-
-        <!-- Sub -->
-        <p class="reveal d2 text-zinc-400 text-lg leading-relaxed max-w-xl mb-12" style="font-weight:300">
-          A youth-driven journalism and storytelling network built for the next generation of truth-seekers, creators, and community leaders across India.
-        </p>
-
-        <!-- CTAs -->
-        <div class="reveal d3 flex flex-wrap gap-4 mb-20">
-          <a href="#community" class="btn-primary">Join Community <span>→</span></a>
-          <a href="#campus" class="btn-ghost">Submit a Story</a>
-        </div>
-
-        <!-- Stats -->
-        <div class="reveal d4">
-          <div class="rule mb-8"></div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div>
-              <div class="stat-val text-white">5K+</div>
-              <div class="label mt-2">Student Reporters</div>
-            </div>
-            <div>
-              <div class="stat-val text-white">200+</div>
-              <div class="label mt-2">Colleges Covered</div>
-            </div>
-            <div>
-              <div class="stat-val text-white">1.2M</div>
-              <div class="label mt-2">Monthly Readers</div>
-            </div>
-            <div>
-              <div class="stat-val text-white">18</div>
-              <div class="label mt-2">States & UTs</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Scroll cue -->
-  <div class="relative z-10 pb-10 flex justify-center">
-    <div class="flex flex-col items-center gap-2 opacity-30 animate-bounce">
-      <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-    </div>
-  </div>
-</section>
-
-
-<!-- TICKER -->
-<div class="ticker-wrap overflow-hidden border-y py-3" style="border-color:var(--wire);background:var(--ink-2)">
-  <div class="ticker-track">
-    <div class="flex items-center gap-0 whitespace-nowrap text-zinc-600" style="font-size:11px;font-weight:500;letter-spacing:.13em">
-      <span class="px-8 border-r" style="border-color:var(--wire)">GROUND REPORTING</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">STUDENT JOURNALISM</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">DOCUMENTARY STORYTELLING</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">CREATOR COLLABORATION</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">CAMPUS MEDIA</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">YOUTH VOICES</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">BHARAT KI AWAZ</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">REAL-TIME FIELD REPORTING</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">GROUND REPORTING</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">STUDENT JOURNALISM</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">DOCUMENTARY STORYTELLING</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">CREATOR COLLABORATION</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">CAMPUS MEDIA</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">YOUTH VOICES</span>
-      <span class="px-8 border-r" style="border-color:var(--wire)">BHARAT KI AWAZ</span>
-      <span class="px-8" style="">REAL-TIME FIELD REPORTING</span>
-    </div>
-  </div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════
-  ABOUT
-═══════════════════════════════════════════ -->
-<section id="about" class="bg-[#F4F3EF] text-[#0C0C0D] py-24 md:py-36 px-6">
-  <div class="max-w-screen-xl mx-auto">
-
-    <!-- Header -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20">
-      <div class="reveal">
-        <div class="label-dark mb-6">About Yuvox</div>
-        <h2 class="section-title leading-tight">
-          The future of<br/>Indian media is<br/><em class="text-blue-700">student-led.</em>
-        </h2>
-      </div>
-      <div class="reveal d1 flex flex-col justify-end">
-        <p class="text-lg text-zinc-600 leading-relaxed mb-6" style="font-weight:300">
-          Yuvox is not just a platform — it's a movement. We bridge the gap between traditional journalism and the modern creator economy by putting young voices at the centre of the national conversation.
-        </p>
-        <a href="#campus" class="btn-dark self-start" style="background:#0C0C0D">Apply to Report →</a>
-      </div>
-    </div>
-
-    <hr class="rule-dark mb-16"/>
-
-    <!-- Pillars grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
-      <div class="reveal border-r border-[#0C0C0D]/10 pr-8 pb-8 lg:pb-0">
-        <div class="label-dark mb-4">01</div>
-        <h4 class="display font-bold text-sm uppercase tracking-tight mb-3">Youth Journalism</h4>
-        <p class="text-zinc-600 text-sm leading-relaxed">Empowering students to report on what shapes their cities, campuses, and futures — not just consume, but create the news.</p>
-      </div>
-      <div class="reveal d1 sm:border-r border-[#0C0C0D]/10 px-8 pb-8 lg:pb-0">
-        <div class="label-dark mb-4">02</div>
-        <h4 class="display font-bold text-sm uppercase tracking-tight mb-3">Ground Reporting</h4>
-        <p class="text-zinc-600 text-sm leading-relaxed">Real stories from real streets and campuses. No boardroom filters — raw, verified, community-driven journalism.</p>
-      </div>
-      <div class="reveal d2 lg:border-r border-[#0C0C0D]/10 px-8 pb-8 sm:pb-0">
-        <div class="label-dark mb-4">03</div>
-        <h4 class="display font-bold text-sm uppercase tracking-tight mb-3">Creator Collaboration</h4>
-        <p class="text-zinc-600 text-sm leading-relaxed">Writers, videographers, photographers, and designers building high-impact stories together across campuses.</p>
-      </div>
-      <div class="reveal d3 lg:pl-8">
-        <div class="label-dark mb-4">04</div>
-        <h4 class="display font-bold text-sm uppercase tracking-tight mb-3">Reporter Ecosystem</h4>
-        <p class="text-zinc-600 text-sm leading-relaxed">A structured pipeline from campus journalist to national contributor — with mentors, tools, and editorial support.</p>
-      </div>
-    </div>
-
-    <hr class="rule-dark my-16"/>
-
-    <!-- Manifesto + photos -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-      <div class="lg:col-span-2 reveal">
-        <div class="label-dark mb-6">Manifesto</div>
-        <p class="pull-quote text-zinc-800 mb-8">
-          "We believe every student has a story worth telling — and a nation worth holding accountable."
-        </p>
-        <div class="label-dark">— Yuvox Editorial Manifesto, 2024</div>
-      </div>
-      <div class="grid grid-cols-2 gap-3 reveal d1">
-        <div class="aspect-[3/4] overflow-hidden bg-zinc-200">
-          <img src="https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" alt=""/>
-        </div>
-        <div class="aspect-[3/4] overflow-hidden bg-zinc-200 mt-8">
-          <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" alt=""/>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════
-  STORIES
-═══════════════════════════════════════════ -->
-  <section id="stories" class="py-24 md:py-36 px-6" style="background:var(--cream)">
-  <div class="max-w-screen-xl mx-auto">
-
-    <div class="flex items-end justify-between mb-12 reveal">
-      <div>
-        <div class="label mb-4">Spotlight Content</div>
-        <h2 class="section-title text-white">Featured Reports</h2>
-      </div>
-      <a href="#" class="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors tracking-widest uppercase hide-sm">All Archives →</a>
-    </div>
-
-    <!-- Hero story -->
-    <div class="story-card reveal mb-6">
-      <div class="grid grid-cols-1 lg:grid-cols-5">
-        <div class="lg:col-span-3 relative overflow-hidden" style="min-height:320px">
-          <div class="story-thumb absolute inset-0">
-            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=900" class="w-full h-full object-cover" style="opacity:.55" alt=""/>
-          </div>
-          <div class="absolute inset-0" style="background:linear-gradient(to right,transparent 50%,var(--ink-2))"></div>
-          <div class="absolute inset-0" style="background:linear-gradient(to top,var(--ink-2) 0%,transparent 50%)"></div>
-          <!-- Play button -->
-          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100" style="opacity:1">
-            <div class="w-14 h-14 bg-blue-700 flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity" style="box-shadow:0 0 30px rgba(29,78,216,.5)">
-              <svg class="w-5 h-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
-            </div>
-          </div>
-          <div class="absolute top-4 left-4 flex items-center gap-2">
-            <span class="badge badge-blue">Documentary</span>
-            <span class="badge" style="background:rgba(0,0,0,.5);color:rgba(255,255,255,.7)">28:14</span>
-          </div>
-        </div>
-        <div class="lg:col-span-2 flex flex-col justify-between p-8 md:p-10" style="background:var(--ink-2)">
-          <div>
-            <div class="label mb-5">Editor's Pick · Ground Report</div>
-            <h3 class="display font-bold uppercase text-xl md:text-2xl tracking-tight leading-tight text-white mb-4">
-              The Digital Divide: Rural Classrooms After the Pandemic
-            </h3>
-            <p class="text-zinc-500 text-sm leading-relaxed mb-6">Students in Jharkhand, Bihar, and UP navigate shattered digital education promises. Yuvox reporters spent 3 weeks embedded in 7 villages — the result is the most comprehensive youth-led investigation into post-pandemic learning loss.</p>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span class="badge badge-blue">#Education</span>
-              <span class="badge badge-blue">#RuralIndia</span>
-              <span class="badge badge-blue">#GroundReport</span>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
+            <!-- Right -->
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-blue-700 flex items-center justify-center display font-bold text-sm text-white flex-shrink-0">AK</div>
-              <div>
-                <div class="text-xs font-semibold text-white">Ananya Krishnan</div>
-                <div class="label" style="margin-top:2px">IIT Delhi · 142K Views</div>
-              </div>
+                <a href="join.html" class="btn-primary hide-sm" style="padding:9px 20px;font-size:12px">Join Movement</a>
+                <button id="ham" onclick="toggleMob()" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5">
+                    <span class="block w-5 h-px bg-white transition-all" id="h1"></span>
+                    <span class="block w-5 h-px bg-white transition-all" id="h2"></span>
+                    <span class="block w-3.5 h-px bg-white transition-all self-start" id="h3"></span>
+                </button>
             </div>
-            <span class="text-blue-400 text-xs font-medium tracking-widest uppercase">Watch →</span>
-          </div>
         </div>
-      </div>
+    </header>
+
+    <!-- Mobile menu -->
+    <div id="mob-menu" class="fixed inset-0 bg-[#0C0C0D] z-40 flex flex-col items-center justify-center gap-7 transform translate-x-full md:hidden">
+        <a href="#more" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">More Than Media</a>
+        <a href="#trending" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Trending</a>
+        <a href="#community" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Community</a>
+        <a href="#spotlight" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Spotlight</a>
+        <a href="join.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Join</a>
+        <a href="join.html" onclick="toggleMob()" class="btn-primary mt-4" style="font-size:14px;padding:14px 36px">Join Movement</a>
     </div>
 
-    <!-- 3 cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
 
-      <div class="story-card reveal group">
-        <div class="relative overflow-hidden" style="aspect-ratio:16/9">
-          <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=600" class="story-thumb w-full h-full object-cover" style="opacity:.6" alt=""/>
-          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div class="w-11 h-11 bg-blue-700 flex items-center justify-center"><svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></div>
-          </div>
-          <div class="absolute top-3 left-3"><span class="badge badge-orange">Campus Report</span></div>
-          <div class="absolute bottom-2 right-2 text-xs font-bold text-white px-1.5 py-0.5" style="background:rgba(0,0,0,.6)">11:47</div>
+    <!-- ═══════════════════════════════════════════
+    HERO
+    ═══════════════════════════════════════════ -->
+    <section class="hero-mesh grain relative min-h-screen flex flex-col pt-16 overflow-hidden">
+
+        <!-- Grid decoration -->
+        <div class="absolute inset-0 pointer-events-none" style="background-image:linear-gradient(var(--wire) 1px,transparent 1px),linear-gradient(90deg,var(--wire) 1px,transparent 1px);background-size:72px 72px;opacity:.5"></div>
+
+        <!-- Photo -->
+        <div class="absolute inset-0 pointer-events-none" style="mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.15) 30%,rgba(0,0,0,.15) 70%,transparent 100%)">
+            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=60&w=1800" class="w-full h-full object-cover" style="filter:grayscale(1);opacity:.12" alt="" />
         </div>
-        <div class="p-5">
-          <h3 class="display font-bold uppercase text-sm tracking-tight leading-tight text-white mb-2">Student Housing Crisis: Exposing DU's Hidden Rental Racket</h3>
-          <p class="text-zinc-600 text-xs leading-relaxed mb-4">Skyrocketing PG rents and exploitative landlords exposed by students who lived it.</p>
-          <div class="flex items-center justify-between">
-            <span class="label">Riya Sen · DU</span>
-            <span class="label">84.2K Views</span>
-          </div>
-        </div>
-      </div>
+        <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(to bottom, transparent 60%, var(--ink) 100%)"></div>
 
-      <div class="story-card reveal d1 group">
-        <div class="relative overflow-hidden" style="aspect-ratio:16/9">
-          <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=600" class="story-thumb w-full h-full object-cover" style="opacity:.6" alt=""/>
-          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div class="w-11 h-11 bg-blue-700 flex items-center justify-center"><svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></div>
-          </div>
-          <div class="absolute top-3 left-3"><span class="badge badge-green">Interview</span></div>
-          <div class="absolute bottom-2 right-2 text-xs font-bold text-white px-1.5 py-0.5" style="background:rgba(0,0,0,.6)">17:32</div>
-        </div>
-        <div class="p-5">
-          <h3 class="display font-bold uppercase text-sm tracking-tight leading-tight text-white mb-2">Gen Z & Politics: India's Youngest Grassroots Campaigners</h3>
-          <p class="text-zinc-600 text-xs leading-relaxed mb-4">Sitting with the 22-year-olds rewriting the playbook of political participation.</p>
-          <div class="flex items-center justify-between">
-            <span class="label">Kaveri Nair · NLSIU</span>
-            <span class="label">51.8K Views</span>
-          </div>
-        </div>
-      </div>
+        <!-- Content -->
+        <div class="relative z-10 flex-1 flex items-center">
+            <div class="max-w-screen-xl mx-auto w-full px-6 py-24">
 
-      <div class="story-card reveal d2 group">
-        <div class="relative overflow-hidden" style="aspect-ratio:16/9">
-          <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=600" class="story-thumb w-full h-full object-cover" style="opacity:.55" alt=""/>
-          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div class="w-11 h-11 bg-blue-700 flex items-center justify-center"><svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></div>
-          </div>
-          <div class="absolute top-3 left-3"><span class="badge badge-purple">Explainer</span></div>
-          <div class="absolute bottom-2 right-2 text-xs font-bold text-white px-1.5 py-0.5" style="background:rgba(0,0,0,.6)">08:55</div>
-        </div>
-        <div class="p-5">
-          <h3 class="display font-bold uppercase text-sm tracking-tight leading-tight text-white mb-2">AI in Indian Education: Promise or Privilege?</h3>
-          <p class="text-zinc-600 text-xs leading-relaxed mb-4">How AI tools are widening — not closing — the gap between elite and state-run institutions.</p>
-          <div class="flex items-center justify-between">
-            <span class="label">Aryan Mehta · IIT-B</span>
-            <span class="label">39.1K Views</span>
-          </div>
-        </div>
-      </div>
-    </div>
+                <div class="max-w-4xl">
+                    <!-- Eyebrow -->
+                    <div class="reveal flex items-center gap-3 mb-10">
+                        <span class="live-dot w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
+                        <span class="label" style="color:#5b85f5;letter-spacing:.2em">India's Youth Media Network · Est. 2024</span>
+                    </div>
 
-    <!-- 2 horizontal -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="story-card reveal group flex gap-0 overflow-hidden">
-        <div class="w-28 flex-shrink-0 relative overflow-hidden" style="min-height:90px">
-          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=200" class="story-thumb w-full h-full object-cover" style="opacity:.55" alt=""/>
-        </div>
-        <div class="p-4 flex flex-col justify-between flex-1">
-          <div>
-            <span class="badge badge-orange mb-2 inline-block">Mental Health</span>
-            <h4 class="display font-bold uppercase text-xs tracking-tight leading-tight text-white">The Invisible Crisis: Campus Mental Health in India</h4>
-          </div>
-          <div class="label mt-2">Rohan Das · BITS · 71K views</div>
-        </div>
-      </div>
-      <div class="story-card reveal d1 group flex gap-0 overflow-hidden">
-        <div class="w-28 flex-shrink-0 relative overflow-hidden" style="min-height:90px">
-          <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=200" class="story-thumb w-full h-full object-cover" style="opacity:.55" alt=""/>
-        </div>
-        <div class="p-4 flex flex-col justify-between flex-1">
-          <div>
-            <span class="badge badge-green mb-2 inline-block">Environment</span>
-            <h4 class="display font-bold uppercase text-xs tracking-tight leading-tight text-white">India's Climate Migrants: Voices from the Flood Plains</h4>
-          </div>
-          <div class="label mt-2">Fatima Sheikh · AMU · 63K views</div>
-        </div>
-      </div>
-    </div>
+                    <!-- Headline -->
+                    <h1 class="hero-title reveal d1 mb-6">
+                        WEVOX<br>
+                        <span class="serif" style="color:#5b85f5;font-weight:400;font-size:.7em;letter-spacing:-.01em;font-style:italic">Voice of Young India.</span>
+                    </h1>
 
-  </div>
-</section>
+                    <!-- Sub -->
+                    <p class="reveal d2 text-zinc-400 text-lg leading-relaxed max-w-xl mb-8" style="font-weight:300">
+                        A youth-powered media community focused on real stories, public voices, and ground-level reporting. From campuses to communities, WEVOX connects the next generation through meaningful conversations and authentic storytelling.
+                    </p>
 
+                    <!-- CTAs -->
+                    <div class="reveal d3 flex flex-wrap gap-4 mb-20">
+                        <a href="join.html" class="btn-primary">Join Community <span>→</span></a>
+                        <a href="#trending" class="btn-ghost">Explore Stories</a>
+                    </div>
 
-<!-- ═══════════════════════════════════════════
-  COMMUNITY
-═══════════════════════════════════════════ -->
-<section id="community" class="py-24 md:py-36 px-6" style="background:var(--paper)">
-  <div class="max-w-screen-xl mx-auto">
+                    <!-- Stats -->
+                    <div class="reveal d4">
+                        <div class="rule mb-8"></div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            <div>
+                                <div class="stat-val text-white">5K+</div>
+                                <div class="label mt-2">Student Reporters</div>
+                            </div>
+                            <div>
+                                <div class="stat-val text-white">200+</div>
+                                <div class="label mt-2">Colleges Covered</div>
+                            </div>
+                            <div>
+                                <div class="stat-val text-white">1.2M</div>
+                                <div class="label mt-2">Monthly Readers</div>
+                            </div>
+                            <div>
+                                <div class="stat-val text-white">18</div>
+                                <div class="label mt-2">States & UTs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 items-end">
-      <div class="reveal">
-        <div class="label mb-4">For Creators & Journalists</div>
-        <h2 class="section-title text-white">Built for<br/><em class="serif" style="color:#5b85f5">young creators.</em></h2>
-      </div>
-      <div class="reveal d1">
-        <p class="text-zinc-500 text-base leading-relaxed" style="font-weight:300">
-          Join 5,000+ student journalists and storytellers from across India in a network that actually helps you grow — from campus to national platform.
-        </p>
-      </div>
-    </div>
-
-    <!-- Benefits -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
-      <div class="benefit-card reveal">
-        <div class="benefit-num">01</div>
-        <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <h4 class="display font-bold text-sm uppercase tracking-tight text-white mb-3">Mentorship</h4>
-        <p class="text-zinc-600 text-sm leading-relaxed">Direct 1-on-1 sessions with journalists from The Hindu, NDTV, Al Jazeera, and more.</p>
-      </div>
-      <div class="benefit-card reveal d1">
-        <div class="benefit-num">02</div>
-        <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        <h4 class="display font-bold text-sm uppercase tracking-tight text-white mb-3">Internships</h4>
-        <p class="text-zinc-600 text-sm leading-relaxed">Exclusive access to paid media internships and editorial fellowships at partner organisations.</p>
-      </div>
-      <div class="benefit-card reveal d2">
-        <div class="benefit-num">03</div>
-        <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        <h4 class="display font-bold text-sm uppercase tracking-tight text-white mb-3">Publishing</h4>
-        <p class="text-zinc-600 text-sm leading-relaxed">Get your stories seen by millions via multi-channel distribution across web, video, and social.</p>
-      </div>
-      <div class="benefit-card reveal d3">
-        <div class="benefit-num">04</div>
-        <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        <h4 class="display font-bold text-sm uppercase tracking-tight text-white mb-3">Networking</h4>
-        <p class="text-zinc-600 text-sm leading-relaxed">Collaborate with fellow creators across 18 states on high-impact cross-campus investigations.</p>
-      </div>
-    </div>
-
-    <!-- Testimonials -->
-    <div class="rule mb-12"></div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="reveal" style="border-left:2px solid var(--blue);padding-left:24px">
-        <p class="text-zinc-400 text-sm leading-relaxed italic mb-4">"Yuvox gave me a platform before any newsroom would. My report on farmer distress in Vidarbha reached 2 lakh people."</p>
-        <div class="label">Priya R. · Delhi University · 3rd Year</div>
-      </div>
-      <div class="reveal d1" style="border-left:2px solid var(--blue);padding-left:24px">
-        <p class="text-zinc-400 text-sm leading-relaxed italic mb-4">"The mentorship sessions are unreal. I got editorial feedback from a senior journalist at Scroll.in on my very first article."</p>
-        <div class="label">Siddharth K. · NLSIU Bengaluru · LLB</div>
-      </div>
-      <div class="reveal d2" style="border-left:2px solid var(--blue);padding-left:24px">
-        <p class="text-zinc-400 text-sm leading-relaxed italic mb-4">"I went from campus reporter to a paid intern at a national publication in 4 months — purely through Yuvox."</p>
-        <div class="label">Neha M. · Miranda House · Journalism</div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════
-  CAMPUS REPORTER PROGRAM
-═══════════════════════════════════════════ -->
-<section id="campus" class="py-24 md:py-36 px-6 blue-strip relative overflow-hidden">
-
-  <!-- Big watermark -->
-  <div class="absolute right-0 bottom-0 pointer-events-none select-none overflow-hidden">
-    <span class="display font-bold text-white uppercase" style="font-size:clamp(8rem,20vw,18rem);line-height:.85;opacity:.05;display:block;transform:translate(5%,15%)">REPORTER</span>
-  </div>
-
-  <div class="max-w-screen-xl mx-auto relative z-10">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-
-      <!-- Info -->
-      <div class="reveal">
-        <div class="label mb-5" style="color:rgba(255,255,255,.45)">Campus Reporter Program</div>
-        <h2 class="display font-bold uppercase tracking-tight leading-tight text-white mb-6"
-            style="font-size:clamp(2.5rem,6vw,4.5rem)">
-          Become a<br/>Campus Reporter.
-        </h2>
-        <p class="text-blue-200 text-lg leading-relaxed mb-10" style="font-weight:300">
-          Represent your institution on a national stage. Report on campus life, social issues, and student achievements — and build a career doing it.
-        </p>
-
-        <div class="space-y-3 mb-12">
-          <div class="flex items-center gap-4 p-4" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">
-            <span class="display font-bold text-blue-200 w-6 flex-shrink-0 text-sm">01</span>
-            <div>
-              <div class="font-semibold text-white text-sm mb-0.5">Official Press Credentials</div>
-              <div class="text-blue-300 text-xs" style="font-weight:300">Yuvox Press ID recognised by student unions and campus administrations</div>
             </div>
-          </div>
-          <div class="flex items-center gap-4 p-4" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">
-            <span class="display font-bold text-blue-200 w-6 flex-shrink-0 text-sm">02</span>
-            <div>
-              <div class="font-semibold text-white text-sm mb-0.5">Production Equipment Support</div>
-              <div class="text-blue-300 text-xs" style="font-weight:300">Borrow cameras, mics, and editing tools from our regional resource hubs</div>
-            </div>
-          </div>
-          <div class="flex items-center gap-4 p-4" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">
-            <span class="display font-bold text-blue-200 w-6 flex-shrink-0 text-sm">03</span>
-            <div>
-              <div class="font-semibold text-white text-sm mb-0.5">National Spotlight Features</div>
-              <div class="text-blue-300 text-xs" style="font-weight:300">Best campus stories get cross-promoted across all Yuvox channels and partners</div>
-            </div>
-          </div>
-          <div class="flex items-center gap-4 p-4" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">
-            <span class="display font-bold text-blue-200 w-6 flex-shrink-0 text-sm">04</span>
-            <div>
-              <div class="font-semibold text-white text-sm mb-0.5">Editorial Training Bootcamp</div>
-              <div class="text-blue-300 text-xs" style="font-weight:300">Monthly intensive workshops on investigative journalism, video reporting, and ethics</div>
-            </div>
-          </div>
         </div>
 
-        <div class="flex gap-10">
-          <div><div class="display font-bold text-3xl text-white">200+</div><div class="label mt-1" style="color:rgba(255,255,255,.4)">Active Reporters</div></div>
-          <div><div class="display font-bold text-3xl text-white">18</div><div class="label mt-1" style="color:rgba(255,255,255,.4)">States</div></div>
-          <div><div class="display font-bold text-3xl text-white">92%</div><div class="label mt-1" style="color:rgba(255,255,255,.4)">Placement Rate</div></div>
-        </div>
-      </div>
-
-      <!-- Form -->
-      <div class="reveal d1" style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);padding:40px">
-        <div class="label mb-6" style="color:rgba(255,255,255,.4)">Apply for the Program</div>
-
-        <form class="space-y-4" onsubmit="handleApply(event)">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-medium text-blue-200 mb-1.5" style="letter-spacing:.06em">First Name</label>
-              <input type="text" class="field" placeholder="Priya"/>
+        <!-- Scroll cue -->
+        <div class="relative z-10 pb-10 flex justify-center">
+            <div class="flex flex-col items-center gap-2 opacity-30 animate-bounce">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
-            <div>
-              <label class="block text-xs font-medium text-blue-200 mb-1.5" style="letter-spacing:.06em">Last Name</label>
-              <input type="text" class="field" placeholder="Raghavan"/>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-blue-200 mb-1.5" style="letter-spacing:.06em">University / College</label>
-            <input type="text" class="field" placeholder="Delhi University"/>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-blue-200 mb-1.5" style="letter-spacing:.06em">Email Address</label>
-            <input type="email" class="field" placeholder="priya@college.edu"/>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-blue-200 mb-1.5" style="letter-spacing:.06em">City & State</label>
-            <input type="text" class="field" placeholder="New Delhi, Delhi"/>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-blue-200 mb-1.5" style="letter-spacing:.06em">Focus Area</label>
-            <select class="field">
-              <option value="">Select your interest</option>
-              <option>Investigative Journalism</option>
-              <option>Video Reporting</option>
-              <option>Campus News</option>
-              <option>Social Issues</option>
-              <option>Documentary</option>
-              <option>Photography</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-blue-200 mb-1.5" style="letter-spacing:.06em">Why Yuvox? (100 words)</label>
-            <textarea rows="3" class="field" style="resize:none" placeholder="Tell us why you want to be a campus reporter…"></textarea>
-          </div>
-          <button type="submit" class="w-full py-4 bg-white text-blue-700 font-bold text-sm tracking-widest uppercase hover:bg-blue-50 transition-colors" style="letter-spacing:.12em">
-            Submit Application →
-          </button>
-        </form>
-
-        <div id="apply-ok" class="hidden mt-4 py-3 text-center text-xs font-medium tracking-widest uppercase" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#6ee7b7">
-          ✓ Application received — we'll be in touch within 72 hours.
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
 
-<!-- ═══════════════════════════════════════════
-  EVENTS
-═══════════════════════════════════════════ -->
-  <section id="events" class="py-24 md:py-36 px-6" style="background:var(--cream)">
-  <div class="max-w-screen-xl mx-auto">
-
-    <div class="flex items-end justify-between mb-12 reveal">
-      <div>
-        <div class="label mb-4">Events & Meetups</div>
-        <h2 class="section-title text-white">Where India's<br/><em class="serif" style="color:#5b85f5">Young Press Meets.</em></h2>
-      </div>
-      <a href="#" class="text-xs font-medium text-blue-400 hover:text-blue-300 tracking-widest uppercase hide-sm">All Events →</a>
+    <!-- TICKER -->
+    <div class="ticker-wrap overflow-hidden border-y py-3" style="border-color:var(--wire);background:var(--ink-2)">
+        <div class="ticker-track">
+            <div class="flex items-center gap-0 whitespace-nowrap text-zinc-600" style="font-size:11px;font-weight:500;letter-spacing:.13em">
+                <span class="px-8 border-r" style="border-color:var(--wire)">GROUND REPORTING</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">STUDENT JOURNALISM</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">DOCUMENTARY STORYTELLING</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">CREATOR COLLABORATION</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">CAMPUS MEDIA</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">YOUTH VOICES</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">BHARAT KI AWAZ</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">REAL-TIME FIELD REPORTING</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">GROUND REPORTING</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">STUDENT JOURNALISM</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">DOCUMENTARY STORYTELLING</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">CREATOR COLLABORATION</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">CAMPUS MEDIA</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">YOUTH VOICES</span>
+                <span class="px-8 border-r" style="border-color:var(--wire)">BHARAT KI AWAZ</span>
+                <span class="px-8" style="">REAL-TIME FIELD REPORTING</span>
+            </div>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-      <!-- Featured event -->
-      <div class="event-card reveal lg:row-span-2">
-        <div class="blue-strip p-6 relative overflow-hidden">
-          <div class="display font-bold text-white opacity-10 pointer-events-none select-none absolute right-4 bottom-0" style="font-size:8rem;line-height:.8;transform:translateY(20%)">22</div>
-          <div class="relative z-10">
-            <div class="label mb-3" style="color:rgba(255,255,255,.45)">Featured · In-Person</div>
-            <div class="display font-bold text-6xl text-white leading-none">22</div>
-            <div class="label mt-2" style="color:rgba(255,255,255,.55)">May 2025</div>
-          </div>
-        </div>
-        <div class="p-6 flex flex-col flex-1">
-          <h3 class="display font-bold uppercase text-base tracking-tight text-white mb-3">Campus Press Freedom Summit 2025</h3>
-          <p class="text-zinc-600 text-sm leading-relaxed mb-5">Two days of workshops, panels, and networking with 300+ student journalists from across India.</p>
-          <div class="space-y-2 mb-6">
-            <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></span><span class="label">India Habitat Centre, New Delhi</span></div>
-            <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></span><span class="label">10:00 AM – 6:00 PM · 2 Days</span></div>
-            <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0"></span><span class="label" style="color:#6ee7b7">Free Entry · Limited Seats</span></div>
-          </div>
-          <button class="w-full py-3 mt-auto font-semibold text-xs tracking-widest uppercase border transition-colors" style="border-color:rgba(29,78,216,.4);color:#93b4ff;background:rgba(29,78,216,.08);" onmouseover="this.style.background='rgba(29,78,216,.18)'" onmouseout="this.style.background='rgba(29,78,216,.08)'">
-            Register Now →
-          </button>
-        </div>
-      </div>
+    <!-- ═══════════════════════════════════════════
+    MORE THAN MEDIA
+    ═══════════════════════════════════════════ -->
+    <section id="more" class="section-light py-24 md:py-36 px-6">
+        <div class="max-w-screen-xl mx-auto">
 
-      <!-- Event 2 -->
-      <div class="event-card reveal d1">
-        <div class="p-5 border-b" style="border-color:var(--wire);display:flex;align-items:center;gap:16px">
-          <div class="text-center border p-2.5 flex-shrink-0" style="border-color:var(--wire);width:52px">
-            <div class="label" style="font-size:9px">JUN</div>
-            <div class="display font-bold text-2xl text-white leading-tight">07</div>
-          </div>
-          <span class="badge badge-green">Online · Free</span>
-        </div>
-        <div class="p-5">
-          <h3 class="display font-bold uppercase text-sm tracking-tight text-white mb-2">Investigative Journalism Masterclass</h3>
-          <p class="text-zinc-600 text-xs leading-relaxed mb-4">RTI filing, source protection, digital verification — with a senior journalist from The Wire.</p>
-          <div class="space-y-1.5 mb-5">
-            <div class="label">📍 Zoom · Virtual</div>
-            <div class="label">⏰ 3:00 PM – 5:30 PM IST</div>
-          </div>
-          <button class="w-full py-2.5 text-xs font-semibold tracking-widest uppercase border transition-colors" style="border-color:rgba(16,185,129,.35);color:#6ee7b7;background:rgba(16,185,129,.08)" onmouseover="this.style.background='rgba(16,185,129,.16)'" onmouseout="this.style.background='rgba(16,185,129,.08)'">Join for Free →</button>
-        </div>
-      </div>
-
-      <!-- Event 3 -->
-      <div class="event-card reveal d2">
-        <div class="p-5 border-b" style="border-color:var(--wire);display:flex;align-items:center;gap:16px">
-          <div class="text-center border p-2.5 flex-shrink-0" style="border-color:var(--wire);width:52px">
-            <div class="label" style="font-size:9px">JUN</div>
-            <div class="display font-bold text-2xl text-white leading-tight">20</div>
-          </div>
-          <span class="badge badge-orange">Awards Night</span>
-        </div>
-        <div class="p-5">
-          <h3 class="display font-bold uppercase text-sm tracking-tight text-white mb-2">Yuvox Annual Student Media Awards</h3>
-          <p class="text-zinc-600 text-xs leading-relaxed mb-4">India's only national awards for student journalism, documentary, and campus media excellence.</p>
-          <div class="space-y-1.5 mb-5">
-            <div class="label">📍 YMCA Auditorium, Mumbai</div>
-            <div class="label">⏰ 7:00 PM Onwards · 12 Categories</div>
-          </div>
-          <button class="w-full py-2.5 text-xs font-semibold tracking-widest uppercase border transition-colors" style="border-color:rgba(234,88,12,.35);color:#fdba74;background:rgba(234,88,12,.08)" onmouseover="this.style.background='rgba(234,88,12,.16)'" onmouseout="this.style.background='rgba(234,88,12,.08)'">Nominate / Attend →</button>
-        </div>
-      </div>
-
-      <!-- Hackathon: full width -->
-      <div class="event-card reveal md:col-span-2 flex overflow-hidden">
-        <div class="w-24 flex-shrink-0 border-r flex flex-col items-center justify-center p-4" style="border-color:var(--wire);background:var(--ink-3)">
-          <div class="label" style="font-size:9px;margin-bottom:4px">JUL</div>
-          <div class="display font-bold text-4xl text-white leading-none">12</div>
-        </div>
-        <div class="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 flex-1">
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <span class="badge badge-purple">Hackathon · 48 Hrs</span>
-              <span class="label">Hybrid Event</span>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16 items-start">
+                <div class="reveal">
+                    <div class="label-dark mb-6">More Than Media</div>
+                    <h2 class="section-title leading-tight">
+                        WEVOX is a growing<br />journalism community.
+                    </h2>
+                </div>
+                <div class="reveal d1 flex flex-col justify-end">
+                    <p class="text-lg leading-relaxed mb-4" style="font-weight:300;color:#3a3a3a;">
+                        Where young voices, campus stories, and public conversations come together. We believe stories from the ground deserve attention, awareness, and impact.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 mt-2">
+                        <span class="text-sm font-medium" style="color:#0C0C0D;">Real voices.</span>
+                        <span class="text-sm font-medium" style="color:#0C0C0D;">Real stories.</span>
+                        <span class="text-sm font-medium" style="color:#0C0C0D;">Real conversations.</span>
+                    </div>
+                </div>
             </div>
-            <h3 class="display font-bold uppercase text-sm tracking-tight text-white mb-1">YuvHack 2025: Build the Future of Indian Media</h3>
-            <p class="text-zinc-600 text-xs leading-relaxed">A 48-hour journalism + tech hackathon. Build tools for fact-checking, vernacular reporting, or student media monetisation.</p>
-          </div>
-          <button class="flex-shrink-0 py-2.5 px-5 text-xs font-semibold tracking-widest uppercase border transition-colors" style="border-color:rgba(124,58,237,.4);color:#c4b5fd;background:rgba(124,58,237,.1);white-space:nowrap" onmouseover="this.style.background='rgba(124,58,237,.2)'" onmouseout="this.style.background='rgba(124,58,237,.1)'">Register Team →</button>
-        </div>
-      </div>
-    </div>
 
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════
-  NEWSLETTER
-═══════════════════════════════════════════ -->
-<section class="py-20 px-6" style="background:var(--mist)">
-  <div class="max-w-2xl mx-auto text-center reveal">
-    <div class="label-dark mb-5">Weekly Brief</div>
-    <h2 class="section-title mb-4" style="color:var(--ink)">Don't miss<br/>the next story.</h2>
-    <p class="text-zinc-500 mb-8 text-sm" style="font-weight:300">India's best student journalism, curated and delivered every Monday.</p>
-    <form class="flex flex-col sm:flex-row gap-0 max-w-md mx-auto" onsubmit="handleNL(event)">
-      <input type="email" required placeholder="your@email.com"
-             class="flex-1 px-5 py-4 text-sm bg-white border border-zinc-300 border-r-0 focus:outline-none focus:border-blue-500 transition-colors" style="color:var(--ink)"/>
-      <button type="submit" class="btn-dark px-7 py-4 text-xs whitespace-nowrap">Subscribe →</button>
-    </form>
-    <div id="nl-ok" class="hidden mt-4 text-xs font-medium" style="color:#059669;letter-spacing:.08em">✓ You're subscribed. Welcome to Yuvox.</div>
-    <p class="text-zinc-400 text-xs mt-3">5,000+ journalists already subscribed. No spam, ever.</p>
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════
-  FOOTER
-═══════════════════════════════════════════ -->
-<footer class="px-6 pt-20 pb-10 border-t border-black/10" style="background:var(--paper)">
-
-  <div class="max-w-screen-xl mx-auto">
-
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-14 mb-20">
-
-      <!-- Brand -->
-      <div class="md:col-span-2">
-
-        <div class="flex items-center gap-3 mb-6">
-
-          <div class="w-8 h-8 bg-blue-700 flex items-center justify-center rounded-sm">
-            <span class="display font-bold text-white text-sm">Y</span>
-          </div>
-
-          <span class="display text-2xl text-black">
-            Yuvox
-          </span>
+            <hr class="rule-dark" />
 
         </div>
+    </section>
 
-        <p class="text-sm leading-relaxed mb-8 max-w-sm text-zinc-600" style="font-weight:400">
 
-          India's youth-driven journalism and storytelling network —
-          building the next generation of reporters, filmmakers,
-          investigators, and truth-seekers.
+    <!-- ═══════════════════════════════════════════
+    TRENDING STORIES
+    ═══════════════════════════════════════════ -->
+    <section id="trending" class="section-cream py-24 md:py-36 px-6">
+        <div class="max-w-screen-xl mx-auto">
 
-        </p>
+            <div class="flex items-end justify-between mb-12 reveal">
+                <div>
+                    <div class="label-dark mb-4">Trending Stories</div>
+                    <h2 class="section-title">Stories that<br /><em class="serif" style="color:#1D4ED8;font-style:italic;">the mainstream missed.</em></h2>
+                </div>
+            </div>
 
-        <!-- Social Icons -->
-        <div class="flex items-center gap-3">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          <a href="#"
-             class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
+                <!-- Left: Featured trending -->
+                <div class="lg:col-span-1 reveal">
+                    <div class="bg-white border border-black/10 p-6 shadow-sm" style="box-shadow:0 10px 30px rgba(0,0,0,0.04);">
+                        <div class="label-dark mb-6">Top Stories</div>
+                        <div class="trending-item">
+                            <span class="trending-number">01</span>
+                            <div>
+                                <h4>Voices From Small Town India</h4>
+                                <p class="text-xs" style="color:#6a6a6a;">Ground reports from beyond the metros</p>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-number">02</span>
+                            <div>
+                                <h4>Student Life Beyond Headlines</h4>
+                                <p class="text-xs" style="color:#6a6a6a;">The real campus experience</p>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-number">03</span>
+                            <div>
+                                <h4>Ground Reports From Communities</h4>
+                                <p class="text-xs" style="color:#6a6a6a;">Stories from the streets and villages</p>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-number">04</span>
+                            <div>
+                                <h4>Youth Conversations That Matter</h4>
+                                <p class="text-xs" style="color:#6a6a6a;">Unfiltered voices of young India</p>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-number">05</span>
+                            <div>
+                                <h4>Stories The Mainstream Missed</h4>
+                                <p class="text-xs" style="color:#6a6a6a;">Investigative deep-dives and untold narratives</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
-            </svg>
+                <!-- Right: featured story card -->
+                <div class="lg:col-span-2 reveal d1">
+                    <div class="story-card" style="background:white;border-color:rgba(0,0,0,0.08);">
+                        <div class="relative overflow-hidden" style="aspect-ratio:16/9;">
+                            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=900" class="story-thumb w-full h-full object-cover" style="opacity:.6" alt="" />
+                            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.4), transparent 50%);"></div>
+                            <div class="absolute bottom-4 left-4 right-4">
+                                <span class="badge badge-blue mb-2 inline-block">Editor's Pick</span>
+                                <h3 class="display font-bold text-white text-xl md:text-2xl leading-tight">The Digital Divide: Rural Classrooms After the Pandemic</h3>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-sm leading-relaxed" style="color:#4a4a4a;">Students in Jharkhand, Bihar, and UP navigate shattered digital education promises. Yuvox reporters spent 3 weeks embedded in 7 villages.</p>
+                            <div class="flex items-center justify-between mt-4">
+                                <span class="label-dark">Ananya Krishnan · IIT Delhi</span>
+                                <span class="label-dark">142K Views</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-          </a>
-
-          <a href="#"
-             class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
-
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
-            </svg>
-
-          </a>
-
-          <a href="#"
-             class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
-
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286z"/>
-            </svg>
-
-          </a>
+            </div>
 
         </div>
+    </section>
 
-      </div>
 
-      <!-- Platform -->
-      <div>
+    <!-- ═══════════════════════════════════════════
+    BUILT BY COMMUNITY
+    ═══════════════════════════════════════════ -->
+    <section id="community" class="section-light py-24 md:py-36 px-6">
+        <div class="max-w-screen-xl mx-auto">
 
-        <div class="label mb-5 text-black">
-          Platform
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 items-end">
+                <div class="reveal">
+                    <div class="label-dark mb-4">Built By The Community</div>
+                    <h2 class="section-title leading-tight">
+                        Powered by students,<br /><em class="serif" style="color:#1D4ED8;font-style:italic;">young reporters &amp; storytellers.</em>
+                    </h2>
+                </div>
+                <div class="reveal d1">
+                    <p class="text-base leading-relaxed" style="font-weight:300;color:#3a3a3a;">
+                        Who believe journalism should be authentic, fearless, and accessible. Together, we are building a new generation media movement.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="benefit-card reveal">
+                    <div class="benefit-num">01</div>
+                    <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    <h4 class="display font-bold text-sm uppercase tracking-tight text-black mb-3">Student-Led</h4>
+                    <p class="text-sm leading-relaxed" style="color:#4a4a4a;">Every story starts with a student reporter on the ground — no corporate filters, just real voices.</p>
+                </div>
+                <div class="benefit-card reveal d1">
+                    <div class="benefit-num">02</div>
+                    <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <h4 class="display font-bold text-sm uppercase tracking-tight text-black mb-3">Fearless</h4>
+                    <p class="text-sm leading-relaxed" style="color:#4a4a4a;">We don't shy away from hard truths. Investigative, honest, and always grounded in the community.</p>
+                </div>
+                <div class="benefit-card reveal d2">
+                    <div class="benefit-num">03</div>
+                    <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <h4 class="display font-bold text-sm uppercase tracking-tight text-black mb-3">Accessible</h4>
+                    <p class="text-sm leading-relaxed" style="color:#4a4a4a;">News for everyone, by everyone. No paywalls, no jargon — just stories that reach the people.</p>
+                </div>
+                <div class="benefit-card reveal d3">
+                    <div class="benefit-num">04</div>
+                    <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                    <h4 class="display font-bold text-sm uppercase tracking-tight text-black mb-3">Community-First</h4>
+                    <p class="text-sm leading-relaxed" style="color:#4a4a4a;">We listen, report, and reflect what matters to the communities we serve — not what trends on a dashboard.</p>
+                </div>
+            </div>
+
         </div>
+    </section>
 
-        <ul class="space-y-3 text-sm text-zinc-600">
 
-          <li>
-            <a href="#stories" class="hover:text-blue-700 transition-colors">
-              Featured Stories
-            </a>
-          </li>
+    <!-- ═══════════════════════════════════════════
+    CREATOR SPOTLIGHT
+    ═══════════════════════════════════════════ -->
+    <section id="spotlight" class="section-cream py-24 md:py-36 px-6">
+        <div class="max-w-screen-xl mx-auto">
 
-          <li>
-            <a href="#" class="hover:text-blue-700 transition-colors">
-              Documentaries
-            </a>
-          </li>
+            <div class="flex items-end justify-between mb-12 reveal">
+                <div>
+                    <div class="label-dark mb-4">Creator Spotlight</div>
+                    <h2 class="section-title">Celebrating<br /><em class="serif" style="color:#1D4ED8;font-style:italic;">the voices that matter.</em></h2>
+                </div>
+            </div>
 
-          <li>
-            <a href="#" class="hover:text-blue-700 transition-colors">
-              Campus Reports
-            </a>
-          </li>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-          <li>
-            <a href="#" class="hover:text-blue-700 transition-colors">
-              Interviews
-            </a>
-          </li>
+                <div class="spotlight-card reveal">
+                    <span class="emoji-big">🏆</span>
+                    <h4>Top Reporter Of The Week</h4>
+                    <p>Pragya Sharma · DU</p>
+                    <span class="label-dark mt-2 inline-block" style="font-size:10px;">128K Views · 32 Reports</span>
+                </div>
 
-        </ul>
+                <div class="spotlight-card reveal d1">
+                    <span class="emoji-big">🌟</span>
+                    <h4>Rising Voice</h4>
+                    <p>Arjun Mehta · IIT-B</p>
+                    <span class="label-dark mt-2 inline-block" style="font-size:10px;">Featured in 5 national outlets</span>
+                </div>
 
-      </div>
+                <div class="spotlight-card reveal d2">
+                    <span class="emoji-big">🔥</span>
+                    <h4>Most Viewed Story</h4>
+                    <p>"The Invisible Crisis"</p>
+                    <span class="label-dark mt-2 inline-block" style="font-size:10px;">2.3M Views · 14K Shares</span>
+                </div>
 
-      <!-- Community -->
-      <div>
+                <div class="spotlight-card reveal d3">
+                    <span class="emoji-big">🤝</span>
+                    <h4>Community Contributor</h4>
+                    <p>Fatima Sheikh · AMU</p>
+                    <span class="label-dark mt-2 inline-block" style="font-size:10px;">50+ stories · 6 awards</span>
+                </div>
 
-        <div class="label mb-5 text-black">
-          Community
+            </div>
+
         </div>
+    </section>
 
-        <ul class="space-y-3 text-sm text-zinc-600">
 
-          <li>
-            <a href="#campus" class="hover:text-blue-700 transition-colors">
-              Reporter Program
-            </a>
-          </li>
+    <!-- ═══════════════════════════════════════════
+    JOIN THE MOVEMENT
+    ═══════════════════════════════════════════ -->
+    <section id="movement" class="section-light py-24 md:py-36 px-6">
+        <div class="max-w-screen-xl mx-auto">
 
-          <li>
-            <a href="#community" class="hover:text-blue-700 transition-colors">
-              Mentorship
-            </a>
-          </li>
+            <div class="movement-cta reveal">
+                <div class="label mb-4" style="color:rgba(255,255,255,0.35);">Join The Movement</div>
+                <h2>WEVOX is more than content.</h2>
+                <p>
+                    It is a growing public media community built around awareness, storytelling, and youth voices shaping the future.
+                </p>
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <a href="join.html" class="btn-primary">Become a Reporter →</a>
+                    <a href="#trending" class="btn-ghost">Explore Stories</a>
+                </div>
+                <div class="flex items-center justify-center gap-8 mt-8">
+                    <div><span class="stat-val text-white" style="font-size:2rem;">5K+</span><div class="label mt-1" style="color:rgba(255,255,255,0.3);">Community Members</div></div>
+                    <div><span class="stat-val text-white" style="font-size:2rem;">200+</span><div class="label mt-1" style="color:rgba(255,255,255,0.3);">Campuses</div></div>
+                    <div><span class="stat-val text-white" style="font-size:2rem;">18</span><div class="label mt-1" style="color:rgba(255,255,255,0.3);">States</div></div>
+                </div>
+            </div>
 
-          <li>
-            <a href="#events" class="hover:text-blue-700 transition-colors">
-              Events
-            </a>
-          </li>
-
-        </ul>
-
-      </div>
-
-      <!-- Company -->
-      <div>
-
-        <div class="label mb-5 text-black">
-          Company
         </div>
+    </section>
 
-        <ul class="space-y-3 text-sm text-zinc-600">
 
-          <li>
-            <a href="#about" class="hover:text-blue-700 transition-colors">
-              About
-            </a>
-          </li>
+    <!-- ═══════════════════════════════════════════
+    NEWSLETTER
+    ═══════════════════════════════════════════ -->
+    <section class="py-20 px-6" style="background:#FAF8F3;">
+        <div class="max-w-2xl mx-auto text-center reveal">
+            <div class="label-dark mb-5">Weekly Brief</div>
+            <h2 class="section-title mb-4" style="color:var(--ink)">Don't miss<br />the next story.</h2>
+            <p class="text-zinc-500 mb-8 text-sm" style="font-weight:300">India's best student journalism, curated and delivered every Monday.</p>
+            <form class="flex flex-col sm:flex-row gap-0 max-w-md mx-auto" onsubmit="handleNL(event)">
+                <input type="email" required placeholder="your@email.com" class="flex-1 px-5 py-4 text-sm bg-white border border-zinc-300 border-r-0 focus:outline-none focus:border-blue-500 transition-colors" style="color:var(--ink)" />
+                <button type="submit" class="btn-dark px-7 py-4 text-xs whitespace-nowrap">Subscribe →</button>
+            </form>
+            <div id="nl-ok" class="hidden mt-4 text-xs font-medium" style="color:#059669;letter-spacing:.08em">✓ You're subscribed. Welcome to Yuvox.</div>
+            <p class="text-zinc-400 text-xs mt-3">5,000+ journalists already subscribed. No spam, ever.</p>
+        </div>
+    </section>
 
-          <li>
-            <a href="#" class="hover:text-blue-700 transition-colors">
-              Editorial Policy
-            </a>
-          </li>
 
-          <li>
-            <a href="#" class="hover:text-blue-700 transition-colors">
-              Contact
-            </a>
-          </li>
+    <!-- ═══════════════════════════════════════════
+    FOOTER
+    ═══════════════════════════════════════════ -->
+    <footer class="px-6 pt-20 pb-10 border-t border-black/10" style="background:#FAF8F3;">
 
-        </ul>
+        <div class="max-w-screen-xl mx-auto">
 
-      </div>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-14 mb-20">
 
-    </div>
+                <!-- Brand -->
+                <div class="md:col-span-2">
 
-    <!-- Bottom -->
-    <div class="border-t border-black/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-5">
+                    <div class="flex items-center gap-3 mb-6">
 
-      <p class="text-xs tracking-wide text-zinc-500 uppercase">
+                        <div class="w-8 h-8 bg-blue-700 flex items-center justify-center rounded-sm">
+                            <span class="display font-bold text-white text-sm">Y</span>
+                        </div>
 
-        © 2025 Yuvox · Voices of Young India
+                        <span class="display text-2xl text-black">
+                            Yuvox
+                        </span>
 
-      </p>
+                    </div>
 
-      <div class="flex items-center gap-6 text-xs uppercase tracking-wide text-zinc-500">
+                    <p class="text-sm leading-relaxed mb-8 max-w-sm text-zinc-600" style="font-weight:400">
+                        India's youth-driven journalism and storytelling network — building the next generation of reporters, filmmakers, investigators, and truth-seekers.
+                    </p>
 
-        <a href="#" class="hover:text-blue-700 transition-colors">
-          Privacy
-        </a>
+                    <!-- Social Icons -->
+                    <div class="flex items-center gap-3">
 
-        <a href="#" class="hover:text-blue-700 transition-colors">
-          Terms
-        </a>
+                        <a href="#" class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" />
+                            </svg>
+                        </a>
 
-        <a href="#" class="hover:text-blue-700 transition-colors">
-          Cookies
-        </a>
+                        <a href="#" class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z" />
+                            </svg>
+                        </a>
 
-      </div>
+                        <a href="#" class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286z" />
+                            </svg>
+                        </a>
 
-    </div>
+                    </div>
 
-  </div>
+                </div>
 
-</footer>
-<!-- SCRIPTS -->
-<script>
-// Mobile menu
-function toggleMob(){
-  const m=document.getElementById('mob-menu');
-  const open=!m.classList.contains('translate-x-full');
-  m.classList.toggle('translate-x-full');
-}
+                <!-- Platform -->
+                <div>
+                    <div class="label-dark mb-5">Platform</div>
+                    <ul class="space-y-3 text-sm text-zinc-600">
+                        <li><a href="#trending" class="hover:text-blue-700 transition-colors">Trending Stories</a></li>
+                        <li><a href="#" class="hover:text-blue-700 transition-colors">Documentaries</a></li>
+                        <li><a href="#" class="hover:text-blue-700 transition-colors">Campus Reports</a></li>
+                        <li><a href="#" class="hover:text-blue-700 transition-colors">Interviews</a></li>
+                    </ul>
+                </div>
 
-// Form handlers
-function handleApply(e){
-  e.preventDefault();
-  const ok=document.getElementById('apply-ok');
-  ok.classList.remove('hidden');
-  e.target.reset();
-  setTimeout(()=>ok.classList.add('hidden'),7000);
-}
-function handleNL(e){
-  e.preventDefault();
-  const ok=document.getElementById('nl-ok');
-  ok.classList.remove('hidden');
-  e.target.reset();
-}
+                <!-- Community -->
+                <div>
+                    <div class="label-dark mb-5">Community</div>
+                    <ul class="space-y-3 text-sm text-zinc-600">
+                        <li><a href="#community" class="hover:text-blue-700 transition-colors">Reporter Program</a></li>
+                        <li><a href="#community" class="hover:text-blue-700 transition-colors">Mentorship</a></li>
+                        <li><a href="#spotlight" class="hover:text-blue-700 transition-colors">Spotlight</a></li>
+                    </ul>
+                </div>
 
-// Scroll reveal
-const observer=new IntersectionObserver((entries)=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      entry.target.classList.add('in');
-      observer.unobserve(entry.target);
-    }
-  });
-},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+                <!-- Company -->
+                <div>
+                    <div class="label-dark mb-5">Company</div>
+                    <ul class="space-y-3 text-sm text-zinc-600">
+                        <li><a href="#more" class="hover:text-blue-700 transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-blue-700 transition-colors">Editorial Policy</a></li>
+                        <li><a href="#" class="hover:text-blue-700 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
 
-document.querySelectorAll('.reveal,.reveal-r').forEach(el=>observer.observe(el));
+            </div>
 
-// Smooth nav active state
-const secs=document.querySelectorAll('section[id]');
-const links=document.querySelectorAll('nav a[href^="#"]');
-window.addEventListener('scroll',()=>{
-  let cur='';
-  secs.forEach(s=>{if(window.scrollY>=s.offsetTop-120)cur=s.id});
-  links.forEach(a=>{
-    const active=a.getAttribute('href')==='#'+cur;
-    a.style.color=active?'#fff':'';
-  });
-},{passive:true});
-</script>
-  <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+            <!-- Bottom -->
+            <div class="border-t border-black/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-5">
+                <p class="text-xs tracking-wide text-zinc-500 uppercase">© 2025 Yuvox · Voices of Young India</p>
+                <div class="flex items-center gap-6 text-xs uppercase tracking-wide text-zinc-500">
+                    <a href="#" class="hover:text-blue-700 transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-blue-700 transition-colors">Terms</a>
+                    <a href="#" class="hover:text-blue-700 transition-colors">Cookies</a>
+                </div>
+            </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
-  authDomain: "cjnsite-d3f3f.firebaseapp.com",
-  projectId: "cjnsite-d3f3f",
-  storageBucket: "cjnsite-d3f3f.firebasestorage.app",
-  messagingSenderId: "491318197551",
-  appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
-  measurementId: "G-JES3G3L45V"
-};
+        </div>
+    </footer>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    <!-- SCRIPTS -->
+    <script>
+        // Mobile menu
+        function toggleMob() {
+            const m = document.getElementById('mob-menu');
+            m.classList.toggle('translate-x-full');
+        }
 
-window.handleApply = async function(event) {
-  event.preventDefault();
+        // Form handlers
+        function handleApply(e) {
+            e.preventDefault();
+            const ok = document.getElementById('apply-ok');
+            ok.classList.remove('hidden');
+            e.target.reset();
+            setTimeout(() => ok.classList.add('hidden'), 7000);
+        }
 
-  const form = event.target;
+        function handleNL(e) {
+            e.preventDefault();
+            const ok = document.getElementById('nl-ok');
+            ok.classList.remove('hidden');
+            e.target.reset();
+        }
 
-  const inputs = form.querySelectorAll("input, textarea, select");
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
 
-  const data = {
-    firstName: inputs[0].value,
-    lastName: inputs[1].value,
-    college: inputs[2].value,
-    email: inputs[3].value,
-    city: inputs[4].value,
-    focusArea: inputs[5].value,
-    message: inputs[6].value,
-    createdAt: new Date()
-  };
+        document.querySelectorAll('.reveal,.reveal-r').forEach(el => observer.observe(el));
 
-  try {
-    await addDoc(collection(db, "applications"), data);
+        // Smooth nav active state
+        const secs = document.querySelectorAll('section[id]');
+        const links = document.querySelectorAll('nav a[href^="#"]');
+        window.addEventListener('scroll', () => {
+            let cur = '';
+            secs.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id });
+            links.forEach(a => {
+                const active = a.getAttribute('href') === '#' + cur;
+                a.style.color = active ? '#fff' : '';
+            });
+        }, { passive: true });
+    </script>
 
-    alert("Application submitted successfully!");
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    form.reset();
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
+            authDomain: "cjnsite-d3f3f.firebaseapp.com",
+            projectId: "cjnsite-d3f3f",
+            storageBucket: "cjnsite-d3f3f.firebasestorage.app",
+            messagingSenderId: "491318197551",
+            appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
+            measurementId: "G-JES3G3L45V"
+        };
 
-  } catch (error) {
-    console.error(error);
-    alert("Error submitting form");
-  }
-}
-  </script>
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.handleApply = async function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+
+            const inputs = form.querySelectorAll("input, textarea, select");
+
+            const data = {
+                firstName: inputs[0].value,
+                lastName: inputs[1].value,
+                college: inputs[2].value,
+                email: inputs[3].value,
+                city: inputs[4].value,
+                focusArea: inputs[5].value,
+                message: inputs[6].value,
+                createdAt: new Date()
+            };
+
+            try {
+                await addDoc(collection(db, "applications"), data);
+                alert("Application submitted successfully!");
+                form.reset();
+            } catch (error) {
+                console.error(error);
+                alert("Error submitting form");
+            }
+        }
+    </script>
 </body>
 </html>
