@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yuvox Media — Student Journalism Platform</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px
+        }
+        :root {
+            --ink: #0C0C0D;
+            --ink-2: #151515;
+            --ink-3: #1C1C1C;
+            --cream: #F4F3EF;
+            --cream-2: #ECE9E1;
+            --paper: #FAF8F3;
+            --blue: #1D4ED8;
+            --blue-soft: #DCE7FF;
+            --gold: #f5c518;
+            --gold-dark: #d4a800;
+            --gold-light: #ffe066;
+            --text: #121212;
+            --text-soft: #5A5A5A;
+            --wire: rgba(255, 255, 255, 0.06);
+            --wire-dark: rgba(0, 0, 0, 0.08);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+        body {
+            letter-spacing: -0.01em;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--ink);
+            color: #fff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .display {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.03em;
+        }
+        ::-webkit-scrollbar {
+            width: 3px
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--ink)
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--blue);
+            border-radius: 4px
+        }
+        .nav {
+            background: rgba(12, 12, 13, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--wire);
+        }
+        .hero-mesh {
+            background: radial-gradient(circle 700px at 20% 50%, rgba(29, 78, 216, 0.12) 0%, transparent 70%),
+                radial-gradient(circle 500px at 80% 30%, rgba(255, 255, 255, 0.04) 0%, transparent 60%),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.55)),
+                var(--ink);
+        }
+        .grain::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: .025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3.2rem, 8vw, 5.5rem);
+            font-weight: 700;
+            line-height: .92;
+            letter-spacing: -0.04em;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4.5vw, 3.5rem);
+            line-height: 1.08;
+            font-weight: 600;
+        }
+        .label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .rule {
+            border: none;
+            border-top: 1px solid var(--wire)
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--blue);
+            color: #fff;
+            padding: 13px 28px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            border: none;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+        }
+        .btn-primary:hover {
+            background: #1a44b8;
+            transform: translateY(-1px)
+        }
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: #fff;
+            padding: 13px 28px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            border: 1px solid var(--wire);
+            cursor: pointer;
+            transition: border-color .2s, background .2s, transform .15s;
+        }
+        .btn-ghost:hover {
+            border-color: rgba(255, 255, 255, .25);
+            background: rgba(255, 255, 255, .05);
+            transform: translateY(-1px)
+        }
+        .btn-gold {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gold);
+            color: #0a0a0a;
+            padding: 13px 28px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            border: none;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+        }
+        .btn-gold:hover {
+            background: var(--gold-dark);
+            transform: translateY(-1px)
+        }
+        .video-card {
+            border: 1px solid var(--wire);
+            background: var(--ink-2);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all .35s cubic-bezier(.16, 1, .3, 1);
+            cursor: default;
+            position: relative;
+        }
+        .video-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(29, 78, 216, .3);
+            box-shadow: var(--shadow);
+        }
+        .video-card.gold-border {
+            border-left: 3px solid var(--gold);
+        }
+        .video-thumb {
+            position: relative;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            background: var(--ink-3);
+            position: relative;
+        }
+        .video-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-thumb .custom-play {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
+            transition: background 0.3s;
+        }
+        .video-thumb .custom-play:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        .video-thumb .play-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(29, 78, 216, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            transition: transform 0.3s;
+            box-shadow: 0 0 30px rgba(29, 78, 216, 0.3);
+        }
+        .video-thumb .custom-play:hover .play-circle {
+            transform: scale(1.08);
+            background: rgba(29, 78, 216, 1);
+        }
+        .video-thumb .badge-overlay {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-weight: 500;
+        }
+        .video-thumb .badge-overlay.gold {
+            background: var(--gold);
+            color: #0a0a0a;
+        }
+        .video-thumb .badge-overlay.green {
+            background: #10b981;
+            color: #fff;
+        }
+        .video-thumb .badge-overlay.trending {
+            background: #ef4444;
+            color: #fff;
+        }
+        .video-thumb .badge-overlay.blue {
+            background: var(--blue);
+            color: #fff;
+        }
+        .video-thumb .duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+        }
+        .video-info {
+            padding: 16px 18px 18px;
+        }
+        .video-info .category {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--blue);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .video-info h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.3;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+        .video-info .meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .video-info .meta .college {
+            color: var(--text-soft);
+        }
+        .video-info .meta .views {
+            color: var(--text-soft);
+        }
+        .video-info .meta .new-badge {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: rgba(29, 78, 216, 0.15);
+            color: var(--blue);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .video-info .meta .gold-badge {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: rgba(245, 197, 24, 0.15);
+            color: var(--gold);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .creator-card {
+            border: 1px solid var(--wire);
+            background: var(--ink-2);
+            border-radius: 12px;
+            padding: 24px 20px;
+            text-align: center;
+            transition: all .35s ease;
+            cursor: default;
+        }
+        .creator-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(29, 78, 216, .3);
+            box-shadow: var(--shadow);
+        }
+        .creator-card img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 12px;
+            display: block;
+        }
+        .creator-card h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #fff;
+        }
+        .creator-card .college {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .creator-card .stats {
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            margin-top: 8px;
+        }
+        .creator-card .btn {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            padding: 6px 18px;
+        }
+        .category-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .category-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border-radius: 30px;
+            background: var(--ink-2);
+            border: 1px solid var(--wire);
+            color: var(--text-soft);
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all .3s;
+            cursor: default;
+        }
+        .category-pill:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: rgba(29, 78, 216, 0.05);
+        }
+        .category-pill .icon {
+            font-size: 1rem;
+        }
+        .submit-cta {
+            padding: 60px 24px;
+            background: linear-gradient(135deg, rgba(245, 197, 24, 0.12) 0%, rgba(29, 78, 216, 0.08) 100%);
+            border-top: 1px solid var(--wire);
+            border-bottom: 1px solid var(--wire);
+            text-align: center;
+            margin: 0;
+        }
+        .submit-cta h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        .submit-cta p {
+            color: var(--text-soft);
+            font-size: 1.1rem;
+            max-width: 480px;
+            margin: 0 auto 24px;
+            font-weight: 300;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity .7s ease, transform .7s cubic-bezier(.16, 1, .3, 1)
+        }
+        .reveal.in {
+            opacity: 1;
+            transform: none
+        }
+        .d1 {
+            transition-delay: .06s
+        }
+        .d2 {
+            transition-delay: .12s
+        }
+        .d3 {
+            transition-delay: .18s
+        }
+        .d4 {
+            transition-delay: .24s
+        }
+        #mob-menu {
+            transition: transform .35s cubic-bezier(.16, 1, .3, 1)
+        }
+        #trendingVideos,
+        #latestVideos {
+            display: grid;
+            gap: 20px;
+        }
+        #trendingVideos {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+        #latestVideos {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+        @media(max-width:768px) {
+            .hide-sm {
+                display: none !important
+            }
+            .hero-title {
+                font-size: clamp(2.4rem, 9vw, 3.2rem) !important;
+            }
+            .section-title {
+                font-size: clamp(1.8rem, 6vw, 2.6rem) !important;
+            }
+            #trendingVideos {
+                grid-template-columns: 1fr 1fr;
+            }
+            #latestVideos {
+                grid-template-columns: 1fr;
+            }
+            .creator-card img {
+                width: 48px;
+                height: 48px;
+            }
+        }
+        @media(max-width:480px) {
+            .hero-title {
+                font-size: clamp(2rem, 10vw, 2.6rem) !important;
+            }
+            .section-title {
+                font-size: clamp(1.5rem, 7vw, 2rem) !important;
+            }
+            #trendingVideos {
+                grid-template-columns: 1fr;
+            }
+            .video-card.gold-border {
+                border-left: 2px solid var(--gold);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════
+    NAV
+    ═══════════════════════════════════════════ -->
+    <header class="nav fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-screen-xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
+
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-2.5 flex-shrink-0">
+                <div class="w-7 h-7 bg-blue-700 flex items-center justify-center">
+                    <span class="display text-white font-bold text-sm">Y</span>
+                </div>
+                <span class="display font-bold text-white tracking-tight text-lg">Yuvox</span>
+            </a>
+
+            <!-- Center links -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="index.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Home</a>
+                <a href="about.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">About</a>
+                <a href="stories.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Stories</a>
+                <a href="community.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Community</a>
+                <a href="join.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Join</a>
+            </nav>
+
+            <!-- Right -->
+            <div class="flex items-center gap-3">
+                <a href="join.html" class="btn-primary hide-sm" style="padding:9px 20px;font-size:12px">Join Movement</a>
+                <button id="ham" onclick="toggleMob()" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5">
+                    <span class="block w-5 h-px bg-white transition-all" id="h1"></span>
+                    <span class="block w-5 h-px bg-white transition-all" id="h2"></span>
+                    <span class="block w-3.5 h-px bg-white transition-all self-start" id="h3"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile menu -->
+    <div id="mob-menu" class="fixed inset-0 bg-[#0C0C0D] z-40 flex flex-col items-center justify-center gap-7 transform translate-x-full md:hidden">
+        <a href="index.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Home</a>
+        <a href="about.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">About</a>
+        <a href="stories.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Stories</a>
+        <a href="community.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Community</a>
+        <a href="join.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Join</a>
+        <a href="join.html" onclick="toggleMob()" class="btn-primary mt-4" style="font-size:14px;padding:14px 36px">Join Movement</a>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+    HERO
+    ═══════════════════════════════════════════ -->
+    <section class="hero-mesh grain relative min-h-[60vh] flex flex-col pt-16 overflow-hidden">
+
+        <!-- Grid decoration -->
+        <div class="absolute inset-0 pointer-events-none" style="background-image:linear-gradient(var(--wire) 1px,transparent 1px),linear-gradient(90deg,var(--wire) 1px,transparent 1px);background-size:72px 72px;opacity:.5"></div>
+
+        <!-- Content -->
+        <div class="relative z-10 flex-1 flex items-center">
+            <div class="max-w-screen-xl mx-auto w-full px-6 py-20 md:py-24">
+
+                <div class="max-w-3xl">
+                    <!-- Eyebrow -->
+                    <div class="reveal flex items-center gap-3 mb-6">
+                        <span class="live-dot w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
+                        <span class="label" style="color:#5b85f5;letter-spacing:.2em">Yuvox Media</span>
+                    </div>
+
+                    <!-- Headline -->
+                    <h1 class="hero-title reveal d1 mb-6">
+                        Your Campus. <span class="serif" style="color:#5b85f5;font-style:italic;">Your Voice.</span> Your Story.
+                    </h1>
+
+                    <!-- Sub -->
+                    <p class="reveal d2 text-zinc-400 text-lg leading-relaxed max-w-xl" style="font-weight:300">
+                        Journalism by students, for everyone. Ground reports, campus stories, and independent voices from across India.
+                    </p>
+
+                    <!-- CTAs -->
+                    <div class="reveal d3 flex flex-wrap gap-4 mt-6">
+                        <a href="#trending" class="btn-primary">Watch Now <span>→</span></a>
+                        <a href="join.html" class="btn-ghost">Submit Your Story</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════
+    SECTION 1 — EDITOR'S PICKS
+    ═══════════════════════════════════════════ -->
+    <section id="editor-picks" class="section py-16 md:py-24 px-6" style="background:var(--ink-2)">
+        <div class="max-w-screen-xl mx-auto">
+
+            <div class="flex items-end justify-between mb-10 md:mb-12 reveal">
+                <div>
+                    <div class="label mb-4" style="color:rgba(255,255,255,0.3);">Editor's Picks 🎯</div>
+                    <span class="badge" style="font-size:0.7rem;padding:4px 12px;border-radius:20px;background:rgba(245,197,24,0.15);color:var(--gold);border:1px solid rgba(245,197,24,0.2);">Handpicked by Yuvox Team</span>
+                    <h2 class="section-title leading-tight text-white mt-2">
+                        Stories that<br />
+                        <span class="serif" style="color:var(--gold);font-style:italic;">deserve the spotlight.</span>
+                    </h2>
+                </div>
+            </div>
+
+            <div id="editor-picks-container" class="video-grid video-grid-3">
+                <!-- Firebase data will load here -->
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════
+    SECTION 2 — MOST VIEWED
+    ═══════════════════════════════════════════ -->
+    <section id="trending" class="section py-16 md:py-24 px-6" style="background:var(--ink)">
+        <div class="max-w-screen-xl mx-auto">
+
+            <div class="flex items-end justify-between mb-10 md:mb-12 reveal">
+                <div>
+                    <div class="label mb-4" style="color:rgba(255,255,255,0.3);">Most Viewed 🔥</div>
+                    <h2 class="section-title leading-tight text-white">
+                        Trending<br />
+                        <span class="serif" style="color:#5b85f5;font-style:italic;">across campuses.</span>
+                    </h2>
+                </div>
+                <span class="badge" style="font-size:0.7rem;padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">Trending Now</span>
+            </div>
+
+            <div id="trendingVideos" class="video-grid video-grid-4">
+                <!-- Firebase data will load here -->
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════
+    SECTION 3 — RISING VOICES
+    ═══════════════════════════════════════════ -->
+    <section class="section py-16 md:py-24 px-6" style="background:var(--ink-2)">
+        <div class="max-w-screen-xl mx-auto">
+
+            <div class="flex items-end justify-between mb-10 md:mb-12 reveal">
+                <div>
+                    <div class="label mb-4" style="color:rgba(255,255,255,0.3);">Rising Voices 🌱</div>
+                    <span class="badge" style="font-size:0.7rem;padding:4px 12px;border-radius:20px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.2);">Low views, but stories worth telling</span>
+                    <h2 class="section-title leading-tight text-white mt-2">
+                        Stories that<br />
+                        <span class="serif" style="color:#10b981;font-style:italic;">need to be heard.</span>
+                    </h2>
+                </div>
+            </div>
+
+            <div id="rising-voices-container" class="video-grid video-grid-3">
+                <!-- Firebase data will load here -->
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════
+    SECTION 4 — TOP CAMPUS CREATORS
+    ═══════════════════════════════════════════ -->
+    <section id="creators" class="section py-16 md:py-24 px-6" style="background:var(--ink)">
+        <div class="max-w-screen-xl mx-auto">
+
+            <div class="flex items-end justify-between mb-10 md:mb-12 reveal">
+                <div>
+                    <div class="label mb-4" style="color:rgba(255,255,255,0.3);">Top Campus Creators ⭐</div>
+                    <h2 class="section-title leading-tight text-white">
+                        Voices that<br />
+                        <span class="serif" style="color:#5b85f5;font-style:italic;">inspire the next generation.</span>
+                    </h2>
+                </div>
+            </div>
+
+            <div id="creators-container" class="creator-grid">
+                <!-- Dummy data will load here -->
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════
+    SECTION 5 — BROWSE BY CATEGORY
+    ═══════════════════════════════════════════ -->
+    <section id="categories" class="section py-16 md:py-24 px-6" style="background:var(--ink-2)">
+        <div class="max-w-screen-xl mx-auto">
+
+            <div class="flex items-end justify-between mb-10 md:mb-12 reveal">
+                <div>
+                    <div class="label mb-4" style="color:rgba(255,255,255,0.3);">Explore by Beat</div>
+                    <h2 class="section-title leading-tight text-white">
+                        Find stories<br />
+                        <span class="serif" style="color:#5b85f5;font-style:italic;">that matter to you.</span>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="category-pills">
+                <span class="category-pill"><span class="icon">🏛️</span> Politics</span>
+                <span class="category-pill"><span class="icon">🌿</span> Environment</span>
+                <span class="category-pill"><span class="icon">👥</span> Social Issues</span>
+                <span class="category-pill"><span class="icon">🎓</span> Campus Life</span>
+                <span class="category-pill"><span class="icon">⚽</span> Sports</span>
+                <span class="category-pill"><span class="icon">💻</span> Tech</span>
+                <span class="category-pill"><span class="icon">🎭</span> Culture</span>
+                <span class="category-pill"><span class="icon">🔍</span> Investigation</span>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════
+    SECTION 6 — LATEST REPORTS
+    ═══════════════════════════════════════════ -->
+    <section class="section py-16 md:py-24 px-6" style="background:var(--ink)">
+        <div class="max-w-screen-xl mx-auto">
+
+            <div class="flex items-end justify-between mb-10 md:mb-12 reveal">
+                <div>
+                    <div class="label mb-4" style="color:rgba(255,255,255,0.3);">Latest Reports 📰</div>
+                    <h2 class="section-title leading-tight text-white">
+                        Fresh stories<br />
+                        <span class="serif" style="color:#5b85f5;font-style:italic;">from the ground.</span>
+                    </h2>
+                </div>
+                <span class="badge" style="font-size:0.7rem;padding:4px 12px;border-radius:20px;background:rgba(29,78,216,0.15);color:var(--blue);border:1px solid rgba(29,78,216,0.2);">New</span>
+            </div>
+
+            <div id="latestVideos" class="video-grid video-grid-2">
+                <!-- Firebase data will load here -->
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════
+    SECTION 7 — SUBMIT YOUR STORY
+    ═══════════════════════════════════════════ -->
+    <section id="submit" class="submit-cta">
+        <h2>Are you a journalism student?</h2>
+        <p>Share your report. We'll amplify your voice.</p>
+        <a href="join.html" class="btn-gold">Submit Your Video →</a>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════
+    FOOTER
+    ═══════════════════════════════════════════ -->
+    <footer class="px-6 pt-16 md:pt-20 pb-10 border-t border-white/10" style="background:var(--ink);">
+
+        <div class="max-w-screen-xl mx-auto">
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 md:gap-14 mb-16 md:mb-20">
+
+                <!-- Brand -->
+                <div class="col-span-2 sm:col-span-3 md:col-span-2">
+
+                    <div class="flex items-center gap-3 mb-6">
+
+                        <div class="w-8 h-8 bg-blue-700 flex items-center justify-center rounded-sm">
+                            <span class="display font-bold text-white text-sm">Y</span>
+                        </div>
+
+                        <span class="display text-2xl text-white">
+                            Yuvox
+                        </span>
+
+                    </div>
+
+                    <p class="text-sm leading-relaxed mb-8 max-w-sm text-zinc-500" style="font-weight:400">
+                        India's youth-driven journalism and storytelling network — building the next generation of reporters, filmmakers, investigators, and truth-seekers.
+                    </p>
+
+                    <div class="flex items-center gap-3">
+                        <a href="#" class="w-10 h-10 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-blue-400 hover:border-blue-400 transition-all">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-blue-400 hover:border-blue-400 transition-all">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-blue-400 hover:border-blue-400 transition-all">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286z"/></svg>
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- Platform -->
+                <div>
+                    <div class="label-dark mb-5" style="color:rgba(255,255,255,0.3);">Platform</div>
+                    <ul class="space-y-3 text-sm text-zinc-500">
+                        <li><a href="stories.html" class="hover:text-blue-400 transition-colors">Stories</a></li>
+                        <li><a href="media.html" class="hover:text-blue-400 transition-colors">Media</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Documentaries</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Campus Reports</a></li>
+                    </ul>
+                </div>
+
+                <!-- Community -->
+                <div>
+                    <div class="label-dark mb-5" style="color:rgba(255,255,255,0.3);">Community</div>
+                    <ul class="space-y-3 text-sm text-zinc-500">
+                        <li><a href="join.html" class="hover:text-blue-400 transition-colors">Join WEVOX</a></li>
+                        <li><a href="community.html" class="hover:text-blue-400 transition-colors">Community</a></li>
+                        <li><a href="index.html#spotlight" class="hover:text-blue-400 transition-colors">Spotlight</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company -->
+                <div>
+                    <div class="label-dark mb-5" style="color:rgba(255,255,255,0.3);">Company</div>
+                    <ul class="space-y-3 text-sm text-zinc-500">
+                        <li><a href="about.html" class="hover:text-blue-400 transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Editorial Policy</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Bottom -->
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-5">
+                <p class="text-xs tracking-wide text-zinc-500 uppercase">© 2025 Yuvox · Voices of Young India</p>
+                <div class="flex items-center gap-6 text-xs uppercase tracking-wide text-zinc-500">
+                    <a href="#" class="hover:text-blue-400 transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-blue-400 transition-colors">Terms</a>
+                    <a href="#" class="hover:text-blue-400 transition-colors">Cookies</a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+
+    <!-- ═══════════════════════════════════════════
+    SCRIPTS
+    ═══════════════════════════════════════════ -->
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js">
+    </script>
+
+    <script>
+        // ── Firebase Config ──
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
+            authDomain: "cjnsite-d3f3f.firebaseapp.com",
+            projectId: "cjnsite-d3f3f",
+            storageBucket: "cjnsite-d3f3f.firebasestorage.app",
+            messagingSenderId: "491318197551",
+            appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
+            measurementId: "G-JES3G3L45V"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        console.log("🔥 Firebase Connected");
+
+        // ── Mobile menu ──
+        function toggleMob() {
+            const m = document.getElementById('mob-menu');
+            m.classList.toggle('translate-x-full');
+        }
+
+        // ── Scroll reveal ──
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // ── Get YouTube Video ID ──
+        function getYouTubeVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // ── Create Video Card ──
+        function createVideoCard(data, isEditorPick, isRisingVoice) {
+            const videoId = getYouTubeVideoId(data.youtube);
+            if (!videoId) return null;
+
+            const goldBorder = isEditorPick ? 'gold-border' : '';
+
+            let badgeHTML = '';
+            if (isEditorPick) {
+                badgeHTML = `<span class="badge-overlay gold">★ Editor's Pick</span>`;
+            } else if (isRisingVoice) {
+                badgeHTML = `<span class="badge-overlay green">Featured by Us</span>`;
+            } else if (data.views && parseInt(data.views) > 1000000) {
+                badgeHTML = `<span class="badge-overlay trending">🔥 Trending</span>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = `video-card ${goldBorder}`;
+            card.innerHTML = `
+                <div class="video-thumb">
+                    <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${data.title || 'Video'}" />
+                    <div class="custom-play">
+                        <div class="play-circle">▶</div>
+                    </div>
+                    ${badgeHTML}
+                    <span class="duration">${data.duration || '10 min'}</span>
+                </div>
+                <div class="video-info">
+                    <div class="category">${data.category || 'REPORT'}</div>
+                    <h4>${data.title || 'Untitled'}</h4>
+                    <div class="meta">
+                        <span class="college">${data.college || 'Unknown Campus'}</span>
+                        <span class="views">${data.views || '0 Views'}</span>
+                        ${isEditorPick ? `<span class="gold-badge">★ Editor's Pick</span>` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Play button functionality
+            const playButton = card.querySelector('.custom-play');
+            const thumb = card.querySelector('.video-thumb');
+            playButton.addEventListener('click', () => {
+                thumb.innerHTML = `
+                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                `;
+            });
+
+            return card;
+        }
+
+        // ── Load Videos ──
+        async function loadVideos() {
+            try {
+                const querySnapshot = await db.collection('videos').get();
+                const videos = [];
+                querySnapshot.forEach(doc => {
+                    videos.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Separate videos
+                const editorPicks = videos.filter(v => v.isEditorPick === true);
+                const mostViewed = [...videos].sort((a, b) => parseInt(b.views || 0) - parseInt(a.views || 0)).slice(0, 4);
+                const risingVoices = videos.filter(v => v.isRisingVoice === true);
+                const latestReports = [...videos].sort((a, b) => {
+                    const dateA = a.uploadDate ? new Date(a.uploadDate) : new Date(0);
+                    const dateB = b.uploadDate ? new Date(b.uploadDate) : new Date(0);
+                    return dateB - dateA;
+                }).slice(0, 4);
+
+                // Render Editor's Picks
+                const editorContainer = document.getElementById('editor-picks-container');
+                if (editorPicks.length > 0) {
+                    editorContainer.innerHTML = '';
+                    editorPicks.forEach(v => {
+                        const card = createVideoCard(v, true, false);
+                        if (card) editorContainer.appendChild(card);
+                    });
+                } else {
+                    editorContainer.innerHTML = `<p style="color:var(--text-soft);text-align:center;padding:40px 0;">No Editor's Picks yet. Add data to Firestore.</p>`;
+                }
+
+                // Render Most Viewed
+                const trendingContainer = document.getElementById('trendingVideos');
+                if (mostViewed.length > 0) {
+                    trendingContainer.innerHTML = '';
+                    mostViewed.forEach(v => {
+                        const card = createVideoCard(v, false, false);
+                        if (card) trendingContainer.appendChild(card);
+                    });
+                } else {
+                    trendingContainer.innerHTML = `<p style="color:var(--text-soft);text-align:center;padding:40px 0;">No videos yet. Add data to Firestore.</p>`;
+                }
+
+                // Render Rising Voices
+                const risingContainer = document.getElementById('rising-voices-container');
+                if (risingVoices.length > 0) {
+                    risingContainer.innerHTML = '';
+                    risingVoices.forEach(v => {
+                        const card = createVideoCard(v, false, true);
+                        if (card) risingContainer.appendChild(card);
+                    });
+                } else {
+                    risingContainer.innerHTML = `<p style="color:var(--text-soft);text-align:center;padding:40px 0;">No Rising Voices yet. Add data to Firestore.</p>`;
+                }
+
+                // Render Latest Reports
+                const latestContainer = document.getElementById('latestVideos');
+                if (latestReports.length > 0) {
+                    latestContainer.innerHTML = '';
+                    latestReports.forEach(v => {
+                        const card = createVideoCard(v, false, false);
+                        if (card) latestContainer.appendChild(card);
+                    });
+                } else {
+                    latestContainer.innerHTML = `<p style="color:var(--text-soft);text-align:center;padding:40px 0;">No reports yet. Add data to Firestore.</p>`;
+                }
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                // Show fallback data if Firebase fails
+                showFallbackData();
+            }
+        }
+
+        // ── Fallback Data ──
+        function showFallbackData() {
+            const fallbackVideos = [
+                { title: 'Inside India\'s Biggest Campus Election', college: 'JNU · Delhi', category: 'Campus Report', views: '1.2M', duration: '18:24', youtube: 'https://youtu.be/dQw4w9WgXcQ', isEditorPick: true },
+                { title: 'Voices From Small Town India', college: 'DU · Delhi', category: 'Documentary', views: '892K', duration: '12:05', youtube: 'https://youtu.be/dQw4w9WgXcQ', isEditorPick: true },
+                { title: 'Mental Health on Campus', college: 'BITS · Pilani', category: 'Social Issues', views: '734K', duration: '08:47', youtube: 'https://youtu.be/dQw4w9WgXcQ', isEditorPick: true },
+            ];
+
+            const editorContainer = document.getElementById('editor-picks-container');
+            editorContainer.innerHTML = '';
+            fallbackVideos.forEach(v => {
+                const card = createVideoCard(v, true, false);
+                if (card) editorContainer.appendChild(card);
+            });
+        }
+
+        // ── Load data on page load ──
+        document.addEventListener('DOMContentLoaded', loadVideos);
+
+        // ── Dummy Creators Data (Top Campus Creators) ──
+        function loadDummyCreators() {
+            const creatorsContainer = document.getElementById('creators-container');
+            const dummyCreators = [
+                {
+                    name: 'Ananya Sharma',
+                    college: 'IIT Delhi',
+                    views: '4.8M',
+                    videos: 24,
+                    image: 'https://i.pravatar.cc/150?img=1'
+                },
+                {
+                    name: 'Rohit Sen',
+                    college: 'Jadavpur University',
+                    views: '2.1M',
+                    videos: 16,
+                    image: 'https://i.pravatar.cc/150?img=2'
+                },
+                {
+                    name: 'Arjun Mehta',
+                    college: 'Presidency University',
+                    views: '1.4M',
+                    videos: 12,
+                    image: 'https://i.pravatar.cc/150?img=3'
+                },
+                {
+                    name: 'Priya Raghavan',
+                    college: 'Miranda House',
+                    views: '986K',
+                    videos: 9,
+                    image: 'https://i.pravatar.cc/150?img=4'
+                }
+            ];
+
+            creatorsContainer.innerHTML = '';
+            dummyCreators.forEach(creator => {
+                const card = document.createElement('div');
+                card.className = 'creator-card';
+                card.innerHTML = `
+                    <img src="${creator.image}" alt="${creator.name}" />
+                    <h4>${creator.name}</h4>
+                    <div class="college">${creator.college}</div>
+                    <div class="stats">${creator.views} Views · ${creator.videos} Videos</div>
+                    <a href="#" class="btn btn-ghost" style="display:inline-block;padding:6px 18px;font-size:0.75rem;">View Profile</a>
+                `;
+                creatorsContainer.appendChild(card);
+            });
+        }
+
+        // ── Load dummy creators on page load ──
+        document.addEventListener('DOMContentLoaded', loadDummyCreators);
+    </script>
+
+</body>
+</html>
