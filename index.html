@@ -1160,12 +1160,12 @@
     const NOW = Date.now();
     const ago = (d) => ({ toDate: () => new Date(NOW - d * 86400000) });
     const SAMPLE_STORIES = [
-      { title: "Inside the hostel mess scam: ₹2.4 crore unaccounted across 6 colleges", category: "Campus Fraud", author: "Ananya Krishnan", university: "DU North Campus", coverImage: "https://picsum.photos/seed/wevox-s1/400/300", readTime: "8 min read", publishedAt: ago(2) },
-      { title: "How private hostels are rigging Bihar's NEET admissions", category: "Investigation", author: "Rohit Kumar", university: "AMU", coverImage: "https://picsum.photos/seed/wevox-s2/400/300", readTime: "12 min read", publishedAt: ago(5) },
-      { title: "The vanishing scholarships: a paper trail across 4 states", category: "Economy", author: "Priya Sharma", university: "JNU", coverImage: "https://picsum.photos/seed/wevox-s3/400/300", readTime: "10 min read", publishedAt: ago(7) },
-      { title: "Election campaigns on campus — who's funding the posters?", category: "Politics", author: "Arjun Mehta", university: "IIT Bombay", coverImage: "https://picsum.photos/seed/wevox-s4/400/300", readTime: "6 min read", publishedAt: ago(10) },
-      { title: "The new student-music underground rewriting Hindi indie", category: "Culture", author: "Sahil Verma", university: "Jadavpur University", coverImage: "https://picsum.photos/seed/wevox-s5/400/300", readTime: "7 min read", publishedAt: ago(12) },
-      { title: "Inside a fake-degree racket near a Tier-2 city", category: "Campus Fraud", author: "Neha Menon", university: "Miranda House", coverImage: "https://picsum.photos/seed/wevox-s6/400/300", readTime: "9 min read", publishedAt: ago(14) }
+      { id: "demo-1", title: "Inside the hostel mess scam: ₹2.4 crore unaccounted across 6 colleges", category: "Campus Fraud", author: "Ananya Krishnan", university: "DU North Campus", coverImage: "https://picsum.photos/seed/wevox-s1/400/300", readTime: "8 min read", publishedAt: ago(2) },
+      { id: "demo-2", title: "How private hostels are rigging Bihar's NEET admissions", category: "Investigation", author: "Rohit Kumar", university: "AMU", coverImage: "https://picsum.photos/seed/wevox-s2/400/300", readTime: "12 min read", publishedAt: ago(5) },
+      { id: "demo-3", title: "The vanishing scholarships: a paper trail across 4 states", category: "Economy", author: "Priya Sharma", university: "JNU", coverImage: "https://picsum.photos/seed/wevox-s3/400/300", readTime: "10 min read", publishedAt: ago(7) },
+      { id: "demo-4", title: "Election campaigns on campus — who's funding the posters?", category: "Politics", author: "Arjun Mehta", university: "IIT Bombay", coverImage: "https://picsum.photos/seed/wevox-s4/400/300", readTime: "6 min read", publishedAt: ago(10) },
+      { id: "demo-5", title: "The new student-music underground rewriting Hindi indie", category: "Culture", author: "Sahil Verma", university: "Jadavpur University", coverImage: "https://picsum.photos/seed/wevox-s5/400/300", readTime: "7 min read", publishedAt: ago(12) },
+      { id: "demo-6", title: "Inside a fake-degree racket near a Tier-2 city", category: "Campus Fraud", author: "Neha Menon", university: "Miranda House", coverImage: "https://picsum.photos/seed/wevox-s6/400/300", readTime: "9 min read", publishedAt: ago(14) }
     ];
     const SAMPLE_VIDEOS = [
       { title: "Field report: the campus protest no national channel covered", category: "Field Reports", author: "Fatima Sheikh", university: "AMU", thumbnailUrl: "https://picsum.photos/seed/wevox-v1/640/360", videoUrl: "https://www.youtube.com/watch?v=ScMzIvxBSi4", duration: "11:24", description: "An on-ground field report from the campus gates. Raw footage, unedited interviews with students who organised the demonstration.", publishedAt: ago(1) },
@@ -1173,12 +1173,12 @@
       { title: "Campus politics in 2024: the new playbook", category: "Politics", author: "Sahil Verma", university: "Jadavpur University", thumbnailUrl: "https://picsum.photos/seed/wevox-v3/640/360", videoUrl: "https://www.youtube.com/watch?v=ScMzIvxBSi4", duration: "14:08", description: "Inside the rooms where student-body decisions are made — and unmade.", publishedAt: ago(8) }
     ];
     const SAMPLE_TRENDING = [
-      { title: "Hostel mess scam exposé crosses 200K reads", tag: "Campus Fraud", type: "story", readCount: 214000 },
-      { title: "Bihar NEET investigation goes viral on X", tag: "Investigation", type: "story", readCount: 168000 },
-      { title: "Vanishing scholarships across 4 states", tag: "Economy", type: "story", readCount: 142000 },
-      { title: "Campus election funding deep-dive", tag: "Politics", type: "story", readCount: 98000 },
+      { title: "Hostel mess scam exposé crosses 200K reads", tag: "Campus Fraud", type: "story", ref_id: "demo-1", readCount: 214000 },
+      { title: "Bihar NEET investigation goes viral on X", tag: "Investigation", type: "story", ref_id: "demo-2", readCount: 168000 },
+      { title: "Vanishing scholarships across 4 states", tag: "Economy", type: "story", ref_id: "demo-3", readCount: 142000 },
+      { title: "Campus election funding deep-dive", tag: "Politics", type: "story", ref_id: "demo-4", readCount: 98000 },
       { title: "Field report: skipped protest footage", tag: "Field Reports", type: "video", readCount: 87000 },
-      { title: "Hindi indie underground takes over campuses", tag: "Culture", type: "story", readCount: 64000 }
+      { title: "Hindi indie underground takes over campuses", tag: "Culture", type: "story", ref_id: "demo-5", readCount: 64000 }
     ];
 
     /* ============ HELPERS ============ */
@@ -1283,7 +1283,7 @@
         return;
       }
       list.innerHTML = filtered.map((s, i) => `
-        <article class="story-card stagger" style="animation-delay:${i * 0.08}s">
+        <a class="story-card stagger" href="${s.id ? 'story.html?id=' + encodeURIComponent(s.id) : '#'}" style="animation-delay:${i * 0.08}s">
           <img class="story-thumb" src="${escapeHtml(s.coverImage || placeholderImg('s' + (s.id || i)))}" alt="" loading="lazy"
                onerror="this.src='${placeholderImg('fallback' + i)}'" />
           <div class="story-body">
@@ -1292,7 +1292,7 @@
             <div class="story-meta">By ${escapeHtml(s.author || "Anonymous")} — ${escapeHtml(s.university || "Independent")}</div>
             <div class="story-readtime">${escapeHtml(s.readTime || "5 min read")} ${s.publishedAt ? "· " + formatPublishedAt(s.publishedAt) : ""}</div>
           </div>
-        </article>
+        </a>
       `).join("");
     }
 
@@ -1388,14 +1388,18 @@
         </div>`;
         return;
       }
-      row.innerHTML = items.slice(0, 8).map((t, i) => `
-        <article class="trending-card stagger" style="animation-delay:${i * 0.06}s">
+      row.innerHTML = items.slice(0, 8).map((t, i) => {
+        const linkable = t.ref_id && (t.type !== "video");
+        const tag = linkable ? "a" : "article";
+        const hrefAttr = linkable ? ` href="story.html?id=${encodeURIComponent(t.ref_id)}"` : "";
+        return `
+        <${tag} class="trending-card stagger"${hrefAttr} style="animation-delay:${i * 0.06}s">
           <div class="trending-num">${String(i + 1).padStart(2, "0")}</div>
           <div class="trending-tag">${escapeHtml(t.tag || t.type || "Trending")}</div>
           <div class="trending-title">${escapeHtml(t.title || "Untitled")}</div>
           <div class="trending-count">${(t.readCount || 0).toLocaleString()} reads</div>
-        </article>
-      `).join("");
+        </${tag}>`;
+      }).join("");
     }
 
     /* ============ ERROR STATE ============ */

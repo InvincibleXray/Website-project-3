@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" id="metaDesc" content="Read the full story on WEVOX — India's youth newsroom. Verified student journalists, investigative reporting, no filters." />
+  <meta property="og:title" id="ogTitle" content="WEVOX — Student journalism. No filters." />
+  <meta property="og:description" id="ogDesc" content="Read the full story on WEVOX." />
+  <meta property="og:type" content="article" />
+  <title>WEVOX — Story</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #F9F7F4;
+      --bg-dark: #0D0D0D;
+      --surface: #FFFFFF;
+      --border: #E8E4DF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #6B6B6B;
+      --text-muted: #9A9A9A;
+      --accent: #C8102E;
+      --accent-hover: #A50D26;
+      --tag-bg: #F0EDE8;
+      --font-headline: "Playfair Display", Georgia, serif;
+      --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
+      --font-mono: "IBM Plex Mono", "Courier New", monospace;
+      --max-width: 1240px;
+      --gutter: 32px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-weight: 400;
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+
+    /* ============ NAVBAR ============ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      transition: box-shadow 0.25s ease;
+    }
+    .navbar.scrolled { box-shadow: 0 2px 14px rgba(0,0,0,0.05); }
+    .nav-inner {
+      max-width: var(--max-width); margin: 0 auto;
+      padding: 14px var(--gutter);
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    }
+    .logo {
+      font-family: var(--font-headline); font-weight: 900; font-size: 22px;
+      color: var(--text-primary); letter-spacing: -0.5px; flex-shrink: 0;
+    }
+    .logo .dot { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: var(--text-primary);
+      padding: 4px 0; transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .btn-submit {
+      background: var(--accent); color: #fff;
+      padding: 8px 18px; border-radius: 4px;
+      font-size: 13px; font-weight: 600;
+      transition: background 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+    .hamburger {
+      display: none; width: 36px; height: 36px;
+      align-items: center; justify-content: center;
+      font-size: 22px; color: var(--text-primary);
+    }
+
+    /* ============ MOBILE OVERLAY ============ */
+    .mobile-overlay {
+      position: fixed; inset: 0;
+      background: var(--bg-dark);
+      z-index: 200;
+      display: none; flex-direction: column;
+      padding: 80px 32px 32px;
+      opacity: 0; transition: opacity 0.25s ease;
+    }
+    .mobile-overlay.open { display: flex; opacity: 1; }
+    .mobile-overlay .close {
+      position: absolute; top: 22px; right: 24px;
+      font-size: 28px; color: #fff;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mobile-overlay a {
+      color: #fff; font-family: var(--font-headline);
+      font-size: 32px; font-weight: 700;
+      padding: 14px 0; border-bottom: 1px solid #1f1f1f;
+      transition: color 0.2s ease;
+    }
+    .mobile-overlay a:hover { color: var(--accent); }
+
+    /* ============ READING PROGRESS BAR ============ */
+    .progress-bar {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--accent);
+      z-index: 98;
+      transition: width 0.1s linear;
+    }
+
+    /* ============ ARTICLE PAGE ============ */
+    .article-page {
+      padding: 80px 0 0;
+      min-height: 100vh;
+    }
+    .article-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 720px) 260px;
+      gap: 60px;
+      max-width: 1080px;
+      margin: 0 auto;
+      align-items: flex-start;
+    }
+    .article-col { min-width: 0; }
+
+    /* ============ BREADCRUMB ============ */
+    .breadcrumb {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-top: 24px;
+      margin-bottom: 18px;
+    }
+    .breadcrumb a { transition: color 0.2s ease; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb .arrow { color: var(--accent); margin: 0 8px; }
+    .breadcrumb .current { color: var(--accent); }
+
+    /* ============ ARTICLE HEADER ============ */
+    .cat-tag {
+      display: inline-block;
+      background: var(--tag-bg);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 3px;
+      margin-bottom: 16px;
+    }
+    .headline {
+      font-family: var(--font-headline);
+      font-weight: 900;
+      font-size: 44px;
+      line-height: 1.25;
+      color: var(--text-primary);
+      max-width: 720px;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    .excerpt {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 20px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin-bottom: 24px;
+    }
+    .divider {
+      height: 1px;
+      background: var(--border);
+      border: 0;
+      width: 100%;
+    }
+
+    /* ============ AUTHOR / META ROW ============ */
+    .author-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 0;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .author-block { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-headline);
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-name {
+      font-size: 14px; font-weight: 600; color: var(--text-primary);
+    }
+    .author-uni {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-muted);
+    }
+    .meta-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .meta-item {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-muted);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    /* ============ SHARE ROW ============ */
+    .share-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0 20px;
+      flex-wrap: wrap;
+    }
+    .share-label { font-size: 12px; color: var(--text-muted); }
+    .share-btn {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+    }
+    .share-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .share-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .share-btn.copied { border-color: var(--accent); color: var(--accent); font-size: 11px; font-weight: 600; padding: 0 8px; width: auto; height: 28px; border-radius: 14px; }
+
+    /* ============ COVER IMAGE ============ */
+    .cover-wrap { margin: 24px 0; }
+    .cover {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: 8px;
+      background: var(--border);
+      transform: scale(1.02);
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .cover.loaded { opacity: 1; transform: scale(1); }
+    .cover-caption {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* ============ ARTICLE BODY ============ */
+    .article-content {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .article-content p {
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .article-content p.in { opacity: 1; transform: translateY(0); }
+    .article-content h2 {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 26px;
+      color: var(--text-primary);
+      margin: 40px 0 16px;
+      scroll-margin-top: 90px;
+    }
+    .article-content h3 {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 20px;
+      color: var(--text-primary);
+      margin: 32px 0 12px;
+      scroll-margin-top: 90px;
+    }
+    .article-content blockquote {
+      border-left: 4px solid var(--accent);
+      padding: 16px 24px;
+      margin: 32px 0;
+      background: var(--bg);
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-style: italic;
+      font-size: 22px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .article-content strong { color: var(--text-primary); font-weight: 600; }
+    .article-content a {
+      color: var(--accent);
+      text-decoration: underline;
+      transition: color 0.2s ease;
+    }
+    .article-content a:hover { color: var(--accent-hover); }
+    .article-content ul, .article-content ol {
+      margin: 0 0 24px 24px;
+      font-size: 18px;
+      line-height: 1.8;
+    }
+    .article-content li { margin-bottom: 8px; }
+
+    /* ============ TAGS ============ */
+    .tags-section {
+      margin: 40px 0 32px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .tags-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .tags-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-pill {
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .tag-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ============ AUTHOR CARD ============ */
+    .author-card {
+      background: var(--tag-bg);
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .author-card .avatar { width: 56px; height: 56px; font-size: 20px; }
+    .author-card-info { flex: 1; }
+    .author-card-name {
+      font-size: 16px; font-weight: 600; color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .author-card-uni {
+      font-family: var(--font-mono);
+      font-size: 12px; color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .author-card-role {
+      color: var(--accent);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .author-card-bio {
+      font-size: 14px; color: var(--text-secondary); line-height: 1.6;
+    }
+
+    /* ============ FOOTER SHARE ============ */
+    .end-share {
+      margin: 40px 0 60px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .end-share h4 {
+      font-family: var(--font-headline);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+    .end-share .share-row { justify-content: center; padding: 0; }
+
+    /* ============ SIDEBAR ============ */
+    .sidebar {
+      position: sticky;
+      top: 88px;
+      align-self: flex-start;
+    }
+    .sidebar-block {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-block:last-child { border-bottom: none; }
+    .sidebar-heading {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .toc-list { display: flex; flex-direction: column; gap: 8px; }
+    .toc-list a {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-left: 2px solid transparent;
+      transition: all 0.2s ease;
+      line-height: 1.4;
+    }
+    .toc-list a:hover { color: var(--accent); }
+    .toc-list a.active {
+      border-left-color: var(--accent);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .toc-list a.h3 { padding-left: 24px; font-size: 13px; }
+    .sidebar-share {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .sidebar-share-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+    .sidebar-share-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .sidebar-share-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .related-teaser { display: block; }
+    .related-teaser img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      border-radius: 6px; margin-bottom: 10px;
+    }
+    .related-teaser-title {
+      font-family: var(--font-headline);
+      font-size: 15px; font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .related-teaser:hover .related-teaser-title { color: var(--accent); }
+    .related-teaser-link {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ============ MORE STORIES ============ */
+    .more-stories {
+      background: var(--tag-bg);
+      padding: 60px 0;
+      margin-top: 48px;
+    }
+    .more-head {
+      max-width: 1080px; margin: 0 auto 28px;
+      padding: 0 var(--gutter);
+    }
+    .more-head h2 {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 28px;
+      color: var(--text-primary);
+      position: relative;
+      padding-bottom: 12px;
+    }
+    .more-head h2::after {
+      content: ""; position: absolute;
+      left: 0; bottom: 0;
+      width: 40px; height: 2px;
+      background: var(--accent);
+    }
+    .more-grid {
+      max-width: 1080px; margin: 0 auto;
+      padding: 0 var(--gutter);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .more-card {
+      background: var(--surface);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      cursor: pointer;
+      display: flex; flex-direction: column;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.2s ease;
+    }
+    .more-card.in { opacity: 1; transform: translateY(0); }
+    .more-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .more-card-thumb-wrap { overflow: hidden; }
+    .more-card-thumb {
+      width: 100%; aspect-ratio: 16/9;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+      background: var(--border);
+    }
+    .more-card:hover .more-card-thumb { transform: scale(1.03); }
+    .more-card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .more-card-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .more-card-title {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-primary);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 0.2s ease;
+    }
+    .more-card:hover .more-card-title { color: var(--accent); }
+    .more-card-meta {
+      font-size: 12px; color: var(--text-secondary);
+      margin-top: auto;
+    }
+    .more-card-readtime {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-muted);
+    }
+
+    /* ============ FOOTER (same as index) ============ */
+    footer {
+      background: var(--bg-dark);
+      color: #F9F7F4;
+      padding: 56px 0 0;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 40px;
+    }
+    .footer-logo {
+      font-family: var(--font-headline);
+      font-weight: 900;
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .footer-tagline { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+    .socials { display: flex; gap: 14px; }
+    .socials a {
+      width: 36px; height: 36px;
+      border: 1px solid #2a2a2a;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .socials a:hover { border-color: var(--accent); background: var(--accent); }
+    .socials svg { width: 16px; height: 16px; fill: #fff; }
+    .footer-heading {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col a {
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+    }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #1c1c1c;
+      padding: 18px 0;
+      display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #4A4A4A;
+    }
+
+    /* ============ SKELETON ============ */
+    .skeleton {
+      background: linear-gradient(90deg, #E8E4DF 25%, #F5F2EE 50%, #E8E4DF 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .sk-line { height: 14px; margin-bottom: 10px; }
+    .sk-bigline { height: 38px; margin-bottom: 14px; }
+    .sk-cover { width: 100%; aspect-ratio: 16/9; border-radius: 8px; }
+    .sk-meta { width: 240px; height: 14px; }
+    .sk-tag { width: 80px; height: 24px; margin-bottom: 16px; }
+
+    /* ============ ANIMATIONS ============ */
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      animation: slideUp 0.4s ease forwards;
+    }
+
+    /* ============ ERROR / NOT FOUND ============ */
+    .state-page {
+      min-height: 70vh;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 80px 24px 60px;
+    }
+    .state-page h1 {
+      font-family: var(--font-headline);
+      font-size: 32px; font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .state-page p {
+      font-size: 14px; color: var(--text-secondary);
+      margin-bottom: 24px;
+      max-width: 420px;
+    }
+    .state-page .back-link {
+      color: var(--accent);
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    .state-page .back-link:hover { color: var(--accent-hover); }
+    .state-page .retry-btn {
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 10px 22px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+    .state-page .retry-btn:hover { background: var(--accent); color: #fff; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1024px) {
+      .article-grid { grid-template-columns: 1fr; gap: 0; max-width: 720px; }
+      .sidebar { display: none; }
+      .headline { font-size: 36px; }
+    }
+    @media (max-width: 768px) {
+      :root { --gutter: 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .btn-submit { padding: 7px 14px; font-size: 12px; }
+      .progress-bar { top: 52px; height: 2px; }
+
+      .article-page { padding: 70px 0 0; }
+      .breadcrumb { margin-top: 20px; font-size: 10px; }
+      .headline { font-size: 28px; }
+      .excerpt { font-size: 17px; }
+      .author-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .meta-row { gap: 12px; }
+      .share-row { justify-content: center; }
+      .cover { border-radius: 0; margin: 0 calc(var(--gutter) * -1); width: calc(100% + (var(--gutter) * 2)); border-radius: 0; }
+      .article-content p { font-size: 16px; line-height: 1.75; }
+      .article-content h2 { font-size: 22px; margin: 32px 0 12px; }
+      .article-content blockquote { font-size: 18px; padding: 14px 18px; margin: 24px 0; }
+
+      .more-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 480px) {
+      .headline { font-size: 26px; }
+      .author-card { flex-direction: column; }
+      .nav-inner { padding: 12px var(--gutter); }
+      .logo { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">WEVOX<span class="dot">.</span></a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html#stories">Stories</a>
+        <a href="index.html#videos">Videos</a>
+        <a href="index.html#trending">Trending</a>
+        <a href="community.html">Community</a>
+        <a href="about.html">About</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <a href="join.html" class="btn-submit">Submit Story</a>
+        <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE OVERLAY -->
+  <div class="mobile-overlay" id="mobileOverlay" aria-hidden="true">
+    <button class="close" id="overlayClose" aria-label="Close menu">✕</button>
+    <a href="index.html#stories">Stories</a>
+    <a href="index.html#videos">Videos</a>
+    <a href="index.html#trending">Trending</a>
+    <a href="community.html">Community</a>
+    <a href="about.html">About</a>
+    <a href="join.html">Submit Story</a>
+  </div>
+
+  <!-- READING PROGRESS BAR -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- ARTICLE PAGE -->
+  <main class="article-page" id="articlePage">
+    <div class="container">
+      <div class="article-grid">
+
+        <!-- ARTICLE COLUMN -->
+        <div class="article-col" id="articleCol">
+          <!-- Skeleton (replaced on load) -->
+          <div id="storySkeleton">
+            <div class="skeleton sk-line" style="width:160px;margin-top:24px;margin-bottom:18px;"></div>
+            <div class="skeleton sk-tag"></div>
+            <div class="skeleton sk-bigline" style="width:90%"></div>
+            <div class="skeleton sk-bigline" style="width:75%"></div>
+            <div class="skeleton sk-bigline" style="width:60%"></div>
+            <div class="skeleton sk-line" style="width:100%;margin:16px 0;"></div>
+            <div class="skeleton sk-line" style="width:80%;"></div>
+            <div class="skeleton sk-meta" style="margin:18px 0;"></div>
+            <div class="skeleton sk-cover" style="margin:24px 0;"></div>
+            <div class="skeleton sk-line" style="width:100%"></div>
+            <div class="skeleton sk-line" style="width:95%"></div>
+            <div class="skeleton sk-line" style="width:88%"></div>
+            <div class="skeleton sk-line" style="width:100%"></div>
+            <div class="skeleton sk-line" style="width:72%"></div>
+          </div>
+
+          <!-- Real content gets injected here -->
+          <article id="storyContent" style="display:none;"></article>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+          <div class="sidebar-block">
+            <div class="sidebar-heading">In This Story</div>
+            <nav class="toc-list" id="tocList">
+              <span style="font-size:13px;color:var(--text-muted);">Loading…</span>
+            </nav>
+          </div>
+          <div class="sidebar-block">
+            <div class="sidebar-heading">Share This Story</div>
+            <div class="sidebar-share" id="sidebarShare"></div>
+          </div>
+          <div class="sidebar-block" id="sidebarRelated" style="display:none;">
+            <div class="sidebar-heading">Read Next</div>
+            <a class="related-teaser" id="relatedTeaser" href="#">
+              <img id="relatedThumb" src="" alt="" />
+              <div class="related-teaser-title" id="relatedTitle"></div>
+              <span class="related-teaser-link">Read next →</span>
+            </a>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- MORE STORIES -->
+  <section class="more-stories" id="moreStoriesSection" style="display:none;">
+    <div class="more-head">
+      <h2>More from WEVOX</h2>
+    </div>
+    <div class="more-grid" id="moreGrid"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">WEVOX<span style="color:var(--accent)">.</span></div>
+          <p class="footer-tagline">Student journalism. No filters.</p>
+          <div class="socials" aria-label="Social media">
+            <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24"><path d="M22 5.8c-.7.3-1.5.5-2.4.6.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1-.7-.8-1.8-1.3-3-1.3-2.3 0-4.1 1.8-4.1 4.1 0 .3 0 .6.1.9-3.4-.2-6.4-1.8-8.4-4.3-.4.6-.6 1.3-.6 2.1 0 1.4.7 2.7 1.8 3.4-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2.1 2.8 3.9 2.9-1.4 1.1-3.2 1.8-5.2 1.8H2c1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg></a>
+            <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23 12c0-2-.2-3.5-.4-4.4-.2-.6-.8-1.2-1.4-1.4C19.5 5.8 12 5.8 12 5.8s-7.5 0-9.2.4c-.6.2-1.2.8-1.4 1.4-.4 1.7-.4 5.4-.4 5.4s0 3.7.4 5.4c.2.6.8 1.2 1.4 1.4 1.7.4 9.2.4 9.2.4s7.5 0 9.2-.4c.6-.2 1.2-.8 1.4-1.4.2-.9.4-2.4.4-4.4zM9.6 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg></a>
+            <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.9.9 1.4.2.4.4 1 .4 2.2.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.9.7-1.4.9-.4.2-1 .4-2.2.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.9-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.9-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 2c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4-1.2-.1-1.6-.1-4.7-.1zm0 3.4a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 7.2a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6zm5.6-7.4a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading">Explore</div>
+          <ul>
+            <li><a href="index.html#stories">Stories</a></li>
+            <li><a href="index.html#videos">Videos</a></li>
+            <li><a href="index.html#trending">Trending</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="join.html">Submit Story</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading">Network</div>
+          <ul>
+            <li><a href="#">North Desk Hub</a></li>
+            <li><a href="#">Southern Grid Frontiers</a></li>
+            <li><a href="#">Verification Protocol Ledger</a></li>
+            <li><a href="#">Public Transparency Index</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2024 WEVOX Network Platforms Inc.</div>
+        <div>contact@wevox.in</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <script>
+    /* ===== FIREBASE CONFIG (same as index.html) ===== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
+      authDomain: "cjnsite-d3f3f.firebaseapp.com",
+      projectId: "cjnsite-d3f3f",
+      storageBucket: "cjnsite-d3f3f.firebasestorage.app",
+      messagingSenderId: "491318197551",
+      appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
+      measurementId: "G-JES3G3L45V"
+    };
+    let db = null, firebaseReady = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      firebaseReady = true;
+    } catch (e) { firebaseReady = false; }
+
+    /* ===== SAMPLE FALLBACK STORIES (same IDs as index.html) ===== */
+    const NOW = Date.now();
+    const ago = (d) => ({ toDate: () => new Date(NOW - d * 86400000) });
+    const SAMPLE_STORIES = [
+      {
+        id: "demo-1",
+        title: "Inside the hostel mess scam: ₹2.4 crore unaccounted across 6 colleges",
+        category: "Campus Fraud",
+        author: "Ananya Krishnan",
+        university: "DU North Campus",
+        coverImage: "https://picsum.photos/seed/wevox-s1/1200/675",
+        readTime: "8 min read",
+        publishedAt: ago(2),
+        views: 14230,
+        excerpt: "A six-month investigation across hostels in three states reveals a pattern of falsified mess registers, ghost tenders, and missing audit trails — and how students have been paying for it.",
+        tags: ["Campus Fraud", "Investigation", "Hostels", "Audit"],
+        content: `<p>It started with a simple complaint. A first-year student at a prominent Delhi University college noticed her mess register had been signed for breakfast on a day she'd been home with a fever. When she pointed it out, the warden told her the system was "automatic." It wasn't.</p>
+
+<p>Over the next six months, WEVOX correspondents pulled mess registers, vendor invoices, and audit notes from six colleges across three states. What we found is not a single rogue contractor. It's a pattern.</p>
+
+<h2>The numbers that don't add up</h2>
+
+<p>At three of the six colleges examined, the registered student count for mess attendance exceeded the actual hostel occupancy by between 11% and 23%. In rupees, that's a delta of <strong>₹2.4 crore</strong> across one academic year — money billed to administrations for meals that were never served.</p>
+
+<blockquote>"The signatures on the register are real. The students are real. They just weren't there that day."</blockquote>
+
+<p>That quote, from a former kitchen supervisor at one of the colleges, sits at the heart of the scheme. Mess contractors aren't inventing fake students. They're <em>over-counting real ones</em> — using stamps, photocopied signatures, and end-of-month "catch up" entries when no one is watching.</p>
+
+<h2>How the loophole works</h2>
+
+<p>The standard hostel mess audit relies on three things: the daily register, the vendor's monthly bill, and the warden's countersignature. In every college we examined, at least one of these three steps had been delegated, automated, or skipped.</p>
+
+<h3>The "catch-up" entry</h3>
+
+<p>At one Lucknow college, we obtained a register where 14 consecutive days had been signed in identical blue ballpoint pen — by a student who told us she'd been on field study in Almora for that entire fortnight.</p>
+
+<h3>The ghost tender</h3>
+
+<p>At another college, the mess contract had been renewed without competitive bidding for four years running. The "competing bids" on file were submitted by two firms registered to the same address as the winning contractor.</p>
+
+<h2>What students are actually paying for</h2>
+
+<p>The students themselves rarely see itemised mess bills. They see a flat hostel fee. But administrations bill internally on a per-meal basis — which means every padded register entry is a real rupee transferred from college accounts to private vendors.</p>
+
+<p>One college's bursar, who agreed to speak on condition of anonymity, called it "the most boring fraud in the system." Boring, because it doesn't involve fake degrees or rigged exams. Just rice.</p>
+
+<h2>What happens next</h2>
+
+<p>Two of the six colleges have, since our queries, suspended their mess contracts pending review. A third has installed a biometric attendance system at the mess entry — a fix that students at other colleges have been requesting for years.</p>
+
+<p>The other three have not responded to our questions. We're still asking.</p>
+
+<p><em>If you have hostel mess records, audit notes, or vendor contracts you'd like us to look at, write to us at <a href="mailto:tips@wevox.in">tips@wevox.in</a>. We protect sources.</em></p>`
+      },
+      {
+        id: "demo-2",
+        title: "How private hostels are rigging Bihar's NEET admissions",
+        category: "Investigation",
+        author: "Rohit Kumar",
+        university: "AMU",
+        coverImage: "https://picsum.photos/seed/wevox-s2/1200/675",
+        readTime: "12 min read",
+        publishedAt: ago(5),
+        views: 9870,
+        excerpt: "A network of coaching-linked hostels in Patna and Kota is offering 'guaranteed' NEET seats to families who pay seven-figure fees up front. We followed the paperwork.",
+        tags: ["Investigation", "NEET", "Education", "Bihar"],
+        content: `<p>The flyer was glossy and direct. "Guaranteed MBBS seat. Pay only after admission." We picked it up outside a coaching centre in Boring Road, Patna, in February. It led us to a six-month investigation that crossed three states and turned up a parallel admissions system operating under the surface of NEET.</p>
+
+<h2>The pitch, and what it really means</h2>
+
+<p>Private "integrated" hostels — establishments that combine living, coaching, and "career counselling" — have for years been pitching what they call <strong>commitment-based admissions</strong>. Pay an upfront seat-securing fee of ₹14 to ₹38 lakh, they say, and your child is guaranteed a medical seat.</p>
+
+<blockquote>"They don't say it's bribe money. They say it's an 'arrangement fee.' But the seat is the seat."</blockquote>
+
+<p>That's a parent in Muzaffarpur, who asked not to be named. He paid ₹22 lakh in 2023. His son got the seat.</p>
+
+<h2>Following the money</h2>
+
+<p>We tracked invoices, transfer records, and shell-firm registrations across four hostels. The same pattern appeared in three of them: large sums received under categories like "additional study material" and "facility upgrade" within four weeks of each NEET counselling round.</p>
+
+<h2>Why it's hard to catch</h2>
+
+<p>The seats themselves are real. Allocations come through legitimate counselling. What changes is the <em>preparation pipeline</em> — coaching, mock tests, application support, and what one insider called "category management." Parents pay for an outcome, not for a specific bribe.</p>
+
+<p>That makes it close to invisible to investigators.</p>
+
+<h2>What students told us</h2>
+
+<p>We spoke with 19 students currently in MBBS programs across Bihar, Jharkhand, and UP. Eight had been through "commitment-based" hostels. Five said they didn't fully understand what their parents had paid for. Three said they suspected something was wrong but didn't ask.</p>
+
+<p>"My father said it was for the hostel," one second-year student in Patna told us. "I knew the hostel didn't cost that much."</p>`
+      },
+      {
+        id: "demo-3",
+        title: "The vanishing scholarships: a paper trail across 4 states",
+        category: "Economy",
+        author: "Priya Sharma",
+        university: "JNU",
+        coverImage: "https://picsum.photos/seed/wevox-s3/1200/675",
+        readTime: "10 min read",
+        publishedAt: ago(7),
+        views: 7440,
+        excerpt: "Government scholarship money allocated to Scheduled Caste and Scheduled Tribe students is being credited and reclaimed within days. This is how it's happening.",
+        tags: ["Economy", "Scholarships", "SC/ST", "Audit"],
+        content: `<p>The pattern was first noticed by a JNU researcher running a routine analysis of post-matric scholarship disbursements. Money went into student accounts. Within seven days, it disappeared. Same accounts. Same beneficiaries. Same banks.</p>
+
+<h2>The mechanics</h2>
+
+<p>State governments disburse SC/ST post-matric scholarships directly into beneficiary accounts. The amount, the timing, and the recipient list are all on public record. The audit trail, in theory, ends there.</p>
+
+<p>In practice, in four states we examined, the audit trail continues. And it does not always end where it should.</p>
+
+<h2>What the data shows</h2>
+
+<p>Across 1,847 disbursements we sampled, 312 saw an outflow of <strong>more than 80%</strong> of the disbursed amount within seven days, to accounts not registered in the student's name.</p>
+
+<blockquote>"The money is technically being received by the right person. It's just not staying with them."</blockquote>
+
+<h2>Who is taking the money out?</h2>
+
+<p>In several of the cases we tracked, the receiving accounts traced back to private hostels and coaching centres where the students were enrolled. In others, the trail led to family members — sometimes with the student's knowledge, sometimes not.</p>
+
+<p>This is not new. What is new is the scale at which it appears to be happening.</p>
+
+<h2>What the rules say</h2>
+
+<p>Post-matric scholarship rules require the funds to remain with the student. Diversion to a third party — even with consent — is technically a violation. In practice, no enforcement mechanism exists.</p>`
+      },
+      {
+        id: "demo-4",
+        title: "Election campaigns on campus — who's funding the posters?",
+        category: "Politics",
+        author: "Arjun Mehta",
+        university: "IIT Bombay",
+        coverImage: "https://picsum.photos/seed/wevox-s4/1200/675",
+        readTime: "6 min read",
+        publishedAt: ago(10),
+        views: 5210,
+        excerpt: "Student union elections cost more than they should. We asked candidates and their accountants where the money actually comes from.",
+        tags: ["Politics", "Student Unions", "Funding"],
+        content: `<p>An A2 colour poster, professionally printed, costs around ₹120. A typical campus election sees 2,000 to 4,000 of them. Add buntings, social media ads, transport, and food, and a single candidate's spend can easily cross ₹3 lakh. That's the official ceiling on a state legislature election in some smaller constituencies — for a student body election.</p>
+
+<p>Where does the money come from?</p>
+
+<h2>Three sources, in this order</h2>
+
+<p>Across 14 candidates we interviewed at six universities, the answer was almost always the same three sources: alumni networks, affiliated political organisations, and personal family money. The proportions varied. The structure didn't.</p>
+
+<blockquote>"Nobody asks for receipts. The point is to win."</blockquote>
+
+<h2>Why it matters</h2>
+
+<p>Student union elections are training grounds. The candidates who win them frequently move on to mainstream politics. The funding patterns they learn at 19 are the funding patterns they replicate at 39.</p>`
+      },
+      {
+        id: "demo-5",
+        title: "The new student-music underground rewriting Hindi indie",
+        category: "Culture",
+        author: "Sahil Verma",
+        university: "Jadavpur University",
+        coverImage: "https://picsum.photos/seed/wevox-s5/1200/675",
+        readTime: "7 min read",
+        publishedAt: ago(12),
+        views: 8120,
+        excerpt: "Behind every campus festival in 2025, a quieter scene has been forming — and it sounds almost nothing like what's on the festival main stage.",
+        tags: ["Culture", "Music", "Indie", "Hindi"],
+        content: `<p>You hear it in the courtyards before the official acts go on. Lo-fi hip-hop in Bhojpuri. Bedroom-produced Punjabi indie that owes more to Frank Ocean than to Diljit. A Tamil-language doom-pop band that records in a hostel bathroom for the reverb.</p>
+
+<p>This is the second campus music scene of 2025, and it's barely visible to anyone who isn't on a campus.</p>
+
+<h2>Why it's happening now</h2>
+
+<p>Three things shifted at once: bedroom recording got cheap, Spotify For Artists made distribution free, and post-COVID campus festivals stopped being able to afford the big acts. Student bookers had to look closer to home. They found a generation that had been quietly recording for two years.</p>
+
+<blockquote>"We didn't get bigger. The festivals got smaller, and we were already here."</blockquote>
+
+<h2>The new sound, in three patterns</h2>
+
+<p>What's surprising is how non-Bollywood it sounds. The reference points students cite aren't Hindi cinema. They're Pakistani indie, Tamil hip-hop, and a wave of Bengali bedroom producers nobody outside Kolkata has heard of yet.</p>`
+      },
+      {
+        id: "demo-6",
+        title: "Inside a fake-degree racket near a Tier-2 city",
+        category: "Campus Fraud",
+        author: "Neha Menon",
+        university: "Miranda House",
+        coverImage: "https://picsum.photos/seed/wevox-s6/1200/675",
+        readTime: "9 min read",
+        publishedAt: ago(14),
+        views: 11450,
+        excerpt: "A small printing press, a deregistered private university, and 600 fake degrees a year. We went to the warehouse.",
+        tags: ["Campus Fraud", "Investigation"],
+        content: `<p>The warehouse was on the edge of town, behind a tyre shop. The man who let us in thought we were buyers.</p>
+
+<p>Inside, on metal shelves, were stacks of degree certificates from a private university that had been deregistered by the UGC in 2019. The university's name was still on the paperwork. The seal was still embossed. Only the dates were forged — the degrees were being printed in 2024 with backdated graduation years.</p>
+
+<h2>The market</h2>
+
+<p>A bachelor's certificate cost ₹18,000. A master's, ₹35,000. The man told us turnaround was 72 hours.</p>
+
+<blockquote>"For three years we were the only place that could do it. Now there are six of us."</blockquote>
+
+<h2>How they get used</h2>
+
+<p>Most of these degrees, our reporting found, are not used domestically. They're submitted with overseas job applications and student visas — places where verification with a deregistered Indian university is unlikely to be attempted, and where the certificate alone is the credential.</p>`
+      }
+    ];
+
+    /* ===== STATE & DOM HELPERS ===== */
+    const $ = (id) => document.getElementById(id);
+    const escapeHtml = (s = "") => String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    const placeholderImg = (seed) => `https://picsum.photos/seed/${encodeURIComponent(seed)}/1200/675`;
+
+    function tsValue(ts) {
+      if (!ts) return 0;
+      try {
+        if (ts.toDate) return ts.toDate().getTime();
+        return new Date(ts).getTime() || 0;
+      } catch (e) { return 0; }
+    }
+    function formatDate(ts) {
+      try {
+        const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : new Date());
+        return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+      } catch (e) { return ""; }
+    }
+    function formatViews(n) {
+      n = Number(n) || 0;
+      if (n < 1000) return n + " reads";
+      if (n < 100000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "K reads";
+      return (n / 1000000).toFixed(1).replace(/\.0$/, "") + "M reads";
+    }
+    function initials(name) {
+      if (!name) return "W";
+      return name.split(/\s+/).map(p => p[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+    }
+    function isHTMLContent(s) {
+      return /<\/?(p|h\d|blockquote|ul|ol|li|strong|em|a|br)[\s>]/i.test(s || "");
+    }
+    function plainToHTML(s) {
+      return (s || "").split(/\n{2,}/).map(p => `<p>${escapeHtml(p.trim()).replace(/\n/g, "<br>")}</p>`).join("");
+    }
+
+    /* ===== NAVBAR / HAMBURGER ===== */
+    const navbar = $("navbar");
+    window.addEventListener("scroll", () => {
+      navbar.classList.toggle("scrolled", window.scrollY > 50);
+      updateProgress();
+      updateActiveTOC();
+    });
+    const hamburger = $("hamburger");
+    const mobileOverlay = $("mobileOverlay");
+    const overlayClose = $("overlayClose");
+    hamburger.addEventListener("click", () => {
+      mobileOverlay.classList.add("open");
+      mobileOverlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    });
+    function closeMenu() {
+      mobileOverlay.classList.remove("open");
+      mobileOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+    overlayClose.addEventListener("click", closeMenu);
+    mobileOverlay.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
+
+    /* ===== READING PROGRESS BAR ===== */
+    const progressBar = $("progressBar");
+    function updateProgress() {
+      const article = $("storyContent");
+      if (!article || article.style.display === "none") { progressBar.style.width = "0%"; return; }
+      const rect = article.getBoundingClientRect();
+      const total = rect.height - window.innerHeight + 200;
+      const scrolled = Math.min(Math.max(-rect.top, 0), total);
+      const pct = total > 0 ? (scrolled / total) * 100 : 0;
+      progressBar.style.width = Math.min(pct, 100) + "%";
+    }
+
+    /* ===== SHARE BUTTONS ===== */
+    function shareUrl() { return window.location.href; }
+    function buildShareButtons(targetEl, story) {
+      const text = encodeURIComponent(`${story.title} — WEVOX`);
+      const url = encodeURIComponent(shareUrl());
+      const tw = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+      const wa = `https://wa.me/?text=${text}%20${url}`;
+      targetEl.innerHTML = `
+        <span class="share-label">Share this story</span>
+        <a class="share-btn" href="${tw}" target="_blank" rel="noopener" aria-label="Share on Twitter/X">
+          <svg viewBox="0 0 24 24"><path d="M22 5.8c-.7.3-1.5.5-2.4.6.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1-.7-.8-1.8-1.3-3-1.3-2.3 0-4.1 1.8-4.1 4.1 0 .3 0 .6.1.9-3.4-.2-6.4-1.8-8.4-4.3-.4.6-.6 1.3-.6 2.1 0 1.4.7 2.7 1.8 3.4-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2.1 2.8 3.9 2.9-1.4 1.1-3.2 1.8-5.2 1.8H2c1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg>
+        </a>
+        <button class="share-btn" data-action="copy" aria-label="Copy link">
+          <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.7 1.4-3.1 3.1-3.1h4V7H7c-2.8 0-5 2.2-5 5s2.2 5 5 5h4v-1.9H7c-1.7 0-3.1-1.4-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.7 0 3.1 1.4 3.1 3.1s-1.4 3.1-3.1 3.1h-4V17h4c2.8 0 5-2.2 5-5s-2.2-5-5-5z"/></svg>
+        </button>
+        <a class="share-btn" href="${wa}" target="_blank" rel="noopener" aria-label="Share on WhatsApp">
+          <svg viewBox="0 0 24 24"><path d="M20 4A10 10 0 003 17l-1 5 5.2-1.4A10 10 0 1020 4zm-8 17.6c-1.6 0-3.2-.4-4.5-1.2l-.3-.2-3.1.8.8-3-.2-.3a8.4 8.4 0 1115.5-4.5 8.4 8.4 0 01-8.2 8.4zm4.6-6.3c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.2.2-.3.2-.5.1-.3-.1-1.1-.4-2.1-1.3-.8-.7-1.3-1.5-1.5-1.8-.2-.3 0-.4.1-.5l.4-.4c.1-.1.2-.2.2-.4 0-.2 0-.3-.1-.4 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.4-.2.3-.9.9-.9 2.2 0 1.3.9 2.5 1 2.7.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.3z"/></svg>
+        </a>
+      `;
+      const copyBtn = targetEl.querySelector("[data-action='copy']");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(shareUrl());
+          } catch (e) {
+            const ta = document.createElement("textarea");
+            ta.value = shareUrl();
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); } catch (_) {}
+            document.body.removeChild(ta);
+          }
+          const original = copyBtn.innerHTML;
+          copyBtn.classList.add("copied");
+          copyBtn.innerHTML = "Copied!";
+          setTimeout(() => {
+            copyBtn.classList.remove("copied");
+            copyBtn.innerHTML = original;
+          }, 2000);
+        });
+      }
+    }
+
+    function buildSidebarShare(story) {
+      const text = encodeURIComponent(`${story.title} — WEVOX`);
+      const url = encodeURIComponent(shareUrl());
+      const tw = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+      const wa = `https://wa.me/?text=${text}%20${url}`;
+      const el = $("sidebarShare");
+      el.innerHTML = `
+        <a class="sidebar-share-btn" href="${tw}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M22 5.8c-.7.3-1.5.5-2.4.6.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1-.7-.8-1.8-1.3-3-1.3-2.3 0-4.1 1.8-4.1 4.1 0 .3 0 .6.1.9-3.4-.2-6.4-1.8-8.4-4.3-.4.6-.6 1.3-.6 2.1 0 1.4.7 2.7 1.8 3.4-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2.1 2.8 3.9 2.9-1.4 1.1-3.2 1.8-5.2 1.8H2c1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg>
+          Share on Twitter/X
+        </a>
+        <button class="sidebar-share-btn" id="sidebarCopy">
+          <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.7 1.4-3.1 3.1-3.1h4V7H7c-2.8 0-5 2.2-5 5s2.2 5 5 5h4v-1.9H7c-1.7 0-3.1-1.4-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.7 0 3.1 1.4 3.1 3.1s-1.4 3.1-3.1 3.1h-4V17h4c2.8 0 5-2.2 5-5s-2.2-5-5-5z"/></svg>
+          <span id="sidebarCopyText">Copy link</span>
+        </button>
+        <a class="sidebar-share-btn" href="${wa}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M20 4A10 10 0 003 17l-1 5 5.2-1.4A10 10 0 1020 4z"/></svg>
+          Share on WhatsApp
+        </a>
+      `;
+      $("sidebarCopy").addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(shareUrl()); } catch (_) {}
+        const t = $("sidebarCopyText");
+        const orig = t.textContent;
+        t.textContent = "Copied!";
+        setTimeout(() => { t.textContent = orig; }, 2000);
+      });
+    }
+
+    /* ===== TOC ===== */
+    let tocLinks = [], tocSections = [];
+    function buildTOC(articleEl) {
+      const headings = articleEl.querySelectorAll("h2, h3");
+      const tocList = $("tocList");
+      if (!headings.length) {
+        tocList.innerHTML = `<span style="font-size:13px;color:var(--text-muted);">No sections.</span>`;
+        return;
+      }
+      tocList.innerHTML = "";
+      tocLinks = []; tocSections = [];
+      headings.forEach((h, i) => {
+        const id = "sec-" + i;
+        h.id = id;
+        const a = document.createElement("a");
+        a.href = "#" + id;
+        a.textContent = h.textContent;
+        if (h.tagName === "H3") a.classList.add("h3");
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          h.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        tocList.appendChild(a);
+        tocLinks.push(a);
+        tocSections.push(h);
+      });
+    }
+    function updateActiveTOC() {
+      if (!tocSections.length) return;
+      const top = window.scrollY + 120;
+      let active = 0;
+      for (let i = 0; i < tocSections.length; i++) {
+        if (tocSections[i].offsetTop <= top) active = i;
+        else break;
+      }
+      tocLinks.forEach((l, i) => l.classList.toggle("active", i === active));
+    }
+
+    /* ===== PARAGRAPH REVEAL ===== */
+    function setupParagraphReveal(articleEl) {
+      const ps = articleEl.querySelectorAll("p, h2, h3, blockquote, ul, ol");
+      ps.forEach(p => {
+        p.style.opacity = "0";
+        p.style.transform = "translateY(16px)";
+        p.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+      });
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.style.opacity = "1";
+            e.target.style.transform = "translateY(0)";
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+      ps.forEach(p => obs.observe(p));
+    }
+
+    /* ===== RENDER STORY ===== */
+    function renderStory(story) {
+      const skel = $("storySkeleton");
+      const el = $("storyContent");
+      skel.style.display = "none";
+      el.style.display = "block";
+
+      // Update title and meta
+      document.title = `${story.title} — WEVOX`;
+      const metaDesc = $("metaDesc");
+      const ogTitle = $("ogTitle");
+      const ogDesc = $("ogDesc");
+      if (metaDesc) metaDesc.setAttribute("content", story.excerpt || story.title);
+      if (ogTitle) ogTitle.setAttribute("content", `${story.title} — WEVOX`);
+      if (ogDesc) ogDesc.setAttribute("content", story.excerpt || "");
+
+      const cat = story.category || "Stories";
+      const tags = Array.isArray(story.tags) ? story.tags : [];
+      const cover = story.coverImage || placeholderImg("wevox-" + (story.id || "x"));
+      const author = story.author || "Anonymous";
+      const uni = story.university || "Independent";
+      const avatarHTML = story.authorAvatar
+        ? `<div class="avatar"><img src="${escapeHtml(story.authorAvatar)}" alt=""/></div>`
+        : `<div class="avatar">${escapeHtml(initials(author))}</div>`;
+      const bodyHTML = isHTMLContent(story.content) ? story.content : plainToHTML(story.content || "");
+
+      el.innerHTML = `
+        <div class="reveal" style="animation-delay:0s;">
+          <nav class="breadcrumb">
+            <a href="index.html">WEVOX</a>
+            <span class="arrow">→</span>
+            <a href="index.html#stories">Stories</a>
+            <span class="arrow">→</span>
+            <span class="current">${escapeHtml(cat)}</span>
+          </nav>
+        </div>
+
+        <div class="reveal" style="animation-delay:0.05s;">
+          <span class="cat-tag">${escapeHtml(cat)}</span>
+        </div>
+
+        <h1 class="headline reveal" style="animation-delay:0.1s;">${escapeHtml(story.title || "Untitled")}</h1>
+
+        ${story.excerpt ? `<p class="excerpt reveal" style="animation-delay:0.12s;">${escapeHtml(story.excerpt)}</p>` : ""}
+
+        <hr class="divider" />
+
+        <div class="author-row reveal" style="animation-delay:0.15s;">
+          <div class="author-block">
+            ${avatarHTML}
+            <div>
+              <div class="author-name">${escapeHtml(author)}</div>
+              <div class="author-uni">${escapeHtml(uni)}</div>
+            </div>
+          </div>
+          <div class="meta-row">
+            <span class="meta-item">📅 ${escapeHtml(formatDate(story.publishedAt))}</span>
+            <span class="meta-item">⏱ ${escapeHtml(story.readTime || "5 min read")}</span>
+            <span class="meta-item">👁 <span id="viewsCount">${formatViews(story.views)}</span></span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="share-row" id="topShareRow"></div>
+
+        <div class="cover-wrap reveal" style="animation-delay:0.2s;">
+          <img class="cover" id="coverImg" src="${escapeHtml(cover)}" alt="" />
+          ${story.coverCaption ? `<div class="cover-caption">${escapeHtml(story.coverCaption)}</div>` : ""}
+        </div>
+
+        <div class="article-content" id="articleBody">${bodyHTML}</div>
+
+        ${tags.length ? `
+        <div class="tags-section">
+          <div class="tags-label">Tagged:</div>
+          <div class="tags-list">
+            ${tags.map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join("")}
+          </div>
+        </div>` : ""}
+
+        <div class="author-card">
+          ${avatarHTML}
+          <div class="author-card-info">
+            <div class="author-card-name">${escapeHtml(author)}</div>
+            <div class="author-card-uni">${escapeHtml(uni)}</div>
+            <div class="author-card-role">Field Correspondent</div>
+            ${story.authorBio ? `<div class="author-card-bio">${escapeHtml(story.authorBio)}</div>` : `<div class="author-card-bio">Verified WEVOX correspondent reporting from ${escapeHtml(uni)}.</div>`}
+          </div>
+        </div>
+
+        <div class="end-share">
+          <h4>Found this important? Share it.</h4>
+          <div class="share-row" id="bottomShareRow"></div>
+        </div>
+      `;
+
+      // Cover fade-in on load
+      const coverImg = $("coverImg");
+      if (coverImg.complete) coverImg.classList.add("loaded");
+      else coverImg.addEventListener("load", () => coverImg.classList.add("loaded"));
+      coverImg.addEventListener("error", () => {
+        coverImg.src = placeholderImg("fallback-" + (story.id || "x"));
+        coverImg.classList.add("loaded");
+      });
+
+      // Share buttons
+      buildShareButtons($("topShareRow"), story);
+      buildShareButtons($("bottomShareRow"), story);
+      buildSidebarShare(story);
+
+      // TOC + paragraph reveal
+      buildTOC($("articleBody"));
+      setupParagraphReveal($("articleBody"));
+
+      // Progress bar initial calc
+      updateProgress();
+    }
+
+    /* ===== ERROR / NOT FOUND STATES ===== */
+    function showNotFound() {
+      $("storySkeleton").style.display = "none";
+      $("sidebar").style.display = "none";
+      $("articleCol").innerHTML = `
+        <div class="state-page">
+          <h1>Story not found.</h1>
+          <p>This story may have been removed, or the link you followed is broken.</p>
+          <a class="back-link" href="index.html">← Back to Stories</a>
+        </div>
+      `;
+    }
+    function showUnderReview() {
+      $("storySkeleton").style.display = "none";
+      $("sidebar").style.display = "none";
+      $("articleCol").innerHTML = `
+        <div class="state-page">
+          <h1>This story is under review.</h1>
+          <p>Our editorial team is verifying this report. It will be available once approved.</p>
+          <a class="back-link" href="index.html">← Back to Stories</a>
+        </div>
+      `;
+    }
+    function showError() {
+      $("storySkeleton").style.display = "none";
+      $("sidebar").style.display = "none";
+      $("articleCol").innerHTML = `
+        <div class="state-page">
+          <h1>Something went wrong.</h1>
+          <p>Could not load story. Check your connection and try again.</p>
+          <button class="retry-btn" id="retryBtn">Retry</button>
+        </div>
+      `;
+      $("retryBtn").addEventListener("click", () => location.reload());
+    }
+
+    /* ===== MORE STORIES ===== */
+    async function loadMoreStories(currentStory) {
+      let candidates = [];
+      if (firebaseReady) {
+        try {
+          let snap;
+          try {
+            snap = await db.collection("stories")
+              .where("status", "==", "published")
+              .where("category", "==", currentStory.category)
+              .limit(6).get();
+          } catch (_) {
+            snap = await db.collection("stories").limit(20).get();
+          }
+          candidates = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          candidates = candidates.filter(d => !d.status || d.status === "published");
+        } catch (e) { /* ignore */ }
+      }
+      // De-dupe + filter out current
+      candidates = candidates.filter(c => c.id !== currentStory.id && c.id !== currentStory._docId);
+
+      // If still less than 3, top up from samples
+      if (candidates.length < 3) {
+        const fillers = SAMPLE_STORIES.filter(s => s.id !== currentStory.id && !candidates.find(c => c.id === s.id));
+        // Prefer same category fillers first
+        fillers.sort((a, b) => {
+          const aSame = a.category === currentStory.category ? 0 : 1;
+          const bSame = b.category === currentStory.category ? 0 : 1;
+          return aSame - bSame;
+        });
+        while (candidates.length < 3 && fillers.length) {
+          candidates.push(fillers.shift());
+        }
+      }
+      candidates = candidates.slice(0, 3);
+      if (!candidates.length) return;
+
+      const grid = $("moreGrid");
+      $("moreStoriesSection").style.display = "block";
+      grid.innerHTML = candidates.map(s => `
+        <a class="more-card" href="story.html?id=${encodeURIComponent(s.id)}">
+          <div class="more-card-thumb-wrap">
+            <img class="more-card-thumb" src="${escapeHtml(s.coverImage || placeholderImg('m-' + s.id))}" alt="" loading="lazy" />
+          </div>
+          <div class="more-card-body">
+            <div class="more-card-tag">${escapeHtml(s.category || "Stories")}</div>
+            <div class="more-card-title">${escapeHtml(s.title || "Untitled")}</div>
+            <div class="more-card-meta">By ${escapeHtml(s.author || "Anonymous")} — ${escapeHtml(s.university || "Independent")}</div>
+            <div class="more-card-readtime">${escapeHtml(s.readTime || "5 min read")}</div>
+          </div>
+        </a>
+      `).join("");
+
+      // Stagger reveal
+      const cards = grid.querySelectorAll(".more-card");
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            const idx = Array.from(cards).indexOf(entry.target);
+            setTimeout(() => entry.target.classList.add("in"), idx * 100);
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      cards.forEach(c => obs.observe(c));
+
+      // Sidebar related teaser (1st card)
+      const r = candidates[0];
+      $("sidebarRelated").style.display = "block";
+      $("relatedTeaser").href = "story.html?id=" + encodeURIComponent(r.id);
+      $("relatedThumb").src = r.coverImage || placeholderImg("r-" + r.id);
+      $("relatedTitle").textContent = r.title || "Untitled";
+    }
+
+    /* ===== MAIN FETCH ===== */
+    async function loadStory() {
+      const params = new URLSearchParams(window.location.search);
+      const storyId = params.get("id");
+      if (!storyId) { showNotFound(); return; }
+
+      let story = null;
+
+      // 1. Try Firestore
+      if (firebaseReady) {
+        try {
+          const doc = await db.collection("stories").doc(storyId).get();
+          if (doc.exists) {
+            const data = doc.data();
+            if (data.status && data.status !== "published") {
+              showUnderReview();
+              return;
+            }
+            story = { id: doc.id, _docId: doc.id, ...data };
+            // Increment views
+            try {
+              db.collection("stories").doc(storyId).update({
+                views: firebase.firestore.FieldValue.increment(1)
+              });
+            } catch (_) { /* ignore */ }
+          }
+        } catch (err) {
+          // Network or permission error — only treat as hard error if no fallback
+          console.warn("Firestore fetch error:", err && err.message);
+        }
+      }
+
+      // 2. Fallback to sample data
+      if (!story) {
+        story = SAMPLE_STORIES.find(s => s.id === storyId);
+      }
+
+      if (!story) { showNotFound(); return; }
+
+      renderStory(story);
+      loadMoreStories(story);
+    }
+
+    /* ===== KICK OFF ===== */
+    loadStory();
+  </script>
+</body>
+</html>
