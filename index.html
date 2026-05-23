@@ -1,1364 +1,1488 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Yuvox — Voices of Young India</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0
-        }
-        html {
-            scroll-behavior: smooth;
-            font-size: 16px
-        }
-        :root {
-            --ink: #0C0C0D;
-            --ink-2: #151515;
-            --ink-3: #1C1C1C;
-            --cream: #F4F3EF;
-            --cream-2: #ECE9E1;
-            --paper: #FAF8F3;
-            --blue: #1D4ED8;
-            --blue-soft: #DCE7FF;
-            --gold: #f5c518;
-            --text: #121212;
-            --text-soft: #5A5A5A;
-            --wire: rgba(255, 255, 255, 0.06);
-            --wire-dark: rgba(0, 0, 0, 0.08);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-        }
-        body {
-            letter-spacing: -0.01em;
-            font-family: 'DM Sans', sans-serif;
-            background: var(--cream);
-            color: #fff;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-        .serif {
-            font-family: 'Playfair Display', serif;
-        }
-        .display {
-            font-family: 'Playfair Display', serif;
-            letter-spacing: -0.03em;
-        }
-        ::-webkit-scrollbar {
-            width: 3px
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--ink)
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--blue);
-            border-radius: 4px
-        }
-        .nav {
-            background: rgba(12, 12, 13, 0.75);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--wire);
-        }
-        .hero-mesh {
-            background: radial-gradient(circle 700px at 20% 50%, rgba(29, 78, 216, 0.12) 0%, transparent 70%),
-                radial-gradient(circle 500px at 80% 30%, rgba(255, 255, 255, 0.04) 0%, transparent 60%),
-                linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.55)),
-                var(--ink);
-        }
-        .grain::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            opacity: .025;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-        }
-        .hero-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(4rem, 9vw, 7.5rem);
-            font-weight: 700;
-            line-height: .92;
-            letter-spacing: -0.04em;
-        }
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.4rem, 5vw, 4.5rem);
-            line-height: 1.08;
-            font-weight: 600;
-            color: var(--text);
-        }
-        .label {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: .14em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-        }
-        .label-dark {
-            color: rgba(0, 0, 0, .4)
-        }
-        .rule {
-            border: none;
-            border-top: 1px solid var(--wire)
-        }
-        .rule-dark {
-            border: none;
-            border-top: 1px solid var(--wire-dark)
-        }
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--blue);
-            color: #fff;
-            padding: 13px 28px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: .04em;
-            border: none;
-            cursor: pointer;
-            transition: background .2s, transform .15s;
-        }
-        .btn-primary:hover {
-            background: #1a44b8;
-            transform: translateY(-1px)
-        }
-        .btn-ghost {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: transparent;
-            color: #fff;
-            padding: 13px 28px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: .04em;
-            border: 1px solid var(--wire);
-            cursor: pointer;
-            transition: border-color .2s, background .2s, transform .15s;
-        }
-        .btn-ghost:hover {
-            border-color: rgba(255, 255, 255, .25);
-            background: rgba(255, 255, 255, .05);
-            transform: translateY(-1px)
-        }
-        .btn-dark {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--ink);
-            color: #fff;
-            padding: 13px 28px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: .04em;
-            border: none;
-            cursor: pointer;
-            transition: background .2s;
-        }
-        .btn-dark:hover {
-            background: #1a1a1f
-        }
-        .btn-outline-dark {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: transparent;
-            color: var(--ink);
-            padding: 13px 28px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: .04em;
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-            transition: border-color .2s, background .2s;
-        }
-        .btn-outline-dark:hover {
-            border-color: var(--blue);
-            background: rgba(29, 78, 216, 0.04);
-        }
-        .story-card {
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: #ffffff;
-            transition: border-color .35s cubic-bezier(.16, 1, .3, 1),
-                transform .45s cubic-bezier(.16, 1, .3, 1),
-                box-shadow .45s cubic-bezier(.16, 1, .3, 1);
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-        }
-        .story-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            border-top: 2px solid transparent;
-            transition: border-color .4s ease;
-        }
-        .story-card:hover {
-            border-color: rgba(29, 78, 216, .18);
-            transform: translateY(-8px);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.10),
-                0 5px 18px rgba(0, 0, 0, 0.04);
-        }
-        .story-card:hover::before {
-            border-top-color: #1D4ED8;
-        }
-        .story-card:hover .story-thumb {
-            transform: scale(1.06);
-        }
-        .story-thumb {
-            transition: transform .8s cubic-bezier(.16, 1, .3, 1);
-            will-change: transform;
-        }
-        .benefit-card {
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: white;
-            padding: 40px 34px;
-            transition: all .35s cubic-bezier(.16, 1, .3, 1);
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-        }
-        .benefit-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(29, 78, 216, .2);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-        }
-        .benefit-num {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            line-height: 1;
-            color: rgba(0, 0, 0, .08);
-            font-weight: 500;
-            margin-bottom: 16px;
-        }
-        .event-card {
-            border: 1px solid var(--wire);
-            background: var(--ink-2);
-            transition: border-color .3s, transform .3s cubic-bezier(.16, 1, .3, 1);
-            cursor: pointer;
-            overflow: hidden;
-        }
-        .event-card:hover {
-            border-color: rgba(255, 255, 255, .15);
-            transform: translateY(-3px)
-        }
-        .field {
-            width: 100%;
-            background: rgba(255, 255, 255, .05);
-            border: 1px solid var(--wire);
-            color: #fff;
-            padding: 14px 18px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            transition: border-color .2s;
-        }
-        .field:focus {
-            outline: none;
-            border-color: rgba(29, 78, 216, .6)
-        }
-        .field::placeholder {
-            color: rgba(255, 255, 255, .22)
-        }
-        .field option {
-            background: var(--ink-2);
-            color: #fff
-        }
-        .ticker-track {
-            display: flex;
-            animation: ticker 30s linear infinite;
-            width: max-content
-        }
-        @keyframes ticker {
-            from {
-                transform: translateX(0)
-            }
-            to {
-                transform: translateX(-50%)
-            }
-        }
-        .ticker-wrap:hover .ticker-track {
-            animation-play-state: paused
-        }
-        .stat-val {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(2rem, 4vw, 3.2rem);
-            font-weight: 800;
-            letter-spacing: -.03em;
-            line-height: 1;
-        }
-        .pull-quote {
-            font-family: 'Instrument Serif', serif;
-            font-size: clamp(1.4rem, 3vw, 2.2rem);
-            line-height: 1.35;
-            font-style: italic;
-            font-weight: 400;
-        }
-        .reveal {
-            opacity: 0;
-            transform: translateY(22px);
-            transition: opacity .7s ease, transform .7s cubic-bezier(.16, 1, .3, 1)
-        }
-        .reveal.in {
-            opacity: 1;
-            transform: none
-        }
-        .reveal-r {
-            opacity: 0;
-            transform: translateX(18px);
-            transition: opacity .7s ease, transform .7s cubic-bezier(.16, 1, .3, 1)
-        }
-        .reveal-r.in {
-            opacity: 1;
-            transform: none
-        }
-        .d1 {
-            transition-delay: .06s
-        }
-        .d2 {
-            transition-delay: .12s
-        }
-        .d3 {
-            transition-delay: .18s
-        }
-        .d4 {
-            transition-delay: .24s
-        }
-        .d5 {
-            transition-delay: .30s
-        }
-        .d6 {
-            transition-delay: .36s
-        }
-        @keyframes livepulse {
-            0%,
-            100% {
-                opacity: 1
-            }
-            50% {
-                opacity: 0
-            }
-        }
-        .live-dot {
-            animation: livepulse 1.6s step-end infinite
-        }
-        #mob-menu {
-            transition: transform .35s cubic-bezier(.16, 1, .3, 1)
-        }
-        .badge {
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            padding: 4px 10px;
-        }
-        .badge-blue {
-            background: rgba(29, 78, 216, .2);
-            color: #93b4ff
-        }
-        .badge-orange {
-            background: rgba(234, 88, 12, .2);
-            color: #fdba74
-        }
-        .badge-green {
-            background: rgba(16, 185, 129, .18);
-            color: #6ee7b7
-        }
-        .badge-purple {
-            background: rgba(124, 58, 237, .2);
-            color: #c4b5fd
-        }
-        .blue-strip {
-            background: linear-gradient(135deg, #1D4ED8 0%, #1a44b8 100%)
-        }
-        .index-line::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            width: 3px;
-            height: 0;
-            background: var(--blue);
-            transition: height .4s cubic-bezier(.16, 1, .3, 1);
-            transform: translateY(-50%);
-        }
-        .index-line:hover::before {
-            height: 100%
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WEVOX — India's youth newsroom. Verified student journalists publishing investigative stories and field video reports. No filters, no gatekeeping." />
+  <meta property="og:title" content="WEVOX — Student journalism. No filters." />
+  <meta property="og:description" content="India's youth newsroom. Verified student journalists publishing investigative stories and field video reports." />
+  <meta property="og:type" content="website" />
+  <title>WEVOX — Student journalism. No filters.</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
 
-        /* ── Hero Transition Fix ── */
-        .hero-section-wrapper {
-            position: relative;
-        }
-        .hero-section-wrapper::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 120px;
-            background: linear-gradient(to bottom, transparent, var(--cream));
-            pointer-events: none;
-            z-index: 2;
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 
-        /* ── Video Cards ── */
-        .video-grid {
-            display: grid;
-            gap: 20px;
-            grid-template-columns: 1fr;
-        }
-        .video-grid a {
-            text-decoration: none;
-            color: inherit;
-        }
-        .video-card {
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            transition: transform .3s ease, box-shadow .3s ease;
-            cursor: pointer;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .video-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-        }
-        .video-thumb {
-            position: relative;
-            aspect-ratio: 16/9;
-            overflow: hidden;
-            background: #e5e5e5;
-        }
-        .video-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .video-thumb .play-overlay {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.2);
-            transition: background 0.3s;
-        }
-        .video-card:hover .video-thumb .play-overlay {
-            background: rgba(0, 0, 0, 0.3);
-        }
-        .video-thumb .play-circle {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: rgba(29, 78, 216, 0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: #fff;
-            box-shadow: 0 0 20px rgba(29, 78, 216, 0.2);
-            transition: transform 0.3s;
-        }
-        .video-card:hover .video-thumb .play-circle {
-            transform: scale(1.08);
-            background: rgba(29, 78, 216, 1);
-        }
-        .video-thumb .duration {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #fff;
-        }
-        .video-thumb .category-tag {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            font-size: 0.6rem;
-            padding: 2px 10px;
-            border-radius: 4px;
-            background: rgba(29, 78, 216, 0.9);
-            color: #fff;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-        }
-        .video-info {
-            padding: 16px 18px 18px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .video-info h3 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 600;
-            font-size: 1.05rem;
-            color: #0C0C0D;
-            line-height: 1.3;
-            margin-bottom: 4px;
-        }
-        .video-info .meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.8rem;
-            color: #5a5a5a;
-            flex-wrap: wrap;
-            margin-top: auto;
-        }
-        .video-info .meta .reporter {
-            color: #3a3a3a;
-            font-weight: 500;
-        }
-        .video-info .meta .views {
-            color: #6a6a6a;
-        }
+  <style>
+    /* ============ DESIGN TOKENS ============ */
+    :root {
+      --bg: #F9F7F4;
+      --bg-dark: #0D0D0D;
+      --surface: #FFFFFF;
+      --border: #E8E4DF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #6B6B6B;
+      --text-muted: #9A9A9A;
+      --accent: #C8102E;
+      --accent-hover: #A50D26;
+      --tag-bg: #F0EDE8;
 
-        /* ── Spotlight Cards ── */
-        .spotlight-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 24px;
-            text-align: center;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            transition: all .3s ease;
-            cursor: default;
-        }
-        .spotlight-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-        .spotlight-card .emoji-big {
-            font-size: 2.8rem;
-            display: block;
-            margin-bottom: 12px;
-        }
-        .spotlight-card h4 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #111111;
-            margin-bottom: 4px;
-        }
-        .spotlight-card p {
-            font-size: 0.85rem;
-            color: #6b7280;
-            margin-bottom: 4px;
-        }
-        .spotlight-card .meta-detail {
-            font-size: 0.75rem;
-            color: #6b7280;
-            display: block;
-        }
+      --font-headline: "Playfair Display", Georgia, serif;
+      --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
+      --font-mono: "IBM Plex Mono", "Courier New", monospace;
 
-        /* ── Explore Stories Button ── */
-        .btn-video {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #1a1a2e;
-            color: #fff;
-            padding: 13px 28px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: .04em;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: all .3s ease;
-            text-decoration: none;
-        }
-        .btn-video:hover {
-            background: #2a2a4e;
-            box-shadow: 0 0 20px rgba(29, 78, 216, 0.15);
-            border-color: rgba(29, 78, 216, 0.3);
-        }
-        .btn-video .icon {
-            font-size: 16px;
-        }
-        .btn-video-subtitle {
-            display: block;
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: .08em;
-            margin-top: 4px;
-            font-weight: 400;
-        }
+      --max-width: 1240px;
+      --gutter: 32px;
+    }
 
-        /* ── Movement CTA Fix ── */
-        .movement-cta {
-            background-color: #0f172a !important;
-            padding: 80px 24px !important;
-            text-align: center !important;
-        }
-        .movement-cta .label {
-            color: #60a5fa !important;
-            font-size: 11px !important;
-            letter-spacing: 3px !important;
-            text-transform: uppercase !important;
-            margin-bottom: 16px !important;
-        }
-        .movement-cta h2 {
-            color: #ffffff !important;
-            font-size: 36px !important;
-            font-weight: 700 !important;
-        }
-        .movement-cta p {
-            color: #94a3b8 !important;
-            font-size: 16px !important;
-            line-height: 1.7 !important;
-        }
-        .movement-cta .btn-primary {
-            background: #2563eb !important;
-            color: #fff !important;
-            padding: 14px 28px !important;
-            border-radius: 6px !important;
-            border: none !important;
-        }
-        .movement-cta .btn-ghost {
-            background: transparent !important;
-            border: 1px solid #ffffff !important;
-            color: #ffffff !important;
-            padding: 14px 28px !important;
-            border-radius: 6px !important;
-        }
-        .movement-cta .stat-val {
-            color: #ffffff !important;
-        }
-        .movement-cta .label {
-            color: #60a5fa !important;
-        }
+    /* ============ RESET ============ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-weight: 400;
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
 
-        @media(min-width:640px) {
-            .video-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media(min-width:1024px) {
-            .video-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media(max-width:768px) {
-            .hide-sm {
-                display: none !important
-            }
-            .hero-title {
-                font-size: clamp(2.8rem, 10vw, 4rem) !important;
-            }
-            .spotlight-card {
-                padding: 16px;
-            }
-            .spotlight-card .emoji-big {
-                font-size: 2.2rem;
-            }
-            .movement-cta {
-                padding: 60px 16px !important;
-            }
-            .movement-cta h2 {
-                font-size: 28px !important;
-            }
-        }
-        @media(max-width:480px) {
-            .hero-title {
-                font-size: clamp(2.2rem, 10vw, 3rem) !important;
-            }
-            .video-grid {
-                grid-template-columns: 1fr;
-            }
-            .spotlight-card h4 {
-                font-size: 1rem;
-            }
-            .movement-cta h2 {
-                font-size: 24px !important;
-            }
-        }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
 
-        /* ── Nav Active State ── */
-        .nav a.active {
-            color: #fff !important;
-        }
-    </style>
+    /* ============ NAVBAR ============ */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      transition: box-shadow 0.25s ease, background 0.25s ease;
+      opacity: 0;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    .navbar.scrolled {
+      box-shadow: 0 2px 14px rgba(0,0,0,0.05);
+    }
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 14px var(--gutter);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .logo {
+      font-family: var(--font-headline);
+      font-weight: 900;
+      font-size: 22px;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    .logo .dot { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      position: relative;
+      padding: 4px 0;
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a.active {
+      color: var(--text-primary);
+    }
+    .nav-links a.active::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      bottom: -4px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .btn-submit {
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s ease, transform 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+    .btn-submit:active { transform: scale(0.97); }
+
+    .hamburger {
+      display: none;
+      width: 36px; height: 36px;
+      align-items: center; justify-content: center;
+      font-size: 22px;
+      color: var(--text-primary);
+    }
+
+    /* Mobile overlay */
+    .mobile-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-dark);
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+      padding: 80px 32px 32px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .mobile-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+    .mobile-overlay .close {
+      position: absolute;
+      top: 22px; right: 24px;
+      font-size: 28px;
+      color: #fff;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mobile-overlay a {
+      color: #fff;
+      font-family: var(--font-headline);
+      font-size: 32px;
+      font-weight: 700;
+      padding: 14px 0;
+      border-bottom: 1px solid #1f1f1f;
+      transition: color 0.2s ease;
+    }
+    .mobile-overlay a:hover { color: var(--accent); }
+
+    /* ============ IDENTITY STRIP ============ */
+    .identity {
+      padding: 100px 0 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideUp 0.4s ease-out 0.1s forwards;
+    }
+    .identity-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 40px;
+    }
+    .identity-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .identity h1 {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 42px;
+      line-height: 1.1;
+      color: var(--text-primary);
+      max-width: 600px;
+      letter-spacing: -1px;
+    }
+    .identity-divider {
+      width: 48px;
+      height: 2px;
+      background: var(--accent);
+      margin-top: 18px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .stat {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 20px;
+      min-width: 130px;
+      background: var(--surface);
+    }
+    .stat-number {
+      font-family: var(--font-headline);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    /* ============ TICKER ============ */
+    .ticker {
+      background: #1A1A1A;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .ticker-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 100%;
+    }
+    .live-badge {
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+    .live-dot {
+      width: 6px; height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    .ticker-track {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%);
+    }
+    .ticker-content {
+      display: inline-flex;
+      gap: 32px;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #E8E4DF;
+      animation: marquee 40s linear infinite;
+      padding-left: 100%;
+    }
+    .ticker-track:hover .ticker-content { animation-play-state: paused; }
+    .ticker-content span::after {
+      content: " • ";
+      color: var(--accent);
+      margin-left: 32px;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* ============ CATEGORY FILTER BAR ============ */
+    .filter-bar {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 60px;
+      z-index: 50;
+      padding: 14px 0;
+    }
+    .filter-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .filter-inner::-webkit-scrollbar { display: none; }
+    .chip {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-primary);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .chip:hover {
+      border-color: var(--text-muted);
+    }
+    .chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ============ MAIN CONTENT GRID ============ */
+    main { padding: 32px 0 48px; }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 60% 40%;
+      gap: 56px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    .section-title::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 32px; height: 2px;
+      background: var(--accent);
+    }
+    .view-all {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    .view-all:hover { color: var(--accent-hover); }
+
+    /* ============ STORY CARDS (LIST STYLE) ============ */
+    .stories-list { display: flex; flex-direction: column; }
+    .story-card {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 20px;
+      padding: 20px 12px;
+      margin: 0 -12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      align-items: flex-start;
+    }
+    .story-card:hover { background: #F9F7F4; }
+    .story-card:hover .story-title { color: var(--accent); }
+    .story-thumb {
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .story-body { display: flex; flex-direction: column; gap: 6px; }
+    .story-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .story-title {
+      font-family: var(--font-headline);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 0.2s ease;
+    }
+    .story-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .story-readtime {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ============ VIDEO CARDS ============ */
+    .videos-list { display: flex; flex-direction: column; gap: 24px; }
+    .video-card {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .video-thumb-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--border);
+    }
+    .video-thumb {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .video-card:hover .video-thumb { transform: scale(1.02); }
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+      opacity: 0;
+    }
+    .video-card:hover .video-overlay {
+      opacity: 1;
+      background: rgba(0,0,0,0.4);
+    }
+    .play-btn {
+      width: 56px; height: 56px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 18px;
+      padding-left: 4px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .duration {
+      position: absolute;
+      bottom: 8px; right: 8px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .video-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .video-title {
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 0.2s ease;
+    }
+    .video-card:hover .video-title { color: var(--accent); }
+    .video-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ============ EMPTY / ERROR STATES ============ */
+    .empty-state, .error-state {
+      padding: 48px 16px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-secondary);
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+    }
+    .empty-state strong {
+      display: block;
+      font-family: var(--font-headline);
+      font-size: 18px;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    /* ============ SKELETON SHIMMER ============ */
+    .skeleton {
+      background: linear-gradient(90deg, #E8E4DF 0%, #F5F2EE 50%, #E8E4DF 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .sk-story {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sk-thumb { width: 120px; height: 80px; }
+    .sk-line { height: 12px; margin-bottom: 8px; }
+    .sk-line.short { width: 30%; }
+    .sk-line.long { width: 90%; height: 18px; }
+    .sk-video-thumb { width: 100%; aspect-ratio: 16/9; }
+
+    /* ============ TRENDING ============ */
+    .trending {
+      background: var(--tag-bg);
+      padding: 56px 0;
+      margin-top: 32px;
+    }
+    .trending-row {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 4px;
+      scroll-snap-type: x mandatory;
+    }
+    .trending-row::-webkit-scrollbar { display: none; }
+    .trending-card {
+      background: var(--surface);
+      padding: 16px;
+      border-radius: 6px;
+      min-width: 220px;
+      max-width: 220px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      scroll-snap-align: start;
+      flex-shrink: 0;
+    }
+    .trending-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    }
+    .trending-num {
+      position: absolute;
+      top: 6px; left: 14px;
+      font-family: var(--font-headline);
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--accent);
+      opacity: 0.15;
+      line-height: 1;
+    }
+    .trending-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 6px;
+    }
+    .trending-title {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .trending-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ============ FAB (FLOATING POST BUTTON) ============ */
+    .fab-wrap {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .fab-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+    .fab-option {
+      background: #fff;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      padding: 10px 18px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .fab-option:hover { background: var(--accent); color: #fff; }
+    .fab-wrap.open .fab-options { pointer-events: auto; }
+    .fab-wrap.open .fab-option {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .fab-wrap.open .fab-option:nth-child(1) { transition-delay: 0.05s; }
+    .fab-wrap.open .fab-option:nth-child(2) { transition-delay: 0.12s; }
+    .fab {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(200,16,46,0.4);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease;
+    }
+    .fab:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 22px rgba(200,16,46,0.55);
+    }
+    .fab-wrap.open .fab {
+      transform: rotate(45deg);
+      background: var(--accent-hover);
+    }
+
+    /* ============ FOOTER ============ */
+    footer {
+      background: var(--bg-dark);
+      color: #F9F7F4;
+      padding: 56px 0 0;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 40px;
+    }
+    .footer-logo {
+      font-family: var(--font-headline);
+      font-weight: 900;
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .footer-tagline {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .socials {
+      display: flex;
+      gap: 14px;
+    }
+    .socials a {
+      width: 36px; height: 36px;
+      border: 1px solid #2a2a2a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .socials a:hover { border-color: var(--accent); background: var(--accent); }
+    .socials svg { width: 16px; height: 16px; fill: #fff; }
+    .footer-heading {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col a {
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+    }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #1c1c1c;
+      padding: 18px 0;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #4A4A4A;
+    }
+
+    /* ============ MODAL ============ */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .modal.open {
+      display: flex;
+      opacity: 1;
+    }
+    .modal-box {
+      background: var(--bg);
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 8px;
+      position: relative;
+      transform: scale(0.96);
+      transition: transform 0.25s ease;
+    }
+    .modal.open .modal-box { transform: scale(1); }
+    .modal-close {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      color: var(--text-primary);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      transition: background 0.2s ease;
+    }
+    .modal-close:hover { background: var(--accent); color: #fff; }
+    .modal-video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      overflow: hidden;
+    }
+    .modal-video iframe, .modal-video video {
+      width: 100%; height: 100%; border: 0;
+    }
+    .modal-info { padding: 24px 28px 28px; }
+    .modal-info .video-tag { margin-bottom: 8px; }
+    .modal-info h3 {
+      font-family: var(--font-headline);
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+    .modal-info .video-meta { margin-bottom: 14px; }
+    .modal-info p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ============ ANIMATIONS ============ */
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .stagger {
+      opacity: 0;
+      transform: translateY(16px);
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1024px) {
+      .main-grid { grid-template-columns: 55% 45%; gap: 36px; }
+      .identity h1 { font-size: 36px; }
+      .stat { padding: 10px 14px; min-width: 110px; }
+      .stat-number { font-size: 20px; }
+    }
+
+    @media (max-width: 768px) {
+      :root { --gutter: 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .btn-submit { padding: 7px 14px; font-size: 12px; }
+
+      .identity { padding: 88px 0 20px; }
+      .identity-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      .identity h1 { font-size: 28px; }
+      .stats {
+        display: flex;
+        overflow-x: auto;
+        scrollbar-width: none;
+        gap: 10px;
+        margin: 0 calc(var(--gutter) * -1);
+        padding: 4px var(--gutter);
+      }
+      .stats::-webkit-scrollbar { display: none; }
+      .stat { flex: 0 0 auto; min-width: 140px; }
+
+      .filter-bar { top: 56px; padding: 12px 0; }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .story-card {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .story-thumb {
+        width: 100%;
+        height: 200px;
+      }
+      .story-title { font-size: 19px; }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+
+      .fab-wrap { bottom: 20px; right: 20px; }
+
+      .trending { padding: 40px 0; }
+
+      .modal-info h3 { font-size: 20px; }
+      .modal-info { padding: 18px 20px 22px; }
+
+      .sk-thumb { width: 100%; height: 200px; }
+      .sk-story { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .identity h1 { font-size: 26px; }
+      .nav-inner { padding: 12px var(--gutter); }
+      .logo { font-size: 20px; }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- ═══════════════════════════════════════════
-    NAV
-    ═══════════════════════════════════════════ -->
-    <header class="nav fixed top-0 left-0 right-0 z-50">
-        <div class="max-w-screen-xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
-
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-2.5 flex-shrink-0">
-                <div class="w-7 h-7 bg-blue-700 flex items-center justify-center">
-                    <span class="display text-white font-bold text-sm">Y</span>
-                </div>
-                <span class="display font-bold text-white tracking-tight text-lg">Yuvox</span>
-            </a>
-
-            <!-- Center links -->
-            <nav class="hidden md:flex items-center gap-8">
-                <a href="index.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors active">Home</a>
-                <a href="about.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">About</a>
-                <a href="stories.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Stories</a>
-                <a href="community.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Community</a>
-                <a href="media.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Media</a>
-                <a href="join.html" class="text-xs font-medium tracking-widest uppercase text-zinc-500 hover:text-white transition-colors">Join</a>
-            </nav>
-
-            <!-- Right -->
-            <div class="flex items-center gap-3">
-                <a href="join.html" class="btn-primary hide-sm" style="padding:9px 20px;font-size:12px">Join Movement</a>
-                <button id="ham" onclick="toggleMob()" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5">
-                    <span class="block w-5 h-px bg-white transition-all" id="h1"></span>
-                    <span class="block w-5 h-px bg-white transition-all" id="h2"></span>
-                    <span class="block w-3.5 h-px bg-white transition-all self-start" id="h3"></span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Mobile menu -->
-    <div id="mob-menu" class="fixed inset-0 bg-[#0C0C0D] z-40 flex flex-col items-center justify-center gap-7 transform translate-x-full md:hidden">
-        <a href="index.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Home</a>
-        <a href="about.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">About</a>
-        <a href="stories.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Stories</a>
-        <a href="community.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Community</a>
-        <a href="media.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Media</a>
-        <a href="join.html" onclick="toggleMob()" class="display text-3xl font-bold uppercase tracking-tight text-white hover:text-blue-400 transition-colors">Join</a>
-        <a href="join.html" onclick="toggleMob()" class="btn-primary mt-4" style="font-size:14px;padding:14px 36px">Join Movement</a>
+  <!-- ============ NAVBAR ============ -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">WEVOX<span class="dot">.</span></a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="stories.html">Stories</a>
+        <a href="youtube.html">Videos</a>
+        <a href="#trending">Trending</a>
+        <a href="community.html">Community</a>
+        <a href="about.html">About</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <a href="join.html" class="btn-submit">Submit Story</a>
+        <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+      </div>
     </div>
+  </header>
 
+  <!-- ============ MOBILE OVERLAY ============ -->
+  <div class="mobile-overlay" id="mobileOverlay" aria-hidden="true">
+    <button class="close" id="overlayClose" aria-label="Close menu">✕</button>
+    <a href="stories.html">Stories</a>
+    <a href="youtube.html">Videos</a>
+    <a href="#trending">Trending</a>
+    <a href="community.html">Community</a>
+    <a href="about.html">About</a>
+    <a href="join.html">Submit Story</a>
+  </div>
 
-    <!-- ═══════════════════════════════════════════
-    HERO
-    ═══════════════════════════════════════════ -->
-    <div class="hero-section-wrapper">
-        <section class="hero-mesh grain relative min-h-[85vh] flex flex-col pt-20 overflow-hidden">
+  <!-- ============ IDENTITY STRIP ============ -->
+  <section class="identity">
+    <div class="container">
+      <div class="identity-grid">
+        <div>
+          <div class="identity-label">India's Youth Newsroom • Est. 2024</div>
+          <h1>Student journalism. No filters.</h1>
+          <div class="identity-divider"></div>
+        </div>
+        <div class="stats" aria-label="Network statistics">
+          <div class="stat"><div class="stat-number">5,000+</div><div class="stat-label">Reporters</div></div>
+          <div class="stat"><div class="stat-number">1.2M+</div><div class="stat-label">Readers</div></div>
+          <div class="stat"><div class="stat-number">200+</div><div class="stat-label">Colleges</div></div>
+          <div class="stat"><div class="stat-number">18+</div><div class="stat-label">States</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-            <!-- Grid decoration -->
-            <div class="absolute inset-0 pointer-events-none" style="background-image:linear-gradient(var(--wire) 1px,transparent 1px),linear-gradient(90deg,var(--wire) 1px,transparent 1px);background-size:72px 72px;opacity:.5"></div>
+  <!-- ============ TICKER ============ -->
+  <div class="ticker" aria-label="Breaking news">
+    <div class="ticker-inner">
+      <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+      <div class="ticker-track">
+        <div class="ticker-content" id="tickerContent">
+          <span>Loading trending topics</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            <!-- Photo -->
-            <div class="absolute inset-0 pointer-events-none" style="mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.15) 30%,rgba(0,0,0,.15) 70%,transparent 100%)">
-                <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=60&w=1800" class="w-full h-full object-cover" style="filter:grayscale(1);opacity:.08" alt="" />
-            </div>
-            <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(to bottom, transparent 60%, var(--ink) 100%)"></div>
+  <!-- ============ CATEGORY FILTER BAR ============ -->
+  <div class="filter-bar" id="filterBar">
+    <div class="filter-inner" id="filterInner">
+      <button class="chip active" data-cat="All">All</button>
+      <button class="chip" data-cat="Campus Fraud">Campus Fraud</button>
+      <button class="chip" data-cat="Economy">Economy</button>
+      <button class="chip" data-cat="Politics">Politics</button>
+      <button class="chip" data-cat="Culture">Culture</button>
+      <button class="chip" data-cat="Field Reports">Field Reports</button>
+      <button class="chip" data-cat="Investigation">Investigation</button>
+    </div>
+  </div>
 
-            <!-- Dark overlay for text visibility -->
-            <div class="absolute inset-0 pointer-events-none" style="background:rgba(0,0,0,0.5);"></div>
+  <!-- ============ MAIN CONTENT ============ -->
+  <main>
+    <div class="container">
+      <div class="main-grid">
 
-            <!-- Content -->
-            <div class="relative z-10 flex-1 flex items-center justify-center">
-                <div class="max-w-screen-xl mx-auto w-full px-6 py-12">
-
-                    <div class="max-w-4xl mx-auto text-center">
-                        <!-- Eyebrow -->
-                        <div class="reveal flex items-center justify-center gap-3 mb-8">
-                            <span class="live-dot w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
-                            <span class="label" style="color:#5b85f5;letter-spacing:.2em">India's Youth Media Network · Est. 2024</span>
-                        </div>
-
-                        <!-- Headline -->
-                        <h1 class="hero-title reveal d1 mb-6">
-                            YUVOX<br>
-                            <span class="serif" style="color:#5b85f5;font-weight:400;font-size:.7em;letter-spacing:-.01em;font-style:italic">Voice of Young India.</span>
-                        </h1>
-
-                        <!-- Sub -->
-                        <p class="reveal d2 text-zinc-300 text-lg leading-relaxed max-w-2xl mx-auto mb-10" style="font-weight:300">
-                            A youth-powered media community focused on real stories, public voices, and ground-level reporting. From campuses to communities, YUVOX connects the next generation through meaningful conversations and authentic storytelling.
-                        </p>
-
-                        <!-- CTAs -->
-                        <div class="reveal d3 flex flex-wrap gap-4 justify-center mb-20">
-                            <a href="join.html" class="btn-primary">Join Community <span>→</span></a>
-                            <a href="media.html" class="btn-video">
-                                <span class="icon">▶</span>
-                                Watch Campus Stories
-                                <span class="btn-video-subtitle">Documentaries · Campus Reports · Ground Stories</span>
-                            </a>
-                        </div>
-
-                        <!-- Stats -->
-                        <div class="reveal d4">
-                            <div class="rule mb-8"></div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-                                <div>
-                                    <div class="stat-val text-white">5K+</div>
-                                    <div class="label mt-2">Student Reporters</div>
-                                </div>
-                                <div>
-                                    <div class="stat-val text-white">200+</div>
-                                    <div class="label mt-2">Colleges Covered</div>
-                                </div>
-                                <div>
-                                    <div class="stat-val text-white">1.2M</div>
-                                    <div class="label mt-2">Monthly Readers</div>
-                                </div>
-                                <div>
-                                    <div class="stat-val text-white">18</div>
-                                    <div class="label mt-2">States & UTs</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Scroll cue -->
-            <div class="relative z-10 pb-6 flex justify-center">
-                <div class="flex flex-col items-center gap-2 opacity-30 animate-bounce">
-                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </div>
-            </div>
+        <!-- LEFT: STORIES -->
+        <section aria-labelledby="stories-heading">
+          <div class="section-head">
+            <h2 class="section-title" id="stories-heading">Stories</h2>
+            <a href="stories.html" class="view-all">View all →</a>
+          </div>
+          <div class="stories-list" id="storiesList">
+            <!-- Skeletons -->
+            <div class="sk-story"><div class="skeleton sk-thumb"></div><div style="flex:1"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long"></div><div class="skeleton sk-line long"></div><div class="skeleton sk-line short"></div></div></div>
+            <div class="sk-story"><div class="skeleton sk-thumb"></div><div style="flex:1"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long"></div><div class="skeleton sk-line long"></div><div class="skeleton sk-line short"></div></div></div>
+            <div class="sk-story"><div class="skeleton sk-thumb"></div><div style="flex:1"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long"></div><div class="skeleton sk-line long"></div><div class="skeleton sk-line short"></div></div></div>
+            <div class="sk-story"><div class="skeleton sk-thumb"></div><div style="flex:1"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long"></div><div class="skeleton sk-line long"></div><div class="skeleton sk-line short"></div></div></div>
+          </div>
         </section>
+
+        <!-- RIGHT: VIDEOS -->
+        <aside aria-labelledby="videos-heading">
+          <div class="section-head">
+            <h2 class="section-title" id="videos-heading">Field Reports</h2>
+            <a href="youtube.html" class="view-all">View all →</a>
+          </div>
+          <div class="videos-list" id="videosList">
+            <div class="video-card"><div class="skeleton sk-video-thumb"></div><div class="skeleton sk-line short"></div><div class="skeleton sk-line long"></div></div>
+            <div class="video-card"><div class="skeleton sk-video-thumb"></div><div class="skeleton sk-line short"></div><div class="skeleton sk-line long"></div></div>
+            <div class="video-card"><div class="skeleton sk-video-thumb"></div><div class="skeleton sk-line short"></div><div class="skeleton sk-line long"></div></div>
+          </div>
+        </aside>
+
+      </div>
     </div>
+  </main>
 
-
-    <!-- TICKER -->
-    <div class="ticker-wrap overflow-hidden border-y py-3" style="border-color:var(--wire);background:var(--ink-2)">
-        <div class="ticker-track">
-            <div class="flex items-center gap-0 whitespace-nowrap text-zinc-600" style="font-size:11px;font-weight:500;letter-spacing:.13em">
-                <span class="px-8 border-r" style="border-color:var(--wire)">GROUND REPORTING</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">STUDENT JOURNALISM</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">DOCUMENTARY STORYTELLING</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">CREATOR COLLABORATION</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">CAMPUS MEDIA</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">YOUTH VOICES</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">BHARAT KI AWAZ</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">REAL-TIME FIELD REPORTING</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">GROUND REPORTING</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">STUDENT JOURNALISM</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">DOCUMENTARY STORYTELLING</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">CREATOR COLLABORATION</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">CAMPUS MEDIA</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">YOUTH VOICES</span>
-                <span class="px-8 border-r" style="border-color:var(--wire)">BHARAT KI AWAZ</span>
-                <span class="px-8" style="">REAL-TIME FIELD REPORTING</span>
-            </div>
-        </div>
+  <!-- ============ TRENDING SECTION ============ -->
+  <section class="trending" id="trending" aria-labelledby="trending-heading">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title" id="trending-heading">Trending Now</h2>
+        <a href="stories.html" class="view-all">All trending →</a>
+      </div>
+      <div class="trending-row" id="trendingRow">
+        <div class="trending-card"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long" style="height:36px"></div><div class="skeleton sk-line short"></div></div>
+        <div class="trending-card"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long" style="height:36px"></div><div class="skeleton sk-line short"></div></div>
+        <div class="trending-card"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long" style="height:36px"></div><div class="skeleton sk-line short"></div></div>
+        <div class="trending-card"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long" style="height:36px"></div><div class="skeleton sk-line short"></div></div>
+        <div class="trending-card"><div class="skeleton sk-line short"></div><div class="skeleton sk-line long" style="height:36px"></div><div class="skeleton sk-line short"></div></div>
+      </div>
     </div>
+  </section>
 
-
-    <!-- ═══════════════════════════════════════════
-    MORE THAN MEDIA
-    ═══════════════════════════════════════════ -->
-    <section id="more" class="section-light py-16 md:py-20 px-6">
-        <div class="max-w-screen-xl mx-auto">
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12 items-start">
-                <div class="reveal">
-                    <div class="label-dark mb-4">More Than Media</div>
-                    <h2 class="section-title leading-tight">
-                        YUVOX is a growing<br />journalism community.
-                    </h2>
-                </div>
-                <div class="reveal d1 flex flex-col justify-end">
-                    <p class="text-lg leading-relaxed mb-4" style="font-weight:300;color:#3a3a3a;">
-                        Where young voices, campus stories, and public conversations come together. We believe stories from the ground deserve attention, awareness, and impact.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-3 mt-2">
-                        <span class="text-sm font-medium" style="color:#0C0C0D;">Real voices.</span>
-                        <span class="text-sm font-medium" style="color:#0C0C0D;">Real stories.</span>
-                        <span class="text-sm font-medium" style="color:#0C0C0D;">Real conversations.</span>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="rule-dark" />
-
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">WEVOX<span style="color:var(--accent)">.</span></div>
+          <p class="footer-tagline">Student journalism. No filters.</p>
+          <div class="socials" aria-label="Social media">
+            <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24"><path d="M22 5.8c-.7.3-1.5.5-2.4.6.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1-.7-.8-1.8-1.3-3-1.3-2.3 0-4.1 1.8-4.1 4.1 0 .3 0 .6.1.9-3.4-.2-6.4-1.8-8.4-4.3-.4.6-.6 1.3-.6 2.1 0 1.4.7 2.7 1.8 3.4-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2.1 2.8 3.9 2.9-1.4 1.1-3.2 1.8-5.2 1.8H2c1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg></a>
+            <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23 12c0-2-.2-3.5-.4-4.4-.2-.6-.8-1.2-1.4-1.4C19.5 5.8 12 5.8 12 5.8s-7.5 0-9.2.4c-.6.2-1.2.8-1.4 1.4-.4 1.7-.4 5.4-.4 5.4s0 3.7.4 5.4c.2.6.8 1.2 1.4 1.4 1.7.4 9.2.4 9.2.4s7.5 0 9.2-.4c.6-.2 1.2-.8 1.4-1.4.2-.9.4-2.4.4-4.4zM9.6 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg></a>
+            <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.9.9 1.4.2.4.4 1 .4 2.2.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.9.7-1.4.9-.4.2-1 .4-2.2.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.9-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.9-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 2c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4-1.2-.1-1.6-.1-4.7-.1zm0 3.4a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 7.2a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6zm5.6-7.4a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
+          </div>
         </div>
-    </section>
-
-
-    <!-- ═══════════════════════════════════════════
-    TRENDING STORIES (Video Cards)
-    ═══════════════════════════════════════════ -->
-    <section id="trending" class="section-cream py-20 md:py-24 px-6">
-        <div class="max-w-screen-xl mx-auto">
-
-            <div class="flex items-end justify-between mb-10 reveal">
-                <div>
-                    <div class="label-dark mb-4">Trending Stories</div>
-                    <h2 class="section-title">Stories that<br /><em class="serif" style="color:#1D4ED8;font-style:italic;">the mainstream missed.</em></h2>
-                </div>
-            </div>
-
-            <div class="video-grid">
-
-                <a href="media.html" class="video-card reveal">
-                    <div class="video-thumb">
-                        <img src="https://picsum.photos/seed/video1/480/270" alt="Thumbnail" loading="lazy" />
-                        <div class="play-overlay">
-                            <div class="play-circle">▶</div>
-                        </div>
-                        <span class="duration">12 min</span>
-                        <span class="category-tag">Campus Report</span>
-                    </div>
-                    <div class="video-info">
-                        <h3>Voices From Small Town India</h3>
-                        <div class="meta">
-                            <span class="reporter">Ananya Krishnan · IIT Delhi</span>
-                            <span class="views">142K Views</span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="media.html" class="video-card reveal d1">
-                    <div class="video-thumb">
-                        <img src="https://picsum.photos/seed/video2/480/270" alt="Thumbnail" loading="lazy" />
-                        <div class="play-overlay">
-                            <div class="play-circle">▶</div>
-                        </div>
-                        <span class="duration">9 min</span>
-                        <span class="category-tag">Campus Life</span>
-                    </div>
-                    <div class="video-info">
-                        <h3>Student Life Beyond Headlines</h3>
-                        <div class="meta">
-                            <span class="reporter">Rohit Sen · Jadavpur University</span>
-                            <span class="views">89K Views</span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="media.html" class="video-card reveal d2">
-                    <div class="video-thumb">
-                        <img src="https://picsum.photos/seed/video3/480/270" alt="Thumbnail" loading="lazy" />
-                        <div class="play-overlay">
-                            <div class="play-circle">▶</div>
-                        </div>
-                        <span class="duration">14 min</span>
-                        <span class="category-tag">Investigation</span>
-                    </div>
-                    <div class="video-info">
-                        <h3>Ground Reports From Communities</h3>
-                        <div class="meta">
-                            <span class="reporter">Neha M. · Miranda House</span>
-                            <span class="views">210K Views</span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="media.html" class="video-card reveal d3">
-                    <div class="video-thumb">
-                        <img src="https://picsum.photos/seed/video4/480/270" alt="Thumbnail" loading="lazy" />
-                        <div class="play-overlay">
-                            <div class="play-circle">▶</div>
-                        </div>
-                        <span class="duration">7 min</span>
-                        <span class="category-tag">Social Issues</span>
-                    </div>
-                    <div class="video-info">
-                        <h3>Youth Conversations That Matter</h3>
-                        <div class="meta">
-                            <span class="reporter">Arjun Mehta · IIT-B</span>
-                            <span class="views">67K Views</span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="media.html" class="video-card reveal d4">
-                    <div class="video-thumb">
-                        <img src="https://picsum.photos/seed/video5/480/270" alt="Thumbnail" loading="lazy" />
-                        <div class="play-overlay">
-                            <div class="play-circle">▶</div>
-                        </div>
-                        <span class="duration">11 min</span>
-                        <span class="category-tag">Documentary</span>
-                    </div>
-                    <div class="video-info">
-                        <h3>Stories The Mainstream Missed</h3>
-                        <div class="meta">
-                            <span class="reporter">Fatima Sheikh · AMU</span>
-                            <span class="views">93K Views</span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="media.html" class="video-card reveal d5">
-                    <div class="video-thumb">
-                        <img src="https://picsum.photos/seed/video6/480/270" alt="Thumbnail" loading="lazy" />
-                        <div class="play-overlay">
-                            <div class="play-circle">▶</div>
-                        </div>
-                        <span class="duration">8 min</span>
-                        <span class="category-tag">Campus Report</span>
-                    </div>
-                    <div class="video-info">
-                        <h3>From Campus to Community: Student Stories</h3>
-                        <div class="meta">
-                            <span class="reporter">Priya R. · DU</span>
-                            <span class="views">55K Views</span>
-                        </div>
-                    </div>
-                </a>
-
-            </div>
-
+        <div class="footer-col">
+          <div class="footer-heading">Explore</div>
+          <ul>
+            <li><a href="stories.html">Stories</a></li>
+            <li><a href="youtube.html">Videos</a></li>
+            <li><a href="#trending">Trending</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="join.html">Submit Story</a></li>
+          </ul>
         </div>
-    </section>
-
-
-    <!-- ═══════════════════════════════════════════
-    BUILT BY COMMUNITY
-    ═══════════════════════════════════════════ -->
-    <section id="community" class="section-light py-16 md:py-20 px-6">
-        <div class="max-w-screen-xl mx-auto">
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10 items-end">
-                <div class="reveal">
-                    <div class="label-dark mb-4">Built By The Community</div>
-                    <h2 class="section-title leading-tight">
-                        Powered by students,<br /><em class="serif" style="color:#1D4ED8;font-style:italic;">young reporters &amp; storytellers.</em>
-                    </h2>
-                </div>
-                <div class="reveal d1">
-                    <p class="text-base leading-relaxed" style="font-weight:300;color:#3a3a3a;">
-                        Who believe journalism should be authentic, fearless, and accessible. Together, we are building a new generation media movement.
-                    </p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="benefit-card reveal">
-                    <div class="benefit-num">01</div>
-                    <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                    <h4 class="display font-bold text-sm uppercase tracking-tight text-black mb-3">Student-Led</h4>
-                    <p class="text-sm leading-relaxed" style="color:#4a4a4a;">Every story starts with a student reporter on the ground — no corporate filters, just real voices.</p>
-                </div>
-                <div class="benefit-card reveal d1">
-                    <div class="benefit-num">02</div>
-                    <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    <h4 class="display font-bold text-sm uppercase tracking-tight text-black mb-3">Fearless</h4>
-                    <p class="text-sm leading-relaxed" style="color:#4a4a4a;">We don't shy away from hard truths. Investigative, honest, and always grounded in the community.</p>
-                </div>
-                <div class="benefit-card reveal d2">
-                    <div class="benefit-num">03</div>
-                    <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    <h4 class="display font-bold text-sm uppercase tracking-tight text-black mb-3">Accessible</h4>
-                    <p class="text-sm leading-relaxed" style="color:#4a4a4a;">News for everyone, by everyone. No paywalls, no jargon — just stories that reach the people.</p>
-                </div>
-                <div class="benefit-card reveal d3">
-                    <div class="benefit-num">04</div>
-                    <svg class="w-6 h-6 text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                    <h4 class="display font-bold text-sm uppercase tracking-tight text-black mb-3">Community-First</h4>
-                    <p class="text-sm leading-relaxed" style="color:#4a4a4a;">We listen, report, and reflect what matters to the communities we serve — not what trends on a dashboard.</p>
-                </div>
-            </div>
-
+        <div class="footer-col">
+          <div class="footer-heading">Network</div>
+          <ul>
+            <li><a href="#">North Desk Hub</a></li>
+            <li><a href="#">Southern Grid Frontiers</a></li>
+            <li><a href="#">Verification Protocol Ledger</a></li>
+            <li><a href="#">Public Transparency Index</a></li>
+          </ul>
         </div>
-    </section>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2024 WEVOX Network Platforms Inc.</div>
+        <div>contact@wevox.in</div>
+      </div>
+    </div>
+  </footer>
 
+  <!-- ============ FAB ============ -->
+  <div class="fab-wrap" id="fabWrap">
+    <div class="fab-options">
+      <a href="join.html?type=story" class="fab-option">📝 Write Story</a>
+      <a href="join.html?type=video" class="fab-option">🎥 Field Video</a>
+    </div>
+    <button class="fab" id="fab" aria-label="Submit content" aria-expanded="false">+</button>
+  </div>
 
-    <!-- ═══════════════════════════════════════════
-    CREATOR SPOTLIGHT
-    ═══════════════════════════════════════════ -->
-    <section id="spotlight" class="section-cream py-20 md:py-24 px-6">
-        <div class="max-w-screen-xl mx-auto">
+  <!-- ============ VIDEO MODAL ============ -->
+  <div class="modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <div class="modal-video" id="modalVideo"></div>
+      <div class="modal-info">
+        <div class="video-tag" id="modalTag"></div>
+        <h3 id="modal-title"></h3>
+        <div class="video-meta" id="modalMeta"></div>
+        <p id="modalDesc"></p>
+      </div>
+    </div>
+  </div>
 
-            <div class="flex items-end justify-between mb-10 reveal">
-                <div>
-                    <div class="label-dark mb-4">Creator Spotlight</div>
-                    <h2 class="section-title">Celebrating<br /><em class="serif" style="color:#1D4ED8;font-style:italic;">the voices that matter.</em></h2>
-                </div>
-            </div>
+  <!-- ============ FIREBASE ============ -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <script>
+    /* ============ FIREBASE CONFIG ============ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
+      authDomain: "cjnsite-d3f3f.firebaseapp.com",
+      projectId: "cjnsite-d3f3f",
+      storageBucket: "cjnsite-d3f3f.firebasestorage.app",
+      messagingSenderId: "491318197551",
+      appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
+      measurementId: "G-JES3G3L45V"
+    };
 
-                <div class="spotlight-card reveal">
-                    <span class="emoji-big">🏆</span>
-                    <h4>Top Reporter Of The Week</h4>
-                    <p>Pragya Sharma · DU</p>
-                    <span class="meta-detail">128K Views · 32 Reports</span>
-                </div>
+    let db = null;
+    let firebaseReady = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      firebaseReady = true;
+    } catch (err) {
+      console.warn("Firebase init failed (placeholder config?):", err);
+      firebaseReady = false;
+    }
 
-                <div class="spotlight-card reveal d1">
-                    <span class="emoji-big">🌟</span>
-                    <h4>Rising Voice</h4>
-                    <p>Arjun Mehta · IIT-B</p>
-                    <span class="meta-detail">Featured in 5 national outlets</span>
-                </div>
+    /* ============ STATE ============ */
+    let currentCategory = "All";
+    let allStories = [];
+    let allVideos = [];
 
-                <div class="spotlight-card reveal d2">
-                    <span class="emoji-big">🔥</span>
-                    <h4>Most Viewed Story</h4>
-                    <p>"The Invisible Crisis"</p>
-                    <span class="meta-detail">2.3M Views · 14K Shares</span>
-                </div>
+    /* ============ DEMO FALLBACK DATA ============
+       Used only when Firestore collections are empty or unavailable.
+       Replace by adding real docs to Firestore with status: "published".
+    */
+    const NOW = Date.now();
+    const ago = (d) => ({ toDate: () => new Date(NOW - d * 86400000) });
+    const SAMPLE_STORIES = [
+      { title: "Inside the hostel mess scam: ₹2.4 crore unaccounted across 6 colleges", category: "Campus Fraud", author: "Ananya Krishnan", university: "DU North Campus", coverImage: "https://picsum.photos/seed/wevox-s1/400/300", readTime: "8 min read", publishedAt: ago(2) },
+      { title: "How private hostels are rigging Bihar's NEET admissions", category: "Investigation", author: "Rohit Kumar", university: "AMU", coverImage: "https://picsum.photos/seed/wevox-s2/400/300", readTime: "12 min read", publishedAt: ago(5) },
+      { title: "The vanishing scholarships: a paper trail across 4 states", category: "Economy", author: "Priya Sharma", university: "JNU", coverImage: "https://picsum.photos/seed/wevox-s3/400/300", readTime: "10 min read", publishedAt: ago(7) },
+      { title: "Election campaigns on campus — who's funding the posters?", category: "Politics", author: "Arjun Mehta", university: "IIT Bombay", coverImage: "https://picsum.photos/seed/wevox-s4/400/300", readTime: "6 min read", publishedAt: ago(10) },
+      { title: "The new student-music underground rewriting Hindi indie", category: "Culture", author: "Sahil Verma", university: "Jadavpur University", coverImage: "https://picsum.photos/seed/wevox-s5/400/300", readTime: "7 min read", publishedAt: ago(12) },
+      { title: "Inside a fake-degree racket near a Tier-2 city", category: "Campus Fraud", author: "Neha Menon", university: "Miranda House", coverImage: "https://picsum.photos/seed/wevox-s6/400/300", readTime: "9 min read", publishedAt: ago(14) }
+    ];
+    const SAMPLE_VIDEOS = [
+      { title: "Field report: the campus protest no national channel covered", category: "Field Reports", author: "Fatima Sheikh", university: "AMU", thumbnailUrl: "https://picsum.photos/seed/wevox-v1/640/360", videoUrl: "https://www.youtube.com/watch?v=ScMzIvxBSi4", duration: "11:24", description: "An on-ground field report from the campus gates. Raw footage, unedited interviews with students who organised the demonstration.", publishedAt: ago(1) },
+      { title: "Why hostel rents doubled in 6 months — investigation", category: "Investigation", author: "Neha Menon", university: "Miranda House", thumbnailUrl: "https://picsum.photos/seed/wevox-v2/640/360", videoUrl: "https://www.youtube.com/watch?v=jNQXAC9IVRw", duration: "8:42", description: "We followed the money trail across landlords, brokers, and university officials. The result is a system designed to extract.", publishedAt: ago(4) },
+      { title: "Campus politics in 2024: the new playbook", category: "Politics", author: "Sahil Verma", university: "Jadavpur University", thumbnailUrl: "https://picsum.photos/seed/wevox-v3/640/360", videoUrl: "https://www.youtube.com/watch?v=ScMzIvxBSi4", duration: "14:08", description: "Inside the rooms where student-body decisions are made — and unmade.", publishedAt: ago(8) }
+    ];
+    const SAMPLE_TRENDING = [
+      { title: "Hostel mess scam exposé crosses 200K reads", tag: "Campus Fraud", type: "story", readCount: 214000 },
+      { title: "Bihar NEET investigation goes viral on X", tag: "Investigation", type: "story", readCount: 168000 },
+      { title: "Vanishing scholarships across 4 states", tag: "Economy", type: "story", readCount: 142000 },
+      { title: "Campus election funding deep-dive", tag: "Politics", type: "story", readCount: 98000 },
+      { title: "Field report: skipped protest footage", tag: "Field Reports", type: "video", readCount: 87000 },
+      { title: "Hindi indie underground takes over campuses", tag: "Culture", type: "story", readCount: 64000 }
+    ];
 
-                <div class="spotlight-card reveal d3">
-                    <span class="emoji-big">🤝</span>
-                    <h4>Community Contributor</h4>
-                    <p>Fatima Sheikh · AMU</p>
-                    <span class="meta-detail">50+ stories · 6 awards</span>
-                </div>
+    /* ============ HELPERS ============ */
+    const $ = (id) => document.getElementById(id);
+    const escapeHtml = (str = "") => String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
 
-            </div>
+    const placeholderImg = (seed = "story") =>
+      `https://picsum.photos/seed/${encodeURIComponent(seed)}/400/300`;
 
-        </div>
-    </section>
+    function tsValue(ts) {
+      if (!ts) return 0;
+      try {
+        if (ts.toDate) return ts.toDate().getTime();
+        return new Date(ts).getTime() || 0;
+      } catch (e) { return 0; }
+    }
 
+    function formatPublishedAt(ts) {
+      try {
+        const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+        if (!d || isNaN(d.getTime())) return "";
+        const diff = (Date.now() - d.getTime()) / 1000;
+        if (diff < 3600) return Math.max(1, Math.floor(diff / 60)) + "m ago";
+        if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+        if (diff < 604800) return Math.floor(diff / 86400) + "d ago";
+        return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+      } catch (e) { return ""; }
+    }
 
-    <!-- ═══════════════════════════════════════════
-    JOIN THE MOVEMENT
-    ═══════════════════════════════════════════ -->
-    <section id="movement" class="movement-cta">
-        <div class="label">JOIN THE MOVEMENT</div>
-        <h2>YUVOX is more than content.</h2>
-        <p>
-            It is a growing public media community built around awareness, storytelling, and youth voices shaping the future.
-        </p>
-        <div class="flex flex-wrap gap-4 justify-center mt-6">
-            <a href="join.html" class="btn-primary">Become a Reporter →</a>
-            <a href="#trending" class="btn-ghost">Explore Stories</a>
-        </div>
-        <div class="flex items-center justify-center gap-8 mt-8">
-            <div><span class="stat-val text-white" style="font-size:2rem;">5K+</span><div class="label mt-1" style="color:#60a5fa !important;">Community Members</div></div>
-            <div><span class="stat-val text-white" style="font-size:2rem;">200+</span><div class="label mt-1" style="color:#60a5fa !important;">Campuses</div></div>
-            <div><span class="stat-val text-white" style="font-size:2rem;">18</span><div class="label mt-1" style="color:#60a5fa !important;">States</div></div>
-        </div>
-    </section>
+    /* ============ NAVBAR SCROLL SHADOW ============ */
+    const navbar = $("navbar");
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 50) navbar.classList.add("scrolled");
+      else navbar.classList.remove("scrolled");
+    });
 
+    /* ============ MOBILE HAMBURGER ============ */
+    const hamburger = $("hamburger");
+    const mobileOverlay = $("mobileOverlay");
+    const overlayClose = $("overlayClose");
+    function openMenu() {
+      mobileOverlay.classList.add("open");
+      mobileOverlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+    function closeMenu() {
+      mobileOverlay.classList.remove("open");
+      mobileOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+    hamburger.addEventListener("click", openMenu);
+    overlayClose.addEventListener("click", closeMenu);
+    mobileOverlay.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
 
-    <!-- ═══════════════════════════════════════════
-    NEWSLETTER
-    ═══════════════════════════════════════════ -->
-    <section class="py-16 px-6" style="background:#FAF8F3;">
-        <div class="max-w-2xl mx-auto text-center reveal">
-            <div class="label-dark mb-5">Weekly Brief</div>
-            <h2 class="section-title mb-4" style="color:var(--ink)">Don't miss<br />the next story.</h2>
-            <p class="text-zinc-500 mb-8 text-sm" style="font-weight:300">India's best student journalism, curated and delivered every Monday.</p>
-            <form class="flex flex-col sm:flex-row gap-0 max-w-md mx-auto" onsubmit="handleNL(event)">
-                <input type="email" required placeholder="your@email.com" class="flex-1 px-5 py-4 text-sm bg-white border border-zinc-300 border-r-0 focus:outline-none focus:border-blue-500 transition-colors" style="color:var(--ink)" />
-                <button type="submit" class="btn-dark px-7 py-4 text-xs whitespace-nowrap">Subscribe →</button>
-            </form>
-            <div id="nl-ok" class="hidden mt-4 text-xs font-medium" style="color:#059669;letter-spacing:.08em">✓ You're subscribed. Welcome to Yuvox.</div>
-            <p class="text-zinc-400 text-xs mt-3">5,000+ journalists already subscribed. No spam, ever.</p>
-        </div>
-    </section>
+    /* ============ FAB ============ */
+    const fabWrap = $("fabWrap");
+    const fab = $("fab");
+    fab.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = fabWrap.classList.toggle("open");
+      fab.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+    document.addEventListener("click", (e) => {
+      if (!fabWrap.contains(e.target)) {
+        fabWrap.classList.remove("open");
+        fab.setAttribute("aria-expanded", "false");
+      }
+    });
 
+    /* ============ CATEGORY FILTER ============ */
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        currentCategory = chip.dataset.cat;
+        renderStories();
+        renderVideos();
+      });
+    });
 
-    <!-- ═══════════════════════════════════════════
-    FOOTER
-    ═══════════════════════════════════════════ -->
-    <footer class="px-6 pt-16 pb-10 border-t border-black/10" style="background:#FAF8F3;">
+    function matchesCategory(item) {
+      if (currentCategory === "All") return true;
+      const c = (item.category || "").toLowerCase();
+      return c === currentCategory.toLowerCase();
+    }
 
-        <div class="max-w-screen-xl mx-auto">
+    /* ============ RENDER STORIES ============ */
+    function renderStories() {
+      const list = $("storiesList");
+      const filtered = allStories.filter(matchesCategory).slice(0, 4);
+      if (!filtered.length) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <strong>No stories published yet.</strong>
+            Be the first.
+          </div>`;
+        return;
+      }
+      list.innerHTML = filtered.map((s, i) => `
+        <article class="story-card stagger" style="animation-delay:${i * 0.08}s">
+          <img class="story-thumb" src="${escapeHtml(s.coverImage || placeholderImg('s' + (s.id || i)))}" alt="" loading="lazy"
+               onerror="this.src='${placeholderImg('fallback' + i)}'" />
+          <div class="story-body">
+            <div class="story-tag">${escapeHtml(s.category || "Uncategorized")}</div>
+            <h3 class="story-title">${escapeHtml(s.title || "Untitled")}</h3>
+            <div class="story-meta">By ${escapeHtml(s.author || "Anonymous")} — ${escapeHtml(s.university || "Independent")}</div>
+            <div class="story-readtime">${escapeHtml(s.readTime || "5 min read")} ${s.publishedAt ? "· " + formatPublishedAt(s.publishedAt) : ""}</div>
+          </div>
+        </article>
+      `).join("");
+    }
 
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-12 mb-16">
+    /* ============ RENDER VIDEOS ============ */
+    function renderVideos() {
+      const list = $("videosList");
+      const filtered = allVideos.filter(matchesCategory).slice(0, 3);
+      if (!filtered.length) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <strong>No field reports yet.</strong>
+            Be the first.
+          </div>`;
+        return;
+      }
+      list.innerHTML = filtered.map((v, i) => `
+        <article class="video-card stagger" data-idx="${i}" style="animation-delay:${i * 0.1}s">
+          <div class="video-thumb-wrap">
+            <img class="video-thumb" src="${escapeHtml(v.thumbnailUrl || placeholderImg('v' + (v.id || i)))}" alt="" loading="lazy"
+                 onerror="this.src='${placeholderImg('vfallback' + i)}'" />
+            <div class="video-overlay"><div class="play-btn">▶</div></div>
+            ${v.duration ? `<div class="duration">${escapeHtml(v.duration)}</div>` : ""}
+          </div>
+          <div class="video-tag">${escapeHtml(v.category || "Field Reports")}</div>
+          <h3 class="video-title">${escapeHtml(v.title || "Untitled")}</h3>
+          <div class="video-meta">By ${escapeHtml(v.author || "Anonymous")} — ${escapeHtml(v.university || "Independent")}</div>
+        </article>
+      `).join("");
 
-                <!-- Brand -->
-                <div class="md:col-span-2">
+      list.querySelectorAll(".video-card").forEach((el, i) => {
+        el.addEventListener("click", () => openVideo(filtered[i]));
+      });
+    }
 
-                    <div class="flex items-center gap-3 mb-6">
+    /* ============ VIDEO MODAL ============ */
+    const modal = $("videoModal");
+    const modalClose = $("modalClose");
+    const modalVideoEl = $("modalVideo");
 
-                        <div class="w-8 h-8 bg-blue-700 flex items-center justify-center rounded-sm">
-                            <span class="display font-bold text-white text-sm">Y</span>
-                        </div>
+    function buildVideoEmbed(url) {
+      if (!url) return `<div style="color:#fff;display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--font-mono);font-size:13px;">No video source</div>`;
+      // YouTube
+      const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+      if (yt) {
+        return `<iframe src="https://www.youtube.com/embed/${yt[1]}?autoplay=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+      }
+      // Vimeo
+      const vm = url.match(/vimeo\.com\/(\d+)/);
+      if (vm) {
+        return `<iframe src="https://player.vimeo.com/video/${vm[1]}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+      }
+      // Direct video
+      return `<video src="${escapeHtml(url)}" controls autoplay></video>`;
+    }
 
-                        <span class="display text-2xl text-black">
-                            Yuvox
-                        </span>
+    function openVideo(v) {
+      modalVideoEl.innerHTML = buildVideoEmbed(v.videoUrl);
+      $("modalTag").textContent = v.category || "Field Reports";
+      $("modal-title").textContent = v.title || "Untitled";
+      $("modalMeta").textContent = `By ${v.author || "Anonymous"} — ${v.university || "Independent"}`;
+      $("modalDesc").textContent = v.description || "";
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+    function closeVideo() {
+      modal.classList.remove("open");
+      modalVideoEl.innerHTML = "";
+      document.body.style.overflow = "";
+    }
+    modalClose.addEventListener("click", closeVideo);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeVideo(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("open")) closeVideo(); });
 
-                    </div>
+    /* ============ TICKER ============ */
+    function renderTicker(items) {
+      const el = $("tickerContent");
+      if (!items || !items.length) {
+        el.innerHTML = `<span>WEVOX Verified Reporter Network is live</span><span>200+ campuses across India</span><span>Submit your story today</span>`;
+        return;
+      }
+      // Duplicate for smooth loop
+      const html = items.map(t => `<span>${escapeHtml(t.tag ? "[" + t.tag.toUpperCase() + "] " : "")}${escapeHtml(t.title || "")}</span>`).join("");
+      el.innerHTML = html + html;
+    }
 
-                    <p class="text-sm leading-relaxed mb-8 max-w-sm text-zinc-600" style="font-weight:400">
-                        India's youth-driven journalism and storytelling network — building the next generation of reporters, filmmakers, investigators, and truth-seekers.
-                    </p>
+    /* ============ TRENDING ============ */
+    function renderTrending(items) {
+      const row = $("trendingRow");
+      if (!items || !items.length) {
+        row.innerHTML = `<div class="empty-state" style="flex:1;min-width:100%;">
+          <strong>No trending items yet.</strong>
+          Check back soon.
+        </div>`;
+        return;
+      }
+      row.innerHTML = items.slice(0, 8).map((t, i) => `
+        <article class="trending-card stagger" style="animation-delay:${i * 0.06}s">
+          <div class="trending-num">${String(i + 1).padStart(2, "0")}</div>
+          <div class="trending-tag">${escapeHtml(t.tag || t.type || "Trending")}</div>
+          <div class="trending-title">${escapeHtml(t.title || "Untitled")}</div>
+          <div class="trending-count">${(t.readCount || 0).toLocaleString()} reads</div>
+        </article>
+      `).join("");
+    }
 
-                    <!-- Social Icons -->
-                    <div class="flex items-center gap-3">
+    /* ============ ERROR STATE ============ */
+    function showError(targetId) {
+      const el = $(targetId);
+      if (!el) return;
+      el.innerHTML = `<div class="error-state">Could not load content. Check connection.</div>`;
+    }
 
-                        <a href="#" class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" />
-                            </svg>
-                        </a>
-
-                        <a href="#" class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z" />
-                            </svg>
-                        </a>
-
-                        <a href="#" class="w-10 h-10 border border-black/10 flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286z" />
-                            </svg>
-                        </a>
-
-                    </div>
-
-                </div>
-
-                <!-- Platform -->
-                <div>
-                    <div class="label-dark mb-5">Platform</div>
-                    <ul class="space-y-3 text-sm text-zinc-600">
-                        <li><a href="#trending" class="hover:text-blue-700 transition-colors">Trending Stories</a></li>
-                        <li><a href="#" class="hover:text-blue-700 transition-colors">Documentaries</a></li>
-                        <li><a href="#" class="hover:text-blue-700 transition-colors">Campus Reports</a></li>
-                        <li><a href="#" class="hover:text-blue-700 transition-colors">Interviews</a></li>
-                    </ul>
-                </div>
-
-                <!-- Community -->
-                <div>
-                    <div class="label-dark mb-5">Community</div>
-                    <ul class="space-y-3 text-sm text-zinc-600">
-                        <li><a href="#community" class="hover:text-blue-700 transition-colors">Reporter Program</a></li>
-                        <li><a href="#community" class="hover:text-blue-700 transition-colors">Mentorship</a></li>
-                        <li><a href="#spotlight" class="hover:text-blue-700 transition-colors">Spotlight</a></li>
-                    </ul>
-                </div>
-
-                <!-- Company -->
-                <div>
-                    <div class="label-dark mb-5">Company</div>
-                    <ul class="space-y-3 text-sm text-zinc-600">
-                        <li><a href="#more" class="hover:text-blue-700 transition-colors">About</a></li>
-                        <li><a href="#" class="hover:text-blue-700 transition-colors">Editorial Policy</a></li>
-                        <li><a href="#" class="hover:text-blue-700 transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-
-            </div>
-
-            <!-- Bottom -->
-            <div class="border-t border-black/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-5">
-                <p class="text-xs tracking-wide text-zinc-500 uppercase">© 2025 Yuvox · Voices of Young India</p>
-                <div class="flex items-center gap-6 text-xs uppercase tracking-wide text-zinc-500">
-                    <a href="#" class="hover:text-blue-700 transition-colors">Privacy</a>
-                    <a href="#" class="hover:text-blue-700 transition-colors">Terms</a>
-                    <a href="#" class="hover:text-blue-700 transition-colors">Cookies</a>
-                </div>
-            </div>
-
-        </div>
-    </footer>
-
-    <!-- SCRIPTS -->
-    <script>
-        // Mobile menu
-        function toggleMob() {
-            const m = document.getElementById('mob-menu');
-            m.classList.toggle('translate-x-full');
+    /* ============ FETCHERS ============ */
+    async function fetchStories() {
+      let docs = [];
+      if (firebaseReady) {
+        try {
+          let snap;
+          try {
+            snap = await db.collection("stories")
+              .where("status", "==", "published")
+              .orderBy("publishedAt", "desc")
+              .limit(40)
+              .get();
+          } catch (e) {
+            // Composite index missing or other query error — fall back to a simple query
+            console.warn("stories optimised query failed, falling back:", e && e.message);
+            snap = await db.collection("stories").limit(60).get();
+          }
+          docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          // Client-side filter (in case fallback query returned everything)
+          docs = docs.filter(d => !d.status || d.status === "published");
+          // Client-side sort by publishedAt desc
+          docs.sort((a, b) => tsValue(b.publishedAt) - tsValue(a.publishedAt));
+        } catch (err) {
+          console.error("stories fetch failed:", err);
         }
+      }
+      // Demo fallback so the page never looks dead
+      if (!docs.length) docs = SAMPLE_STORIES;
+      allStories = docs;
+      renderStories();
+    }
 
-        // Form handlers
-        function handleApply(e) {
-            e.preventDefault();
-            const ok = document.getElementById('apply-ok');
-            ok.classList.remove('hidden');
-            e.target.reset();
-            setTimeout(() => ok.classList.add('hidden'), 7000);
+    async function fetchVideos() {
+      let docs = [];
+      if (firebaseReady) {
+        try {
+          let snap;
+          try {
+            snap = await db.collection("videos")
+              .where("status", "==", "published")
+              .orderBy("publishedAt", "desc")
+              .limit(20)
+              .get();
+          } catch (e) {
+            console.warn("videos optimised query failed, falling back:", e && e.message);
+            snap = await db.collection("videos").limit(40).get();
+          }
+          docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          docs = docs.filter(d => !d.status || d.status === "published");
+          docs.sort((a, b) => tsValue(b.publishedAt) - tsValue(a.publishedAt));
+        } catch (err) {
+          console.error("videos fetch failed:", err);
         }
+      }
+      if (!docs.length) docs = SAMPLE_VIDEOS;
+      allVideos = docs;
+      renderVideos();
+    }
 
-        function handleNL(e) {
-            e.preventDefault();
-            const ok = document.getElementById('nl-ok');
-            ok.classList.remove('hidden');
-            e.target.reset();
+    async function fetchTrending() {
+      let docs = [];
+      if (firebaseReady) {
+        try {
+          const snap = await db.collection("trending").limit(12).get();
+          docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        } catch (err) {
+          console.error("trending fetch failed:", err);
         }
+      }
+      if (!docs.length) docs = SAMPLE_TRENDING;
+      renderTicker(docs);
+      renderTrending(docs);
+    }
 
-        // Scroll reveal
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('in');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
-
-        document.querySelectorAll('.reveal,.reveal-r').forEach(el => observer.observe(el));
-
-        // Smooth nav active state
-        const secs = document.querySelectorAll('section[id]');
-        const links = document.querySelectorAll('nav a[href^="#"]');
-        window.addEventListener('scroll', () => {
-            let cur = '';
-            secs.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id });
-            links.forEach(a => {
-                const active = a.getAttribute('href') === '#' + cur;
-                a.style.color = active ? '#fff' : '';
-            });
-        }, { passive: true });
-
-        // Set active state for current page
-        const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll('.nav a');
-        navLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href && currentPath.includes(href)) {
-                link.classList.add('active');
-            }
-        });
-    </script>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
-            authDomain: "cjnsite-d3f3f.firebaseapp.com",
-            projectId: "cjnsite-d3f3f",
-            storageBucket: "cjnsite-d3f3f.firebasestorage.app",
-            messagingSenderId: "491318197551",
-            appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
-            measurementId: "G-JES3G3L45V"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.handleApply = async function(event) {
-            event.preventDefault();
-
-            const form = event.target;
-
-            const inputs = form.querySelectorAll("input, textarea, select");
-
-            const data = {
-                firstName: inputs[0].value,
-                lastName: inputs[1].value,
-                college: inputs[2].value,
-                email: inputs[3].value,
-                city: inputs[4].value,
-                focusArea: inputs[5].value,
-                message: inputs[6].value,
-                createdAt: new Date()
-            };
-
-            try {
-                await addDoc(collection(db, "applications"), data);
-                alert("Application submitted successfully!");
-                form.reset();
-            } catch (error) {
-                console.error(error);
-                alert("Error submitting form");
-            }
-        }
-    </script>
+    /* ============ KICK OFF ============ */
+    fetchStories();
+    fetchVideos();
+    fetchTrending();
+  </script>
 </body>
 </html>
