@@ -1293,7 +1293,7 @@
         return;
       }
       list.innerHTML = filtered.map((s, i) => `
-        <a class="story-card stagger" href="${s.id ? 'stories.html?id=' + encodeURIComponent(s.id) : '#'}" style="animation-delay:${i * 0.08}s">
+        <a class="story-card stagger" href="${s.id ? 'story.html?id=' + encodeURIComponent(s.id) : '#'}" style="animation-delay:${i * 0.08}s">
           <img class="story-thumb" src="${escapeHtml(s.coverImage || placeholderImg('s' + (s.id || i)))}" alt="" loading="lazy"
                onerror="this.src='${placeholderImg('fallback' + i)}'" />
           <div class="story-body">
