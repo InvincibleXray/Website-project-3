@@ -500,6 +500,10 @@
                                 <div class="input-group"><label>Stat 1 Label</label><input type="text" id="set-s1l" class="form-control"></div>
                                 <div class="input-group"><label>Stat 2 Value</label><input type="text" id="set-s2v" class="form-control"></div>
                                 <div class="input-group"><label>Stat 2 Label</label><input type="text" id="set-s2l" class="form-control"></div>
+                                <div class="input-group"><label>Stat 3 Value</label><input type="text" id="set-s3v" class="form-control"></div>
+                                <div class="input-group"><label>Stat 3 Label</label><input type="text" id="set-s3l" class="form-control"></div>
+                                <div class="input-group"><label>Stat 4 Value</label><input type="text" id="set-s4v" class="form-control"></div>
+                                <div class="input-group"><label>Stat 4 Label</label><input type="text" id="set-s4l" class="form-control"></div>
                             </div>
                             <button class="btn-primary mt-3" onclick="saveConfig('hero')">Save Hero Config</button>
                         </div>
@@ -525,6 +529,13 @@
                             <button class="btn-primary mt-3" onclick="saveConfig('footer')">Save Footer Config</button>
                         </div>
                     </div>
+
+                    <!-- Test Firebase Connection -->
+                    <div class="content-card" style="margin-top: 24px;">
+                        <div class="sub-header">Firebase Diagnostics</div>
+                        <p class="text-secondary" style="font-size:13px; margin-bottom:16px;">Verify that Firestore read/write is working end-to-end.</p>
+                        <button class="btn-secondary" onclick="testFirebaseConnection()" id="btn-test-conn">🔌 Test Connection</button>
+                    </div>
                 </div>
 
             </div>
@@ -537,6 +548,16 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <script>
+        // ==========================================
+        // DEBUG LOGGING UTILITY (BUG 8 FIX)
+        // ==========================================
+        const DEBUG = true;
+        function dbLog(message, data) {
+            if (DEBUG) {
+                console.log('[WEVOX]', message, data !== undefined ? data : '');
+            }
+        }
+
         // ==========================================
         // 1. CONFIGURATION & INIT
         // ==========================================
@@ -570,15 +591,20 @@
         const categories = ['Campus Fraud', 'Economy', 'Politics', 'Culture', 'Investigation', 'Field Reports', 'Documentary'];
 
         // ==========================================
-        // 2. AUTH & BOOTSTRAP (Bypassed as requested)
+        // 2. AUTH & BOOTSTRAP
+        // BUG 6 FIX: onAuthStateChanged is the ONLY place that shows/hides the
+        // dashboard. showDashboard() is never called anywhere else.
+        // Firebase persists auth state via IndexedDB between refreshes automatically —
+        // this listener fires on every page load with the restored user.
         // ==========================================
-        
-        // Real Auth Flow — login required
+
+        // THIS MUST RUN IMMEDIATELY after Firebase init:
         auth.onAuthStateChanged(user => {
+            dbLog('onAuthStateChanged fired', user ? `uid=${user.uid}` : 'not signed in');
             if (user) {
+                // BUG 6 FIX: showDashboard logic lives ONLY here
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('app-layout').style.display = 'flex';
-                // Show admin email + initial in sidebar
                 const email = user.email || '';
                 const initial = (email[0] || 'A').toUpperCase();
                 const adminEmailEl = document.querySelector('.admin-text p');
@@ -589,6 +615,7 @@
                 if (adminInitialTopEl) adminInitialTopEl.textContent = initial;
                 initDashboard();
             } else {
+                // BUG 6 FIX: showLoginScreen logic lives ONLY here
                 document.getElementById('login-page').style.display = 'flex';
                 document.getElementById('app-layout').style.display = 'none';
             }
@@ -743,14 +770,19 @@
                 renderEmptyStates();
                 return;
             }
+            dbLog('initDashboard: starting all data fetches');
             try {
+                // BUG 1 FIX: loadSettings is called on every dashboard init so
+                // settings fields are always populated from Firestore on page load
                 await Promise.all([
+                    loadSettings(),
                     fetchPending(), fetchStories(), fetchVideos(),
                     fetchTrending(), fetchPicks(), fetchCreators(), fetchContacts()
                 ]);
                 updateStats();
+                dbLog('initDashboard: all data loaded');
             } catch (e) {
-                console.error("Fetch error:", e);
+                console.error("[WEVOX] initDashboard fetch error:", e);
                 showToast("Error fetching data. Check permissions/config.", "error");
             }
         }
@@ -771,29 +803,76 @@
         }
 
         // --- PENDING SUBMISSIONS ---
-        async function fetchPending() {
-            const snap = await db.collection('submissions').where('status','==','pending').orderBy('submittedAt','desc').get();
-            state.pending = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            renderPending();
-            
-            // Render recent on dashboard
-            const dashContainer = document.getElementById('dash-recent-pending');
-            if(state.pending.length === 0) {
-                dashContainer.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">All clear! No pending submissions.</div></div>`;
-            } else {
-                dashContainer.innerHTML = state.pending.slice(0,3).map(p => `
-                    <div class="content-card" style="padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-                        <div class="flex-gap">
-                            <span class="badge ${p.type==='STORY'?'badge-red':'badge-blue'}">${p.type}</span>
-                            <div>
-                                <div style="font-size:14px; font-weight:500; color:white;">${p.title}</div>
-                                <div style="font-size:12px; color:var(--text-secondary)">By ${p.authorName} • ${p.university}</div>
-                            </div>
-                        </div>
-                        <a href="#" onclick="showSection('pending')" style="color:var(--accent); font-size:13px; font-weight:500;">Review →</a>
-                    </div>
-                `).join('');
-            }
+        // BUG 5 FIX: Use onSnapshot (real-time listener) instead of one-time get()
+        // so the pending count badge updates live without needing a page refresh.
+        // The listener is set up once during initDashboard via fetchPending().
+        let _pendingUnsub = null; // track listener so we don't duplicate on re-init
+
+        function fetchPending() {
+            return new Promise((resolve) => {
+                if (!db) { resolve(); return; }
+
+                // Unsubscribe any previous listener
+                if (_pendingUnsub) { _pendingUnsub(); _pendingUnsub = null; }
+
+                dbLog('Setting up onSnapshot listener for submissions/pending...');
+
+                // BUG 4 FIX: empty collection handled inside snapshot callback
+                _pendingUnsub = db.collection('submissions')
+                    .where('status', '==', 'pending')
+                    .orderBy('submittedAt', 'desc')
+                    .onSnapshot(snapshot => {
+                        dbLog('submissions/pending snapshot received', `size=${snapshot.size}`);
+
+                        // BUG 5 FIX: live count — updates pending-count and badge instantly
+                        const count = snapshot.size;
+                        const pendingCountEl = document.getElementById('stat-pending');
+                        if (pendingCountEl) pendingCountEl.innerText = count;
+
+                        // Update sidebar badge
+                        const bp = document.getElementById('badge-pending');
+                        if (bp) {
+                            bp.innerText = count;
+                            bp.style.display = count > 0 ? 'flex' : 'none';
+                        }
+
+                        // BUG 4 FIX: graceful empty state
+                        if (snapshot.empty) {
+                            state.pending = [];
+                            renderPending();
+                            const dashContainer = document.getElementById('dash-recent-pending');
+                            if (dashContainer) {
+                                dashContainer.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">All clear! No pending submissions.</div></div>`;
+                            }
+                            resolve();
+                            return;
+                        }
+
+                        state.pending = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                        renderPending();
+
+                        const dashContainer = document.getElementById('dash-recent-pending');
+                        if (dashContainer) {
+                            dashContainer.innerHTML = state.pending.slice(0, 3).map(p => `
+                                <div class="content-card" style="padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div class="flex-gap">
+                                        <span class="badge ${p.type==='STORY'?'badge-red':'badge-blue'}">${p.type || 'UNKNOWN'}</span>
+                                        <div>
+                                            <div style="font-size:14px; font-weight:500; color:white;">${p.title || 'Untitled'}</div>
+                                            <div style="font-size:12px; color:var(--text-secondary)">By ${p.authorName || 'Unknown'} • ${p.university || ''}</div>
+                                        </div>
+                                    </div>
+                                    <a href="#" onclick="showSection('pending')" style="color:var(--accent); font-size:13px; font-weight:500;">Review →</a>
+                                </div>
+                            `).join('');
+                        }
+                        resolve();
+                    }, err => {
+                        console.error('[WEVOX] submissions onSnapshot error:', err);
+                        showToast('Failed to load submissions: ' + err.message, 'error');
+                        resolve();
+                    });
+            });
         }
 
         function renderPending() {
@@ -852,6 +931,7 @@
             const cat = document.getElementById(`cat-${id}`).value;
             if(!cat) return showToast("Select category first", "error");
             
+            dbLog(`Approving submission ${id} as ${type} in category ${cat}...`);
             try {
                 const subRef = db.collection('submissions').doc(id);
                 const subDoc = await subRef.get();
@@ -859,126 +939,185 @@
                 
                 const targetColl = type === 'STORY' ? 'stories' : 'videos';
                 
-                // Add to published collection
+                // BUG 3 FIX: field names match exactly what fetchStories/fetchVideos reads
                 await db.collection(targetColl).add({
-                    title: data.title,
-                    category: cat,
-                    author: data.authorName,
-                    university: data.university,
-                    [type==='STORY'?'content':'description']: data.content || data.description || '',
-                    [type==='STORY'?'coverImage':'thumbnailUrl']: data.imageUrl || '',
-                    ...(type==='VIDEO' && {videoUrl: data.videoUrl, duration: '00:00'}),
-                    ...(type==='STORY' && {readTime: '5 min read'}),
-                    status: 'published',
+                    title:       data.title        || '',
+                    category:    cat,
+                    author:      data.authorName   || '',
+                    university:  data.university   || '',
+                    excerpt:     data.excerpt      || '',
+                    ...(type === 'STORY'  && { content:      data.content      || '',
+                                               coverImage:   data.imageUrl     || '',
+                                               readTime:     data.readTime     || '5 min read' }),
+                    ...(type === 'VIDEO'  && { description:  data.description  || '',
+                                               thumbnailUrl: data.imageUrl     || '',
+                                               videoUrl:     data.videoUrl     || '',
+                                               duration:     data.duration     || '00:00' }),
+                    status:      'published',
                     publishedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    views: 0
+                    views:       0
                 });
 
-                // Update submission status
                 await subRef.update({ status: 'approved' });
+                dbLog(`Submission ${id} approved and published to ${targetColl}`);
                 
                 document.getElementById(`pend-${id}`).style.display = 'none';
                 showToast("✅ Published successfully!", "success");
-                await fetchPending();
+                // fetchPending is handled by onSnapshot — no manual call needed
                 if(type==='STORY') fetchStories(); else fetchVideos();
                 updateStats();
 
-            } catch(e) { console.error(e); showToast("Error publishing", "error"); }
+            } catch(e) {
+                console.error('[WEVOX] approveSubmission failed:', e);
+                showToast("Error publishing: " + e.message, "error");
+            }
         }
 
         function rejectSubmission(id) {
             showConfirm("Reject Submission", "Are you sure? This cannot be undone.", async () => {
+                dbLog(`Rejecting submission ${id}...`);
                 try {
                     await db.collection('submissions').doc(id).update({ status: 'rejected' });
+                    dbLog(`Submission ${id} rejected`);
                     document.getElementById(`pend-${id}`).style.display = 'none';
                     showToast("Submission rejected", "info");
-                    await fetchPending();
+                    // fetchPending is handled by onSnapshot — count auto-updates
                     updateStats();
-                } catch(e) { showToast("Error rejecting", "error"); }
+                } catch(e) {
+                    console.error('[WEVOX] rejectSubmission failed:', e);
+                    showToast("Error rejecting: " + e.message, "error");
+                }
             });
         }
 
         // --- STORIES & VIDEOS ---
+        // BUG 4 FIX: graceful empty state + per-function error handling + dbLog
         async function fetchStories() {
-            const snap = await db.collection('stories').where('status','==','published').orderBy('publishedAt','desc').get();
-            state.stories = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            
-            const tbody = document.getElementById('table-stories');
-            if(state.stories.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No stories published yet.</td></tr>`;
-                return;
+            if (!db) return;
+            dbLog('Fetching stories/published...');
+            try {
+                const snap = await db.collection('stories')
+                    .where('status', '==', 'published')
+                    .orderBy('publishedAt', 'desc')
+                    .get();
+                dbLog('stories snapshot', `size=${snap.size}`);
+                const tbody = document.getElementById('table-stories');
+                // BUG 4 FIX: handle empty collection gracefully
+                if (snap.empty) {
+                    state.stories = [];
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:40px 0;"><div class="empty-icon">📰</div><div class="empty-text">No stories published yet.</div></div></td></tr>`;
+                    return;
+                }
+                state.stories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (tbody) {
+                    tbody.innerHTML = state.stories.map(s => `
+                        <tr>
+                            <td><img src="${s.coverImage || 'https://via.placeholder.com/150'}" class="table-thumb"></td>
+                            <td>
+                                <div class="td-title">${s.title || 'Untitled'}</div>
+                                <div class="td-sub">By ${s.author || 'Unknown'}</div>
+                            </td>
+                            <td><span class="badge badge-soft-red">${s.category || '--'}</span></td>
+                            <td class="font-mono text-muted">${formatDate(s.publishedAt)}</td>
+                            <td class="table-actions">
+                                <button onclick="deleteDoc('stories', '${s.id}', fetchStories)">🗑️</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('[WEVOX] fetchStories failed:', err);
+                showToast('Failed to load stories: ' + err.message, 'error');
             }
-            tbody.innerHTML = state.stories.map(s => `
-                <tr>
-                    <td><img src="${s.coverImage || 'https://via.placeholder.com/150'}" class="table-thumb"></td>
-                    <td>
-                        <div class="td-title">${s.title}</div>
-                        <div class="td-sub">By ${s.author}</div>
-                    </td>
-                    <td><span class="badge badge-soft-red">${s.category}</span></td>
-                    <td class="font-mono text-muted">${formatDate(s.publishedAt)}</td>
-                    <td class="table-actions">
-                        <button onclick="deleteDoc('stories', '${s.id}', fetchStories)">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
         }
 
         async function fetchVideos() {
-            const snap = await db.collection('videos').where('status','==','published').orderBy('publishedAt','desc').get();
-            state.videos = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            
-            const tbody = document.getElementById('table-videos');
-            if(state.videos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No videos published yet.</td></tr>`;
-                return;
+            if (!db) return;
+            dbLog('Fetching videos/published...');
+            try {
+                const snap = await db.collection('videos')
+                    .where('status', '==', 'published')
+                    .orderBy('publishedAt', 'desc')
+                    .get();
+                dbLog('videos snapshot', `size=${snap.size}`);
+                const tbody = document.getElementById('table-videos');
+                // BUG 4 FIX: handle empty collection gracefully
+                if (snap.empty) {
+                    state.videos = [];
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:40px 0;"><div class="empty-icon">📹</div><div class="empty-text">No videos published yet.</div></div></td></tr>`;
+                    return;
+                }
+                state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (tbody) {
+                    tbody.innerHTML = state.videos.map(v => `
+                        <tr>
+                            <td><img src="${v.thumbnailUrl || 'https://via.placeholder.com/150'}" class="table-thumb"></td>
+                            <td>
+                                <div class="td-title">${v.title || 'Untitled'}</div>
+                                <div class="td-sub">By ${v.author || 'Unknown'}</div>
+                            </td>
+                            <td><span class="badge badge-soft-red">${v.category || '--'}</span></td>
+                            <td class="font-mono text-muted">${v.duration || '--'}</td>
+                            <td class="table-actions">
+                                <button onclick="deleteDoc('videos', '${v.id}', fetchVideos)">🗑️</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('[WEVOX] fetchVideos failed:', err);
+                showToast('Failed to load videos: ' + err.message, 'error');
             }
-            tbody.innerHTML = state.videos.map(v => `
-                <tr>
-                    <td><img src="${v.thumbnailUrl || 'https://via.placeholder.com/150'}" class="table-thumb"></td>
-                    <td>
-                        <div class="td-title">${v.title}</div>
-                        <div class="td-sub">By ${v.author}</div>
-                    </td>
-                    <td><span class="badge badge-soft-red">${v.category}</span></td>
-                    <td class="font-mono text-muted">${v.duration || '--'}</td>
-                    <td class="table-actions">
-                        <button onclick="deleteDoc('videos', '${v.id}', fetchVideos)">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
         }
 
         async function deleteDoc(collection, id, callback) {
             showConfirm("Delete Item", "Remove this item permanently?", async () => {
+                dbLog(`Deleting ${collection}/${id}...`);
                 try {
                     await db.collection(collection).doc(id).delete();
+                    dbLog(`${collection}/${id} deleted`);
                     showToast("Deleted successfully", "info");
                     if(callback) callback();
                     updateStats();
-                } catch(e) { showToast("Delete failed", "error"); }
+                } catch(e) {
+                    console.error('[WEVOX] deleteDoc failed:', e);
+                    showToast("Delete failed: " + e.message, "error");
+                }
             });
         }
 
         // --- TRENDING ---
         async function fetchTrending() {
-            const snap = await db.collection('trending').get();
-            state.trending = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            const list = document.getElementById('trending-list');
-            if(state.trending.length === 0) { list.innerHTML = `<div class="empty-state">No trending items.</div>`; return; }
-            
-            list.innerHTML = state.trending.map((t, i) => `
-                <div class="flex-between" style="padding: 12px 0; border-bottom: 1px solid var(--border);">
-                    <div class="flex-gap">
-                        <span class="font-head text-accent" style="font-size:24px; opacity:0.5;">0${i+1}</span>
-                        <div>
-                            <div style="font-size:14px; font-weight:500;">${t.title}</div>
-                            <div class="font-mono text-muted" style="font-size:11px;">${t.tag} • ${t.readCount}</div>
+            if (!db) return;
+            dbLog('Fetching trending...');
+            try {
+                const snap = await db.collection('trending').get();
+                dbLog('trending snapshot', `size=${snap.size}`);
+                state.trending = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                const list = document.getElementById('trending-list');
+                // BUG 4 FIX: graceful empty state
+                if(snap.empty) {
+                    if (list) list.innerHTML = `<div class="empty-state"><div class="empty-icon">🔥</div><div class="empty-text">No trending items yet.</div></div>`;
+                    return;
+                }
+                if (list) {
+                    list.innerHTML = state.trending.map((t, i) => `
+                        <div class="flex-between" style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+                            <div class="flex-gap">
+                                <span class="font-head text-accent" style="font-size:24px; opacity:0.5;">0${i+1}</span>
+                                <div>
+                                    <div style="font-size:14px; font-weight:500;">${t.title}</div>
+                                    <div class="font-mono text-muted" style="font-size:11px;">${t.tag} • ${t.readCount}</div>
+                                </div>
+                            </div>
+                            <button class="btn-danger-outline" style="border:none; padding:4px;" onclick="deleteDoc('trending', '${t.id}', fetchTrending)">🗑️</button>
                         </div>
-                    </div>
-                    <button class="btn-danger-outline" style="border:none; padding:4px;" onclick="deleteDoc('trending', '${t.id}', fetchTrending)">🗑️</button>
-                </div>
-            `).join('');
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('[WEVOX] fetchTrending failed:', err);
+                showToast('Failed to load trending: ' + err.message, 'error');
+            }
         }
 
         function openTrendingModal() {
@@ -997,70 +1136,292 @@
             const tag = document.getElementById('tr-tag').value;
             const readCount = document.getElementById('tr-read').value;
             if(!title || !tag) return showToast("Title and Tag required", "error");
+            dbLog('Saving trending item...', { title, tag, readCount });
             try {
                 await db.collection('trending').add({ title, tag, readCount });
+                dbLog('Trending item saved');
                 showToast("Added to trending", "success");
                 closeModal();
                 fetchTrending();
-            } catch(e) { showToast("Error saving", "error"); }
+            } catch(e) {
+                console.error('[WEVOX] saveTrending failed:', e);
+                showToast("Error saving trending: " + e.message, "error");
+            }
         }
 
-        // --- EDITOR PICKS, CREATORS, CONTACTS (Simplified for length, maintaining structure) ---
+        // --- EDITOR PICKS ---
+        // BUG 4 FIX: was a stub — now fully implemented with empty-state handling
         async function fetchPicks() {
-            // Implementation matches trending logic
+            if (!db) return;
+            dbLog('Fetching picks...');
+            try {
+                const snap = await db.collection('picks').get();
+                dbLog('picks snapshot', `size=${snap.size}`);
+                state.picks = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                const list = document.getElementById('picks-list');
+                if (snap.empty) {
+                    if (list) list.innerHTML = `<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-text">No editor's picks yet.</div></div>`;
+                    return;
+                }
+                if (list) {
+                    list.innerHTML = state.picks.map((p, i) => `
+                        <div class="flex-between" style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+                            <div class="flex-gap">
+                                <span class="font-head text-accent" style="font-size:24px; opacity:0.5;">0${i+1}</span>
+                                <div>
+                                    <div style="font-size:14px; font-weight:500;">${p.title || 'Untitled'}</div>
+                                    <div class="font-mono text-muted" style="font-size:11px;">${p.category || ''}</div>
+                                </div>
+                            </div>
+                            <button class="btn-danger-outline" style="border:none; padding:4px;" onclick="deleteDoc('picks', '${p.id}', fetchPicks)">🗑️</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('[WEVOX] fetchPicks failed:', err);
+                showToast('Failed to load picks: ' + err.message, 'error');
+            }
         }
-        function openPickModal() { showToast("Modal opened", "info"); }
+
+        function openPickModal() {
+            if (state.picks.length >= 4) return showToast("Max 4 editor's picks allowed. Delete one first.", "warning");
+            const html = `
+                <div class="input-group"><label>Story Title</label><input type="text" id="pk-title" class="form-control"></div>
+                <div class="input-group"><label>Category</label><input type="text" id="pk-cat" class="form-control font-mono"></div>
+                <button class="btn-primary" style="width:100%" onclick="savePick()">Add Editor's Pick</button>
+            `;
+            openModal("Add Editor's Pick", html);
+        }
+
+        async function savePick() {
+            const title = document.getElementById('pk-title')?.value || '';
+            const category = document.getElementById('pk-cat')?.value || '';
+            if (!title) return showToast("Title required", "error");
+            dbLog('Saving pick...', { title, category });
+            try {
+                await db.collection('picks').add({ title, category });
+                dbLog('Pick saved');
+                showToast("Added to Editor's Picks", "success");
+                closeModal();
+                fetchPicks();
+            } catch (e) {
+                console.error('[WEVOX] savePick failed:', e);
+                showToast("Error saving pick: " + e.message, "error");
+            }
+        }
         
+        // BUG 4 FIX: empty state + error handling + dbLog
         async function fetchCreators() {
-            const snap = await db.collection('creators').get();
-            state.creators = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            const tbody = document.getElementById('table-creators');
-            tbody.innerHTML = state.creators.map(c => `
-                <tr>
-                    <td><div class="admin-avatar">${c.name.charAt(0)}</div></td>
-                    <td><div class="td-title">${c.name}</div><div class="td-sub">${c.university}</div></td>
-                    <td class="font-mono text-muted">${c.reach || '--'}</td>
-                    <td>${c.featured ? '<span class="badge badge-red">YES</span>' : '<span class="badge" style="background:var(--border)">NO</span>'}</td>
-                    <td class="table-actions"><button onclick="deleteDoc('creators', '${c.id}', fetchCreators)">🗑️</button></td>
-                </tr>
-            `).join('') || `<tr><td colspan="5" class="empty-state">No creators found.</td></tr>`;
+            if (!db) return;
+            dbLog('Fetching creators...');
+            try {
+                const snap = await db.collection('creators').get();
+                dbLog('creators snapshot', `size=${snap.size}`);
+                state.creators = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                const tbody = document.getElementById('table-creators');
+                if (snap.empty) {
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:40px 0;"><div class="empty-icon">👤</div><div class="empty-text">No creators added yet.</div></div></td></tr>`;
+                    return;
+                }
+                if (tbody) {
+                    tbody.innerHTML = state.creators.map(c => `
+                        <tr>
+                            <td><div class="admin-avatar">${(c.name || 'U').charAt(0)}</div></td>
+                            <td><div class="td-title">${c.name || 'Unknown'}</div><div class="td-sub">${c.university || '--'}</div></td>
+                            <td class="font-mono text-muted">${c.reach || '--'}</td>
+                            <td>${c.featured ? '<span class="badge badge-red">YES</span>' : '<span class="badge" style="background:var(--border)">NO</span>'}</td>
+                            <td class="table-actions"><button onclick="deleteDoc('creators', '${c.id}', fetchCreators)">🗑️</button></td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('[WEVOX] fetchCreators failed:', err);
+                showToast('Failed to load creators: ' + err.message, 'error');
+            }
         }
+
         function openCreatorModal() { 
             const html = `<div class="input-group"><label>Name</label><input type="text" id="cr-name" class="form-control"></div>
                           <div class="input-group"><label>University</label><input type="text" id="cr-uni" class="form-control"></div>
                           <button class="btn-primary" style="width:100%" onclick="saveCreator()">Add Creator</button>`;
             openModal("Add Creator", html);
         }
+
         async function saveCreator() {
+            const name = document.getElementById('cr-name')?.value || '';
+            const university = document.getElementById('cr-uni')?.value || '';
+            if (!name) return showToast("Name required", "error");
+            dbLog('Saving creator...', { name, university });
             try {
-                await db.collection('creators').add({ name: document.getElementById('cr-name').value, university: document.getElementById('cr-uni').value, featured: false });
-                closeModal(); fetchCreators(); showToast("Creator added", "success");
-            } catch(e) { showToast("Error", "error"); }
+                await db.collection('creators').add({ name, university, featured: false });
+                dbLog('Creator saved');
+                closeModal();
+                fetchCreators();
+                showToast("Creator added", "success");
+            } catch(e) {
+                console.error('[WEVOX] saveCreator failed:', e);
+                showToast("Error adding creator: " + e.message, "error");
+            }
         }
 
+        // BUG 4 FIX: empty state + error handling + dbLog
         async function fetchContacts() {
-            const snap = await db.collection('contacts').orderBy('createdAt','desc').get();
-            state.contacts = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            const list = document.getElementById('contacts-list');
-            list.innerHTML = state.contacts.map(c => `
-                <div class="content-card" style="padding:16px; margin-bottom:8px; opacity: ${c.read ? '0.6' : '1'}">
-                    <div class="flex-between">
-                        <div class="flex-gap">
-                            ${!c.read ? '<div style="width:8px; height:8px; border-radius:50%; background:var(--info);"></div>' : ''}
-                            <span style="font-weight:600; color:white;">${c.name}</span>
-                            <span class="font-mono text-muted" style="font-size:11px;">${c.email}</span>
+            if (!db) return;
+            dbLog('Fetching contacts...');
+            try {
+                const snap = await db.collection('contacts').orderBy('createdAt','desc').get();
+                dbLog('contacts snapshot', `size=${snap.size}`);
+                state.contacts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                const list = document.getElementById('contacts-list');
+                if (snap.empty) {
+                    if (list) list.innerHTML = `<div class="empty-state"><div class="empty-icon">📬</div><div class="empty-text">Inbox empty.</div></div>`;
+                    return;
+                }
+                if (list) {
+                    list.innerHTML = state.contacts.map(c => `
+                        <div class="content-card" style="padding:16px; margin-bottom:8px; opacity: ${c.read ? '0.6' : '1'}">
+                            <div class="flex-between">
+                                <div class="flex-gap">
+                                    ${!c.read ? '<div style="width:8px; height:8px; border-radius:50%; background:var(--info);"></div>' : ''}
+                                    <span style="font-weight:600; color:white;">${c.name || 'Unknown'}</span>
+                                    <span class="font-mono text-muted" style="font-size:11px;">${c.email || ''}</span>
+                                </div>
+                                <button class="btn-secondary" style="padding:4px 8px;" onclick="deleteDoc('contacts','${c.id}',fetchContacts)">Delete</button>
+                            </div>
+                            <div class="text-secondary" style="font-size:13px; margin-top:8px;">${c.message || ''}</div>
                         </div>
-                        <button class="btn-secondary" style="padding:4px 8px;" onclick="deleteDoc('contacts','${c.id}',fetchContacts)">Delete</button>
-                    </div>
-                    <div class="text-secondary" style="font-size:13px; margin-top:8px;">${c.message}</div>
-                </div>
-            `).join('') || `<div class="empty-state">Inbox empty.</div>`;
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('[WEVOX] fetchContacts failed:', err);
+                showToast('Failed to load contacts: ' + err.message, 'error');
+            }
         }
 
+        // ==========================================
+        // BUG 1 + 2 + 3 FIX: saveConfig — real Firestore write with auth check,
+        // error handling, and correct collection='siteConfig', doc=docId
+        // ==========================================
         async function saveConfig(docId) {
-            showToast(`Saving ${docId} config...`, "info");
-            // Real implementation would gather inputs and db.collection('siteConfig').doc(docId).set(...)
-            setTimeout(() => showToast("Settings saved successfully", "success"), 500);
+            // BUG 2 FIX: Check auth before write — silent failures were caused by
+            // unauthenticated writes being blocked by Firestore rules
+            const user = auth ? auth.currentUser : null;
+            if (!user) {
+                showToast('Not authenticated! Please log in.', 'error');
+                return;
+            }
+
+            let data = {};
+
+            // BUG 3 FIX: Field names match exactly what index.html/loadSettings expect
+            if (docId === 'hero') {
+                data = {
+                    eyebrow:    (document.getElementById('set-eyebrow')?.value || '').trim(),
+                    headline:   (document.getElementById('set-headline')?.value || '').trim(),
+                    stat1Value: (document.getElementById('set-s1v')?.value || '').trim(),
+                    stat1Label: (document.getElementById('set-s1l')?.value || '').trim(),
+                    stat2Value: (document.getElementById('set-s2v')?.value || '').trim(),
+                    stat2Label: (document.getElementById('set-s2l')?.value || '').trim(),
+                    stat3Value: (document.getElementById('set-s3v')?.value || '').trim(),
+                    stat3Label: (document.getElementById('set-s3l')?.value || '').trim(),
+                    stat4Value: (document.getElementById('set-s4v')?.value || '').trim(),
+                    stat4Label: (document.getElementById('set-s4l')?.value || '').trim(),
+                };
+            } else if (docId === 'footer') {
+                data = {
+                    email:     (document.getElementById('set-email')?.value || '').trim(),
+                    twitter:   (document.getElementById('set-tw')?.value || '').trim(),
+                    youtube:   (document.getElementById('set-yt')?.value || '').trim(),
+                    instagram: (document.getElementById('set-ig')?.value || '').trim(),
+                };
+            } else {
+                showToast('Unknown config section', 'error');
+                return;
+            }
+
+            // BUG 1 FIX: Consistent collection='siteConfig', doc=docId (e.g. 'hero' / 'footer')
+            // Both save and load must use the same path — no case/spelling drift
+            dbLog(`Saving siteConfig/${docId}...`, data);
+            try {
+                // set() with merge:true so partial updates don't wipe other fields
+                await db.collection('siteConfig').doc(docId).set(data, { merge: true });
+                dbLog(`siteConfig/${docId} saved successfully!`);
+                showToast(`✅ ${docId.charAt(0).toUpperCase() + docId.slice(1)} config saved!`, 'success');
+            } catch (error) {
+                console.error(`[WEVOX] saveConfig(${docId}) failed:`, error);
+                showToast('Error saving: ' + error.message, 'error');
+            }
+        }
+
+        // BUG 1 FIX: loadSettings reads from SAME collection/doc IDs that saveConfig writes to
+        async function loadSettings() {
+            if (!db) return;
+            dbLog('Loading siteConfig/hero and siteConfig/footer...');
+            try {
+                const [heroDoc, footerDoc] = await Promise.all([
+                    db.collection('siteConfig').doc('hero').get(),
+                    db.collection('siteConfig').doc('footer').get()
+                ]);
+
+                // BUG 3 FIX: field names match exactly what saveConfig writes
+                if (heroDoc.exists) {
+                    const h = heroDoc.data();
+                    dbLog('Hero config loaded', h);
+                    if (document.getElementById('set-eyebrow'))  document.getElementById('set-eyebrow').value  = h.eyebrow    || '';
+                    if (document.getElementById('set-headline')) document.getElementById('set-headline').value = h.headline   || '';
+                    if (document.getElementById('set-s1v'))      document.getElementById('set-s1v').value      = h.stat1Value || '';
+                    if (document.getElementById('set-s1l'))      document.getElementById('set-s1l').value      = h.stat1Label || '';
+                    if (document.getElementById('set-s2v'))      document.getElementById('set-s2v').value      = h.stat2Value || '';
+                    if (document.getElementById('set-s2l'))      document.getElementById('set-s2l').value      = h.stat2Label || '';
+                    if (document.getElementById('set-s3v'))      document.getElementById('set-s3v').value      = h.stat3Value || '';
+                    if (document.getElementById('set-s3l'))      document.getElementById('set-s3l').value      = h.stat3Label || '';
+                    if (document.getElementById('set-s4v'))      document.getElementById('set-s4v').value      = h.stat4Value || '';
+                    if (document.getElementById('set-s4l'))      document.getElementById('set-s4l').value      = h.stat4Label || '';
+                } else {
+                    dbLog('siteConfig/hero does not exist yet (first run)');
+                }
+
+                if (footerDoc.exists) {
+                    const f = footerDoc.data();
+                    dbLog('Footer config loaded', f);
+                    if (document.getElementById('set-email')) document.getElementById('set-email').value = f.email     || '';
+                    if (document.getElementById('set-tw'))    document.getElementById('set-tw').value    = f.twitter   || '';
+                    if (document.getElementById('set-yt'))    document.getElementById('set-yt').value    = f.youtube   || '';
+                    if (document.getElementById('set-ig'))    document.getElementById('set-ig').value    = f.instagram || '';
+                } else {
+                    dbLog('siteConfig/footer does not exist yet (first run)');
+                }
+            } catch (error) {
+                console.error('[WEVOX] loadSettings failed:', error);
+                showToast('Failed to load settings: ' + error.message, 'error');
+            }
+        }
+
+        // BUG 9 (Verification): Test Firebase Connection end-to-end
+        async function testFirebaseConnection() {
+            const btn = document.getElementById('btn-test-conn');
+            if (!db) { showToast('Firebase not initialized', 'error'); return; }
+            const user = auth ? auth.currentUser : null;
+            if (!user) { showToast('Not authenticated — cannot test write', 'error'); return; }
+            btn.disabled = true;
+            btn.textContent = '⏳ Testing...';
+            dbLog('Testing Firebase connection — write/read/delete...');
+            const testRef = db.collection('_connectionTest').doc('probe');
+            try {
+                await testRef.set({ ts: firebase.firestore.FieldValue.serverTimestamp(), by: user.uid });
+                dbLog('Test write succeeded');
+                const snap = await testRef.get();
+                dbLog('Test read succeeded', snap.data());
+                await testRef.delete();
+                dbLog('Test delete succeeded');
+                showToast('✅ Firebase connected and working!', 'success');
+            } catch (error) {
+                console.error('[WEVOX] Connection test failed:', error);
+                showToast('❌ Connection failed: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔌 Test Connection';
+            }
         }
 
         function renderEmptyStates() {
