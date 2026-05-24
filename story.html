@@ -1407,6 +1407,162 @@
       updateProgress();
     }
 
+    /* ===== RENDER VIDEO ===== */
+    function renderVideo(story) {
+      const skel = document.querySelector('#storySkeleton');
+      const el = document.querySelector('#storyContent');
+      skel.style.display = 'none';
+      el.style.display = 'block';
+
+      document.title = `${story.title} — WEVOX`;
+
+      // Convert YouTube URL to embed
+      function toEmbed(url) {
+        if (!url) return '';
+        const m = url.match(
+          /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/
+        );
+        if (m) return `https://www.youtube.com/embed/${m[1]}`;
+        if (url.includes('/embed/')) return url;
+        return url;
+      }
+
+      const cat = story.category || 'Field Reports';
+      const author = story.author || 'Anonymous';
+      const uni = story.university || 'Independent';
+      const embedUrl = toEmbed(story.videoUrl || '');
+      const avatarHTML = `<div class="avatar">${initials(author)}</div>`;
+
+      el.innerHTML = `
+        <div class="reveal" style="animation-delay:0s;">
+          <nav class="breadcrumb">
+            <a href="index.html">WEVOX</a>
+            <span class="arrow">→</span>
+            <a href="media.html">Field Reports</a>
+            <span class="arrow">→</span>
+            <span class="current">${escapeHtml(cat)}</span>
+          </nav>
+        </div>
+
+        <div class="reveal" style="animation-delay:0.05s;">
+          <span class="cat-tag">${escapeHtml(cat)}</span>
+        </div>
+
+        <h1 class="headline reveal"
+            style="animation-delay:0.1s;">
+          ${escapeHtml(story.title || 'Untitled')}
+        </h1>
+
+        <hr class="divider"/>
+
+        <div class="author-row reveal"
+             style="animation-delay:0.15s;">
+          <div class="author-block">
+            ${avatarHTML}
+            <div>
+              <div class="author-name">
+                ${escapeHtml(author)}
+              </div>
+              <div class="author-uni">
+                ${escapeHtml(uni)}
+              </div>
+            </div>
+          </div>
+          <div class="meta-row">
+            <span class="meta-item">
+              📅 ${formatDate(story.publishedAt)}
+            </span>
+            <span class="meta-item">
+              🎬 ${escapeHtml(story.duration || '')}
+            </span>
+            <span class="meta-item">
+              👁 <span id="viewsCount">
+                ${formatViews(story.views)}
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="share-row"
+             id="topShareRow"></div>
+
+        <div class="reveal"
+             style="animation-delay:0.2s;
+                    margin:24px 0;">
+          ${embedUrl ? `
+            <div style="position:relative;
+                        padding-bottom:56.25%;
+                        height:0;
+                        overflow:hidden;
+                        border-radius:8px;
+                        background:#000;">
+              <iframe
+                src="${escapeHtml(embedUrl)}"
+                style="position:absolute;
+                       top:0;left:0;
+                       width:100%;height:100%;
+                       border:none;"
+                allowfullscreen
+                allow="accelerometer; autoplay;
+                       clipboard-write;
+                       encrypted-media;
+                       gyroscope; picture-in-picture"
+                loading="lazy">
+              </iframe>
+            </div>
+          ` : `
+            <div style="background:#1a1a1a;
+                        border-radius:8px;
+                        padding:60px;
+                        text-align:center;
+                        color:#9A9A9A;">
+              Video not available
+            </div>
+          `}
+        </div>
+
+        ${story.description ? `
+        <div class="article-content"
+             id="articleBody">
+          <p>${escapeHtml(story.description)}</p>
+        </div>` : ''}
+
+        <div class="author-card">
+          ${avatarHTML}
+          <div class="author-card-info">
+            <div class="author-card-name">
+              ${escapeHtml(author)}
+            </div>
+            <div class="author-card-uni">
+              ${escapeHtml(uni)}
+            </div>
+            <div class="author-card-role">
+              Field Correspondent
+            </div>
+          </div>
+        </div>
+
+        <div class="end-share">
+          <h4>Found this important? Share it.</h4>
+          <div class="share-row"
+               id="bottomShareRow"></div>
+        </div>
+      `;
+
+      buildShareButtons(
+        document.querySelector('#topShareRow'),
+        story
+      );
+      buildShareButtons(
+        document.querySelector('#bottomShareRow'),
+        story
+      );
+      buildSidebarShare(story);
+      updateProgress();
+    }
+
     /* ===== ERROR / NOT FOUND STATES ===== */
     function showNotFound() {
       $("storySkeleton").style.display = "none";
@@ -1517,6 +1673,70 @@
       $("relatedTitle").textContent = r.title || "Untitled";
     }
 
+    /* ===== MORE VIDEOS ===== */
+    async function loadMoreVideos(currentStory) {
+      let candidates = [];
+      if (firebaseReady) {
+        try {
+          const snap = await db
+            .collection('videos')
+            .where('status','==','published')
+            .limit(6).get();
+          candidates = snap.docs.map(d => ({
+            id: d.id, ...d.data()
+          }));
+        } catch(e) { /* ignore */ }
+      }
+
+      candidates = candidates.filter(
+        c => c.id !== currentStory.id
+      ).slice(0, 3);
+
+      if (!candidates.length) return;
+
+      const grid = document
+        .querySelector('#moreGrid');
+      const section = document
+        .querySelector('#moreStoriesSection');
+      const heading = section
+        .querySelector('h2');
+      if (heading)
+        heading.textContent = 'More Field Reports';
+      section.style.display = 'block';
+
+      grid.innerHTML = candidates.map(s => `
+        <a class="more-card"
+           href="story.html?id=${encodeURIComponent(s.id)}">
+          <div class="more-card-thumb-wrap">
+            <img class="more-card-thumb"
+                 src="${escapeHtml(
+                   s.thumbnailUrl ||
+                   placeholderImg('v-' + s.id)
+                 )}"
+                 alt="" loading="lazy"/>
+          </div>
+          <div class="more-card-body">
+            <div class="more-card-tag">
+              ${escapeHtml(s.category ||
+                'Field Reports')}
+            </div>
+            <div class="more-card-title">
+              ${escapeHtml(s.title || 'Untitled')}
+            </div>
+            <div class="more-card-meta">
+              By ${escapeHtml(s.author ||
+                'Anonymous')} —
+              ${escapeHtml(s.university ||
+                'Independent')}
+            </div>
+            <div class="more-card-readtime">
+              🎬 ${escapeHtml(s.duration || '')}
+            </div>
+          </div>
+        </a>
+      `).join('');
+    }
+
     /* ===== MAIN FETCH ===== */
     async function loadStory() {
       const params = new URLSearchParams(window.location.search);
@@ -1556,8 +1776,13 @@
 
       if (!story) { showNotFound(); return; }
 
-      renderStory(story);
-      loadMoreStories(story);
+      if (story.type === 'VIDEO') {
+        renderVideo(story);
+        loadMoreVideos(story);
+      } else {
+        renderStory(story);
+        loadMoreStories(story);
+      }
     }
 
     /* ===== KICK OFF ===== */
