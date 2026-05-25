@@ -10,8 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-    <!-- TinyMCE -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+    <!-- Quill Editor -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 
     <!-- Styles -->
     <style>
@@ -235,6 +236,31 @@
             .data-table tr { margin-bottom: 16px; border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
             .data-table td { border-bottom: none; padding: 8px 0; }
             .table-thumb { width: 100%; height: 160px; }
+        }
+
+        /* Quill Editor */
+        .ql-toolbar {
+            background: #2a2a2a !important;
+            border-color: #333 !important;
+            border-radius: 8px 8px 0 0;
+        }
+        .ql-container {
+            background: #1a1a1a !important;
+            border-color: #333 !important;
+            border-radius: 0 0 8px 8px;
+            min-height: 200px;
+            color: #f0f0f0 !important;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .ql-editor { min-height: 200px; }
+        .ql-snow .ql-stroke {
+            stroke: #9A9A9A !important;
+        }
+        .ql-snow .ql-fill {
+            fill: #9A9A9A !important;
+        }
+        .ql-snow .ql-picker {
+            color: #9A9A9A !important;
         }
     </style>
 </head>
@@ -1222,7 +1248,8 @@
                             <input type="text" id="edit-image" class="form-control font-mono" value="${(d.coverImage || '').replace(/"/g,'&quot;')}">
                         </div>
                         <div class="input-group"><label>Content</label>
-                            <textarea id="story-content-editor" class="form-control" rows="6">${d.content || ''}</textarea>
+                            <div id="edit-content-quill" style="height:220px;"></div>
+                            <input type="hidden" id="edit-content" value="${(d.content || '').replace(/"/g,'&quot;')}">
                         </div>
                         <div class="input-group"><label>Read Time</label>
                             <input type="text" id="edit-readtime" class="form-control font-mono" value="${(d.readTime || '5 min read').replace(/"/g,'&quot;')}">
@@ -1245,17 +1272,27 @@
                 `;
                 openModal(`Edit ${isStory ? 'Story' : 'Video'}`, html);
                 if (isStory) {
-                    tinymce.init({
-                        selector: '#story-content-editor',
-                        skin: 'oxide-dark',
-                        content_css: 'dark',
-                        plugins: 'link lists code media blockquote image',
-                        toolbar: 'blocks bold italic | link image media | blockquote bullist | code',
-                        height: 380,
-                        menubar: false,
-                        branding: false,
-                        promotion: false
-                    });
+                    setTimeout(() => {
+                        const quill = new Quill('#edit-content-quill', {
+                            theme: 'snow',
+                            modules: {
+                                toolbar: [
+                                    ['bold','italic','underline'],
+                                    [{'header':[2,3,false]}],
+                                    ['link','blockquote'],
+                                    [{'list':'ordered'},{'list':'bullet'}],
+                                    ['clean']
+                                ]
+                            }
+                        });
+                        // Pre-fill existing content
+                        const existingContent = document.getElementById('edit-content').value;
+                        if (existingContent) {
+                            quill.clipboard.dangerouslyPasteHTML(existingContent);
+                        }
+                        // Store quill instance
+                        window._quillEditor = quill;
+                    }, 100);
                 }
             } catch (e) {
                 handleFirestoreError(e, 'openEditModal');
@@ -1274,7 +1311,7 @@
             const update = { title, author, category };
             if (isStory) {
                 update.coverImage = document.getElementById('edit-image').value.trim();
-                update.content = tinymce.get('story-content-editor')?.getContent() || document.getElementById('story-content-editor').value;
+                update.content = window._quillEditor ? window._quillEditor.root.innerHTML : document.getElementById('edit-content').value;
                 update.readTime = document.getElementById('edit-readtime').value.trim();
             } else {
                 update.thumbnailUrl = document.getElementById('edit-image').value.trim();
