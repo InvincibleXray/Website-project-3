@@ -659,12 +659,14 @@
         // Initialize Firebase
         let db;
         let auth;
+        let firebaseInitError = null;
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
             auth = firebase.auth();
         } catch (e) {
             console.error("Firebase init error (likely missing config):", e);
+            firebaseInitError = e;
         }
 
         // Global State
@@ -680,31 +682,52 @@
         // ==========================================
         
         // Real Auth Flow — login required
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('app-layout').style.display = 'flex';
-                // Show admin email + initial in sidebar
-                const email = user.email || '';
-                const initial = (email[0] || 'A').toUpperCase();
-                const adminEmailEl = document.querySelector('.admin-text p');
-                const adminInitialEl = document.querySelector('.sidebar-header .admin-avatar');
-                const adminInitialTopEl = document.querySelector('.top-actions .admin-avatar');
-                if (adminEmailEl) adminEmailEl.textContent = email;
-                if (adminInitialEl) adminInitialEl.textContent = initial;
-                if (adminInitialTopEl) adminInitialTopEl.textContent = initial;
-                initDashboard();
-            } else {
-                document.getElementById('login-page').style.display = 'flex';
-                document.getElementById('app-layout').style.display = 'none';
-            }
-        });
+        if (auth && typeof auth.onAuthStateChanged === 'function') {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById('login-page').style.display = 'none';
+                    document.getElementById('app-layout').style.display = 'flex';
+                    // Show admin email + initial in sidebar
+                    const email = user.email || '';
+                    const initial = (email[0] || 'A').toUpperCase();
+                    const adminEmailEl = document.querySelector('.admin-text p');
+                    const adminInitialEl = document.querySelector('.sidebar-header .admin-avatar');
+                    const adminInitialTopEl = document.querySelector('.top-actions .admin-avatar');
+                    if (adminEmailEl) adminEmailEl.textContent = email;
+                    if (adminInitialEl) adminInitialEl.textContent = initial;
+                    if (adminInitialTopEl) adminInitialTopEl.textContent = initial;
+                    initDashboard();
+                } else {
+                    document.getElementById('login-page').style.display = 'flex';
+                    document.getElementById('app-layout').style.display = 'none';
+                }
+            });
+        } else {
+            // Auth failed to initialize — keep login page visible and surface the error
+            console.error("Auth not available. Login disabled.", firebaseInitError);
+            document.addEventListener('DOMContentLoaded', () => {
+                const errEl = document.getElementById('login-error');
+                if (errEl) {
+                    errEl.textContent = "Authentication service unavailable. Check Firebase config / network.";
+                    errEl.style.display = 'block';
+                }
+            });
+        }
 
         async function handleLogin() {
             const emailEl = document.getElementById('login-email');
             const passEl = document.getElementById('login-pass');
             const errEl = document.getElementById('login-error');
             const btn = document.querySelector('#login-page .btn-primary');
+
+            // Guard: if auth isn't available, don't attempt sign-in
+            if (!auth || typeof auth.signInWithEmailAndPassword !== 'function') {
+                if (errEl) {
+                    errEl.textContent = "Authentication service unavailable. Check Firebase config / network.";
+                    errEl.style.display = 'block';
+                }
+                return;
+            }
 
             const email = (emailEl.value || '').trim();
             const pass = passEl.value || '';
