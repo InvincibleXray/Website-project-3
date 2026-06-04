@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WEVOX News — Student investigative journalism. Campus reports, politics, fraud exposés. No filters." />
+  <meta property="og:title" content="WEVOX News — Student journalism. No filters." />
+  <meta property="og:description" content="India's youth newsroom. Verified student journalists publishing investigative stories and field video reports." />
+  <meta property="og:type" content="website" />
+  <title>News — WEVOX</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============ DESIGN TOKENS ============ */
+    /* FIXED: tokens synced exactly to index.html / stories.html */
+    :root {
+      --bg: #F9F7F4;
+      --bg-dark: #0D0D0D;
+      --surface: #FFFFFF;
+      --border: #E8E4DF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #6B6B6B;
+      --text-muted: #9A9A9A;
+      --accent: #C8102E;
+      --accent-hover: #A50D26;
+      --tag-bg: #F0EDE8;
+      --font-headline: "Playfair Display", Georgia, serif;
+      --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
+      --font-mono: "IBM Plex Mono", "Courier New", monospace;
+      --max-width: 1240px;
+      --gutter: 32px;
+      --nav-h: 57px;
+    }
+
+    /* ============ RESET ============ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-weight: 400;
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+
+
+    /* ============ NAVBAR ============ */
+    /* FIXED: cream + blur navbar (was off-palette black-bordered); matches index/stories */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(249,247,244,0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      transition: box-shadow 0.25s ease;
+    }
+    .navbar.scrolled { box-shadow: 0 2px 14px rgba(0,0,0,0.05); }
+    .nav-inner {
+      max-width: var(--max-width); margin: 0 auto;
+      padding: 14px var(--gutter);
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    }
+    .logo {
+      font-family: var(--font-headline); font-weight: 900; font-size: 22px;
+      color: var(--text-primary); letter-spacing: -0.5px; flex-shrink: 0;
+    }
+    .logo .dot { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      position: relative;
+      font-family: var(--font-body);
+      font-size: 14px; font-weight: 500; color: var(--text-primary);
+      padding: 4px 0; transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a.active { color: var(--accent); }
+    .nav-links a.active::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: -4px;
+      height: 2px; background: var(--accent);
+      border-radius: 2px;
+    }
+    .btn-submit {
+      background: var(--accent); color: #fff;
+      padding: 8px 18px; border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 13px; font-weight: 600;
+      transition: background 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+    .hamburger {
+      display: none; width: 36px; height: 36px;
+      align-items: center; justify-content: center;
+      font-size: 22px; color: var(--text-primary);
+    }
+
+    /* ============ MOBILE OVERLAY ============ */
+    .mobile-overlay {
+      position: fixed; inset: 0;
+      background: var(--bg-dark);
+      z-index: 200;
+      display: none; flex-direction: column;
+      padding: 80px 32px 32px;
+      opacity: 0; transition: opacity 0.25s ease;
+    }
+    .mobile-overlay.open { display: flex; opacity: 1; }
+    .mobile-overlay .close {
+      position: absolute; top: 22px; right: 24px;
+      font-size: 28px; color: #fff;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mobile-overlay a {
+      color: #fff; font-family: var(--font-headline);
+      font-size: 32px; font-weight: 700;
+      padding: 14px 0; border-bottom: 1px solid #1f1f1f;
+      transition: color 0.2s ease;
+    }
+    .mobile-overlay a:hover { color: var(--accent); }
+    .mobile-overlay a.active { color: var(--accent); }
+
+
+    /* ============ TICKER BAR ============ */
+    /* FIXED: rebuilt to match index/stories ticker idiom — dark bar, red LIVE pill, mono marquee */
+    .ticker-bar {
+      margin-top: var(--nav-h);
+      background: #1A1A1A;
+      height: 36px; overflow: hidden;
+      display: flex; align-items: center;
+    }
+    .ticker-bar-inner {
+      max-width: var(--max-width); margin: 0 auto;
+      padding: 0 var(--gutter);
+      display: flex; align-items: center; gap: 16px; height: 100%; width: 100%;
+    }
+    .live-badge {
+      background: var(--accent); color: #fff;
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 600;
+      padding: 4px 10px; border-radius: 3px;
+      display: inline-flex; align-items: center; gap: 6px;
+      letter-spacing: 1px; flex-shrink: 0;
+    }
+    .live-dot {
+      width: 6px; height: 6px;
+      background: #fff; border-radius: 50%;
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    .ticker-track {
+      flex: 1; overflow: hidden; position: relative;
+      mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%);
+    }
+    .ticker-content {
+      display: inline-flex; gap: 32px;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      font-size: 11px; color: #E8E4DF;
+      animation: marquee 40s linear infinite;
+    }
+    .ticker-track:hover .ticker-content { animation-play-state: paused; }
+    .ticker-content span::after {
+      content: " • ";
+      color: var(--accent);
+      margin-left: 32px;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+
+    /* ============ PAGE HEADER ============ */
+    /* FIXED: rebuilt inconsistent hero into the site-standard page-header (matches stories.html) */
+    .page-header {
+      background: var(--bg);
+      padding: 56px 0 32px;
+    }
+    .page-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .page-title {
+      font-family: var(--font-headline);
+      font-weight: 900;
+      font-size: 52px;
+      color: var(--text-primary);
+      letter-spacing: -1.2px;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    .page-title-rule {
+      width: 48px; height: 2px;
+      background: var(--accent);
+      margin-bottom: 16px;
+    }
+    .page-sub {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 540px;
+      line-height: 1.55;
+    }
+    .header-divider { height: 1px; background: var(--border); border: 0; width: 100%; }
+
+
+    /* ============ SECTION LABEL ============ */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: var(--text-secondary);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .section-label .accent-bar {
+      width: 28px; height: 3px; background: var(--accent);
+      display: inline-block; vertical-align: middle;
+    }
+    .section-rule { width: 100%; height: 1px; background: var(--border); margin: 0; }
+
+
+    /* ============ IMAGE PLACEHOLDER ============ */
+    /* FIXED: replaced dead grey boxes with site idiom — tag-bg + Playfair category-initial watermark */
+    .img-placeholder {
+      position: relative;
+      background: var(--tag-bg);
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .img-placeholder::after {
+      content: attr(data-initial);
+      font-family: var(--font-headline);
+      font-weight: 900;
+      color: rgba(200,16,46,0.16);
+      line-height: 1;
+      font-size: 72px;
+      user-select: none;
+    }
+    .img-placeholder.sm::after { font-size: 40px; }
+
+
+    /* ============ CATEGORY TAG ============ */
+    /* FIXED: mono + accent to match index .story-tag / stories .card-cat */
+    .cat-tag {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--accent);
+      display: inline-block;
+    }
+    .cat-tag.solid {
+      color: #fff; background: var(--accent);
+      padding: 3px 10px; border-radius: 3px;
+    }
+
+
+    /* ============ HERO STORY ============ */
+    /* FIXED: tag on own line above Playfair headline; spacing standardized */
+    .hero-section { padding: 40px 0; }
+    .hero-image-wrap { width: 100%; aspect-ratio: 16/9; max-height: 420px; margin-bottom: 24px; }
+    .hero-image-wrap .img-placeholder { width: 100%; height: 100%; }
+    .hero-content { max-width: 800px; }
+
+    .hero-content .cat-tag {
+      display: block;        /* FIXED: tag on its own line */
+      margin-bottom: 10px;   /* tag → title gap */
+    }
+    .hero-headline {
+      font-family: var(--font-headline);
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;   /* title → excerpt gap */
+    }
+    .hero-excerpt {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 17px; line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+      max-width: 680px;
+    }
+    .hero-byline { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .avatar-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-headline); font-size: 13px;
+      font-weight: 700; flex-shrink: 0;
+    }
+    .byline-text { font-family: var(--font-body); font-size: 13px; color: var(--text-secondary); }
+    .byline-text strong { color: var(--text-primary); font-weight: 600; }
+    .hero-meta {
+      font-family: var(--font-mono);
+      font-size: 11px; letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .hero-meta span { margin-right: 8px; }
+    .read-link {
+      font-family: var(--font-body);
+      font-size: 13px; font-weight: 700;
+      color: var(--accent);
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: color 0.2s ease;
+    }
+    .read-link:hover { color: var(--accent-hover); text-decoration: underline; }
+
+
+    /* ============ SECONDARY STORY ============ */
+    /* FIXED: tag above headline; image right; 20px card padding, standardized gaps */
+    .secondary-section { padding: 40px 0; }
+    .secondary-card {
+      display: grid; grid-template-columns: 1fr 340px;
+      gap: 28px; align-items: center;
+      border-top: 3px solid var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+      transition: box-shadow 0.2s ease;
+    }
+    .secondary-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .secondary-card:hover .secondary-headline { color: var(--accent); }
+    .secondary-text { display: flex; flex-direction: column; }
+    .secondary-text .cat-tag { display: block; margin-bottom: 10px; }
+    .secondary-headline {
+      font-family: var(--font-headline);
+      font-size: clamp(20px, 2.5vw, 28px);
+      font-weight: 700; line-height: 1.25;
+      color: var(--text-primary);
+      letter-spacing: -0.4px;
+      transition: color 0.2s ease;
+      margin-bottom: 12px;
+    }
+    .secondary-excerpt {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 15px; line-height: 1.6;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+    .secondary-meta {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .secondary-image .img-placeholder { width: 340px; height: 200px; }
+
+
+    /* ============ MORE TOP STORIES GRID ============ */
+    /* FIXED: tag above headline, image right, consistent 16px gaps, 20px card padding */
+    .top-stories-section { padding: 40px 0; }
+    .stories-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; }
+    .grid-story-card {
+      display: grid; grid-template-columns: 1fr 140px;
+      gap: 16px; align-items: flex-start;
+      padding: 20px 0; border-bottom: 1px solid var(--border);
+    }
+    .grid-story-card:nth-child(odd)  { padding-right: 28px; border-right: 1px solid var(--border); }
+    .grid-story-card:nth-child(even) { padding-left: 28px; }
+    .grid-story-card:hover .grid-story-headline { color: var(--accent); }
+    .grid-story-text { display: flex; flex-direction: column; }
+    .grid-story-text .cat-tag { display: block; margin-bottom: 10px; }
+    .grid-story-headline {
+      font-family: var(--font-headline);
+      font-size: 17px; font-weight: 700;
+      line-height: 1.4; color: var(--text-primary);
+      transition: color 0.2s ease;
+      margin-bottom: 8px;
+    }
+    .grid-story-meta {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+    .grid-story-image { order: 2; }
+    .grid-story-image .img-placeholder { width: 140px; height: 90px; border-radius: 6px; }
+
+
+    /* ============ INVESTIGATION DEEP-DIVE ============ */
+    .investigation-section { padding: 40px 0; }
+    .inv-tag-row { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+    .inv-section-title {
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: var(--accent); cursor: pointer;
+    }
+    .inv-section-title:hover { text-decoration: underline; }
+    .tag-pill {
+      font-family: var(--font-body);
+      font-size: 13px; font-weight: 500;
+      color: var(--text-primary);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: 999px;
+      cursor: pointer; transition: all 0.18s ease;
+    }
+    .tag-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+    .inv-featured-image { width: 100%; aspect-ratio: 16/9; max-height: 420px; margin-bottom: 18px; }
+    .inv-featured-image .img-placeholder { width: 100%; height: 100%; }
+    .inv-featured-tag { display: block; margin-bottom: 10px; }
+    .inv-featured-headline {
+      font-family: var(--font-headline);
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 700; line-height: 1.2;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .inv-featured-headline:hover { color: var(--accent); cursor: pointer; }
+    .inv-featured-excerpt {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 16px; line-height: 1.65;
+      color: var(--text-secondary); max-width: 700px;
+      margin-bottom: 14px;
+    }
+    .inv-sub-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 16px; margin-top: 24px;
+      border-top: 1px solid var(--border); padding-top: 24px;
+    }
+    .inv-sub-card { display: flex; flex-direction: column; }
+    .inv-sub-card:hover .inv-sub-headline { color: var(--accent); }
+    .inv-sub-image .img-placeholder { width: 100%; height: 160px; margin-bottom: 12px; border-radius: 6px; }
+    .inv-sub-card .cat-tag { display: block; margin-bottom: 10px; }
+    .inv-sub-headline {
+      font-family: var(--font-headline);
+      font-size: 17px; font-weight: 700;
+      line-height: 1.3; color: var(--text-primary);
+      transition: color 0.2s ease;
+      margin-bottom: 12px;
+    }
+    .inv-sub-excerpt {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 14px; line-height: 1.6;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .inv-sub-meta {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+
+    /* ============ NEWSLETTER CARD ============ */
+    .newsletter-section { padding: 40px 0 48px; }
+    .newsletter-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 10px;
+      display: flex; align-items: center; gap: 24px;
+      padding: 20px 28px;
+    }
+    .newsletter-logo {
+      font-family: var(--font-headline);
+      font-size: 20px; font-weight: 900;
+      color: var(--text-primary); flex-shrink: 0;
+      border: 2px solid var(--accent);
+      padding: 6px 10px; border-radius: 4px;
+    }
+    .newsletter-logo span { color: var(--accent); }
+    .newsletter-text { flex: 1; }
+    .newsletter-title {
+      font-family: var(--font-headline);
+      font-size: 18px; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 4px;
+    }
+    .newsletter-sub {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 14px; color: var(--text-secondary); line-height: 1.5;
+    }
+    .btn-subscribe {
+      background: var(--accent); color: #fff;
+      font-family: var(--font-body); font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.3px; padding: 10px 22px;
+      border-radius: 4px; flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+    .btn-subscribe:hover { background: var(--accent-hover); }
+
+
+    /* ============ FOOTER ============ */
+    footer { background: var(--bg-dark); color: #F9F7F4; padding: 56px 0 0; }
+    .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px; padding-bottom: 40px; }
+    .footer-logo {
+      font-family: var(--font-headline);
+      font-weight: 900; font-size: 24px;
+      color: #fff; margin-bottom: 12px;
+    }
+    .footer-tagline { font-family: var(--font-body); font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+    .socials { display: flex; gap: 14px; }
+    .socials a {
+      width: 36px; height: 36px;
+      border: 1px solid #2a2a2a; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .socials a:hover { border-color: var(--accent); background: var(--accent); }
+    .socials svg { width: 16px; height: 16px; fill: #fff; }
+    .footer-heading {
+      font-family: var(--font-mono);
+      font-size: 11px; letter-spacing: 2px;
+      color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase;
+    }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col a { font-family: var(--font-body); font-size: 14px; color: var(--text-muted); transition: color 0.2s ease; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #1c1c1c; padding: 18px 0;
+      display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      font-family: var(--font-mono); font-size: 11px; color: #4A4A4A;
+    }
+
+
+    /* ============ FAB ============ */
+    /* FIXED: added the red FAB from index.html (was missing on news.html) */
+    .fab-wrap {
+      position: fixed; bottom: 28px; right: 28px;
+      z-index: 999;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+    }
+    .fab-options { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; pointer-events: none; }
+    .fab-option {
+      background: #fff; color: var(--accent);
+      border: 1.5px solid var(--accent);
+      padding: 10px 18px; border-radius: 24px;
+      font-family: var(--font-body);
+      font-size: 13px; font-weight: 600;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease;
+      pointer-events: none; white-space: nowrap;
+    }
+    .fab-option:hover { background: var(--accent); color: #fff; }
+    .fab-wrap.open .fab-options { pointer-events: auto; }
+    .fab-wrap.open .fab-option { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .fab-wrap.open .fab-option:nth-child(1) { transition-delay: 0.05s; }
+    .fab-wrap.open .fab-option:nth-child(2) { transition-delay: 0.12s; }
+    .fab {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      font-size: 28px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(200,16,46,0.4);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease;
+    }
+    .fab:hover { transform: scale(1.08); box-shadow: 0 6px 22px rgba(200,16,46,0.55); }
+    .fab-wrap.open .fab { transform: rotate(45deg); background: var(--accent-hover); }
+
+
+    /* ============ ANIMATIONS ============ */
+    @keyframes fadeIn { to { opacity: 1; } }
+
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1024px) {
+      .page-title { font-size: 44px; }
+    }
+    @media (max-width: 768px) {
+      :root { --gutter: 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .btn-submit { padding: 7px 14px; font-size: 12px; }
+
+      .page-header { padding: 36px 0 24px; }
+      .page-title { font-size: 34px; }
+      .page-sub { font-size: 15px; }
+
+      .secondary-card { grid-template-columns: 1fr; }
+      .secondary-image .img-placeholder { width: 100%; height: 200px; }
+
+      .stories-grid { grid-template-columns: 1fr; }
+      .grid-story-card { grid-template-columns: 1fr 100px; }
+      .grid-story-card:nth-child(odd)  { padding-right: 0; border-right: none; }
+      .grid-story-card:nth-child(even) { padding-left: 0; }
+
+      .inv-sub-grid { grid-template-columns: 1fr; }
+
+      .newsletter-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+
+      .fab-wrap { bottom: 20px; right: 20px; }
+    }
+    @media (max-width: 480px) {
+      .page-title { font-size: 30px; }
+      .nav-inner { padding: 12px var(--gutter); }
+      .logo { font-size: 20px; }
+      .grid-story-card { grid-template-columns: 1fr; }
+      .grid-story-image { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ NAVBAR ============ -->
+  <!-- FIXED: nav links + active state match site standard -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">WEVOX<span class="dot">.</span></a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="stories.html">Stories</a>
+        <a href="media.html">Videos</a>
+        <a href="news.html" class="active" aria-current="page">News</a>
+        <a href="community.html">Community</a>
+        <a href="about.html">About</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <a href="submit.html" class="btn-submit">Submit Story</a>
+        <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ MOBILE OVERLAY ============ -->
+  <div class="mobile-overlay" id="mobileOverlay" aria-hidden="true">
+    <button class="close" id="overlayClose" aria-label="Close menu">✕</button>
+    <a href="stories.html">Stories</a>
+    <a href="media.html">Videos</a>
+    <a href="news.html" class="active" aria-current="page">News</a>
+    <a href="community.html">Community</a>
+    <a href="about.html">About</a>
+    <a href="submit.html">Submit Story</a>
+  </div>
+
+  <!-- ============ TICKER BAR ============ -->
+  <!-- FIXED: dark bar + red LIVE pill + mono marquee, placed below navbar (matches index) -->
+  <div class="ticker-bar" aria-label="Latest updates">
+    <div class="ticker-bar-inner">
+      <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+      <div class="ticker-track">
+        <div class="ticker-content">
+          <span>Stories Published: 1</span>
+          <span>Trending: Fly ka chori</span>
+          <span>Contributors: 3</span>
+          <span>Campus Reports: Amity University</span>
+          <span>Last Updated: 24 May 2026</span>
+          <span>Stories Published: 1</span>
+          <span>Trending: Fly ka chori</span>
+          <span>Contributors: 3</span>
+          <span>Campus Reports: Amity University</span>
+          <span>Last Updated: 24 May 2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PAGE HEADER ============ -->
+  <!-- FIXED: site-standard header (eyebrow + Playfair-900 title + rule + sub) replaces inconsistent hero header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="page-eyebrow">INVESTIGATIVE JOURNALISM</div>
+      <h1 class="page-title">News.</h1>
+      <div class="page-title-rule"></div>
+      <p class="page-sub">Campus investigations, politics, and fraud exposés — reported by students, no filters.</p>
+    </div>
+  </section>
+  <hr class="header-divider" />
+
+  <!-- ============ HERO STORY ============ -->
+  <!-- FIXED: tag on own line above headline; placeholder uses site idiom; spacing standardized -->
+  <section class="hero-section" aria-labelledby="hero-headline">
+    <div class="container">
+
+      <div class="hero-image-wrap">
+        <div class="img-placeholder" data-initial="P"></div>
+      </div>
+
+      <div class="hero-content">
+        <span class="cat-tag solid">Politics</span>
+        <h2 class="hero-headline" id="hero-headline">Fly ka chori</h2>
+
+        <p class="hero-excerpt">
+          An exclusive ground-level investigation into allegations of systematic pilferage
+          at a prominent campus facility — tracing the trail from student complaints to
+          administrative silence, and what the evidence actually shows.
+        </p>
+        <div class="hero-byline">
+          <div class="avatar-circle" aria-hidden="true">G</div>
+          <div class="byline-text">By <strong>Gigit</strong> — Amity University</div>
+        </div>
+        <div class="hero-meta">
+          <span>5 min read</span><span>•</span><span>24 May 2026</span>
+        </div>
+        <a href="story.html" class="read-link">Read Full Story &rarr;</a>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <!-- ============ SECONDARY STORY ============ -->
+  <section class="secondary-section" aria-labelledby="secondary-headline">
+    <div class="container">
+      <article class="secondary-card">
+        <div class="secondary-text">
+          <span class="cat-tag">Campus Fraud</span>
+          <h2 class="secondary-headline" id="secondary-headline">
+            Campus Elections: Who Really Controls the Student Union?
+          </h2>
+          <p class="secondary-excerpt">
+            Behind the banners and manifestos, a parallel network of senior faculty, off-campus
+            political operatives and alumni donors appears to be quietly deciding the outcomes
+            of your student body elections. We followed the money and the phone calls.
+          </p>
+          <div class="secondary-meta">
+            By <strong style="color:var(--text-primary);">Priya Rao</strong> — Delhi University &nbsp;•&nbsp; 18 May 2026 &nbsp;•&nbsp; 3 min read
+          </div>
+          <a href="story.html" class="read-link" style="margin-top:6px;">Read Investigation &rarr;</a>
+        </div>
+        <div class="secondary-image">
+          <div class="img-placeholder" data-initial="C"></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <!-- ============ MORE TOP STORIES 2×2 GRID ============ -->
+  <!-- FIXED: tag above headline, image right, consistent 16px gaps -->
+  <section class="top-stories-section" aria-labelledby="top-stories-heading">
+    <div class="container">
+      <div class="section-label" id="top-stories-heading">
+        <span class="accent-bar"></span>More Top Stories
+      </div>
+      <div class="stories-grid">
+
+        <article class="grid-story-card">
+          <div class="grid-story-text">
+            <span class="cat-tag">Economy</span>
+            <h3 class="grid-story-headline">Fee hike protests grip three campuses as admin stays silent</h3>
+            <div class="grid-story-meta">4 min read &nbsp;•&nbsp; 22 May 2026</div>
+          </div>
+          <div class="grid-story-image"><div class="img-placeholder sm" data-initial="E"></div></div>
+        </article>
+
+        <article class="grid-story-card">
+          <div class="grid-story-text">
+            <span class="cat-tag">Field Reports</span>
+            <h3 class="grid-story-headline">Hostel food quality report: What we found after 30 days</h3>
+            <div class="grid-story-meta">6 min read &nbsp;•&nbsp; 20 May 2026</div>
+          </div>
+          <div class="grid-story-image"><div class="img-placeholder sm" data-initial="F"></div></div>
+        </article>
+
+        <article class="grid-story-card">
+          <div class="grid-story-text">
+            <span class="cat-tag">Investigation</span>
+            <h3 class="grid-story-headline">Leaked emails reveal exam paper circulation in WhatsApp groups</h3>
+            <div class="grid-story-meta">7 min read &nbsp;•&nbsp; 17 May 2026</div>
+          </div>
+          <div class="grid-story-image"><div class="img-placeholder sm" data-initial="I"></div></div>
+        </article>
+
+        <article class="grid-story-card">
+          <div class="grid-story-text">
+            <span class="cat-tag">Campus Fraud</span>
+            <h3 class="grid-story-headline">Field report: Inside the university's disciplinary committee</h3>
+            <div class="grid-story-meta">5 min read &nbsp;•&nbsp; 14 May 2026</div>
+          </div>
+          <div class="grid-story-image"><div class="img-placeholder sm" data-initial="C"></div></div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <!-- ============ INVESTIGATION DEEP-DIVE ============ -->
+  <section class="investigation-section" aria-labelledby="inv-heading">
+    <div class="container">
+
+      <div class="inv-tag-row">
+        <span class="inv-section-title">INVESTIGATION ›</span>
+        <span class="tag-pill">Campus Fraud</span>
+        <span class="tag-pill">Economy</span>
+        <span class="tag-pill">Politics</span>
+        <span class="tag-pill">Culture</span>
+      </div>
+
+      <a href="story.html" style="display:block;">
+        <div class="inv-featured-image"><div class="img-placeholder" data-initial="I"></div></div>
+        <span class="cat-tag solid inv-featured-tag">Investigation</span>
+        <h2 class="inv-featured-headline" id="inv-heading">
+          The ghost classrooms of Sector 125: How Amity built campuses students never attended
+        </h2>
+      </a>
+      <p class="inv-featured-excerpt">
+        A three-month investigation tracing infrastructure grants, enrollment records and
+        satellite imagery reveals a pattern of classrooms that exist on paper, fees that
+        were collected in full, and a regulatory body that received every report and filed
+        none of them. This is what we found.
+      </p>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div class="avatar-circle" aria-hidden="true">R</div>
+        <span class="byline-text">By <strong>Riya Malhotra</strong> — Amity University</span>
+      </div>
+      <div class="hero-meta" style="margin-bottom:0;">
+        <span>11 min read</span><span>•</span><span>10 May 2026</span>
+      </div>
+
+      <div class="inv-sub-grid">
+
+        <article class="inv-sub-card">
+          <a href="story.html" style="display:block;">
+            <div class="inv-sub-image"><div class="img-placeholder" data-initial="P"></div></div>
+            <span class="cat-tag">Politics</span>
+            <h3 class="inv-sub-headline">Student body president's undisclosed party affiliation — the paper trail</h3>
+          </a>
+          <p class="inv-sub-excerpt">
+            Registration documents, social media archives and a leaked WhatsApp voice note
+            connect the newly elected president to a state-level political apparatus.
+          </p>
+          <div class="inv-sub-meta">By Karan Joshi — JNU &nbsp;•&nbsp; 8 min read &nbsp;•&nbsp; 6 May 2026</div>
+        </article>
+
+        <article class="inv-sub-card">
+          <a href="story.html" style="display:block;">
+            <div class="inv-sub-image"><div class="img-placeholder" data-initial="C"></div></div>
+            <span class="cat-tag">Culture</span>
+            <h3 class="inv-sub-headline">The underground zine network keeping campus dissent alive in 2026</h3>
+          </a>
+          <p class="inv-sub-excerpt">
+            Printed on borrowed risographs and distributed in library bathrooms — a
+            new generation of student editors is choosing paper over algorithms, and
+            it is working.
+          </p>
+          <div class="inv-sub-meta">By Meera Pillai — Hyderabad Central &nbsp;•&nbsp; 5 min read &nbsp;•&nbsp; 2 May 2026</div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <!-- ============ NEWSLETTER CARD ============ -->
+  <section class="newsletter-section" aria-labelledby="newsletter-heading">
+    <div class="container">
+      <div class="newsletter-card">
+        <div class="newsletter-logo">WEVOX<span>.</span></div>
+        <div class="newsletter-text">
+          <div class="newsletter-title" id="newsletter-heading">WEVOX Weekly Digest</div>
+          <p class="newsletter-sub">
+            Get campus investigations delivered to your inbox every week.
+            No noise — only verified, student-reported stories.
+          </p>
+        </div>
+        <a href="submit.html" class="btn-subscribe">Subscribe &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+
+        <div class="footer-col">
+          <div class="footer-logo">WEVOX<span style="color:var(--accent)">.</span></div>
+          <p class="footer-tagline">Student journalism. No filters.</p>
+          <div class="socials" aria-label="Social media">
+            <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+              <svg viewBox="0 0 24 24"><path d="M22 5.8c-.7.3-1.5.5-2.4.6.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1-.7-.8-1.8-1.3-3-1.3-2.3 0-4.1 1.8-4.1 4.1 0 .3 0 .6.1.9-3.4-.2-6.4-1.8-8.4-4.3-.4.6-.6 1.3-.6 2.1 0 1.4.7 2.7 1.8 3.4-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2.1 2.8 3.9 2.9-1.4 1.1-3.2 1.8-5.2 1.8H2c1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg>
+            </a>
+            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <svg viewBox="0 0 24 24"><path d="M23 12c0-2-.2-3.5-.4-4.4-.2-.6-.8-1.2-1.4-1.4C19.5 5.8 12 5.8 12 5.8s-7.5 0-9.2.4c-.6.2-1.2.8-1.4 1.4-.4 1.7-.4 5.4-.4 5.4s0 3.7.4 5.4c.2.6.8 1.2 1.4 1.4 1.7.4 9.2.4 9.2.4s7.5 0 9.2-.4c.6-.2 1.2-.8 1.4-1.4.2-.9.4-2.4.4-4.4zM9.6 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.9.9 1.4.2.4.4 1 .4 2.2.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.9.7-1.4.9-.4.2-1 .4-2.2.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.9-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.9-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 2c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4-1.2-.1-1.6-.1-4.7-.1zm0 3.4a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 7.2a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6zm5.6-7.4a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Explore</div>
+          <ul>
+            <li><a href="stories.html">Stories</a></li>
+            <li><a href="media.html">Videos</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="submit.html">Submit Story</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Network</div>
+          <ul>
+            <li><a href="#">North Desk Hub</a></li>
+            <li><a href="#">Southern Grid Frontiers</a></li>
+            <li><a href="#">Verification Protocol Ledger</a></li>
+            <li><a href="#">Public Transparency Index</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <div>© <span id="copy-year">2026</span> WEVOX Network Platforms Inc.</div>
+        <div>contact@wevox.in</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ FAB ============ -->
+  <div class="fab-wrap" id="fabWrap">
+    <div class="fab-options">
+      <a href="submit.html?type=story" class="fab-option">📝 Write Story</a>
+      <a href="submit.html?type=video" class="fab-option">🎥 Field Video</a>
+    </div>
+    <button class="fab" id="fab" aria-label="Submit content" aria-expanded="false">+</button>
+  </div>
+
+  <!-- ============ SCRIPTS ============ -->
+  <script>
+    /* Navbar scroll shadow */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 30);
+    });
+
+    /* Mobile hamburger */
+    const hamburger     = document.getElementById('hamburger');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const overlayClose  = document.getElementById('overlayClose');
+
+    function openMenu() {
+      mobileOverlay.classList.add('open');
+      mobileOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMenu() {
+      mobileOverlay.classList.remove('open');
+      mobileOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+    hamburger.addEventListener('click', openMenu);
+    overlayClose.addEventListener('click', closeMenu);
+    mobileOverlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+    /* FAB */
+    const fabWrap = document.getElementById('fabWrap');
+    const fab     = document.getElementById('fab');
+    fab.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = fabWrap.classList.toggle('open');
+      fab.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    document.addEventListener('click', (e) => {
+      if (!fabWrap.contains(e.target)) {
+        fabWrap.classList.remove('open');
+        fab.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    /* Dynamic copyright year */
+    const copyYearEl = document.getElementById('copy-year');
+    if (copyYearEl) copyYearEl.textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>

@@ -65,6 +65,31 @@
       padding: 0 var(--gutter);
     }
 
+    /* ============ AUTH GATE LOADER ============ */
+    /* Page ko tab tak chhupao jab tak auth check na ho jaye (flash avoid) */
+    #authGate {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px;
+      transition: opacity 0.3s ease;
+    }
+    #authGate.hide { opacity: 0; pointer-events: none; }
+    #authGate .gate-logo {
+      font-family: var(--font-headline); font-weight: 900; font-size: 28px;
+      color: var(--text-primary); letter-spacing: -0.5px;
+    }
+    #authGate .gate-logo .dot { color: var(--accent); }
+    #authGate .gate-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    #authGate .gate-text {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;
+      color: var(--text-muted); text-transform: uppercase;
+    }
+
     /* ============ NAVBAR (same as index.html) ============ */
     .navbar {
       position: fixed;
@@ -111,6 +136,7 @@
       left: 0; right: 0; bottom: -4px;
       height: 2px; background: var(--accent);
     }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
     .btn-submit {
       background: var(--accent);
       color: #fff;
@@ -125,6 +151,15 @@
     .btn-submit:hover { background: var(--accent-hover); }
     .btn-submit:active { transform: scale(0.97); }
     .btn-submit.active { box-shadow: 0 0 0 2px rgba(200,16,46,0.25); }
+
+    /* Navbar avatar (logged-in) */
+    .nav-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-headline); font-size: 13px; font-weight: 700;
+      cursor: pointer; flex-shrink: 0;
+    }
 
     .hamburger {
       display: none;
@@ -349,6 +384,12 @@
     }
     .input.error, .textarea.error, .select.error {
       border-color: var(--danger);
+    }
+    /* Read-only prefilled fields (from logged-in account) */
+    .input[readonly] {
+      background: var(--tag-bg);
+      color: var(--text-secondary);
+      cursor: not-allowed;
     }
     .select {
       appearance: none;
@@ -713,19 +754,28 @@
 </head>
 <body>
 
+  <!-- ============ AUTH GATE LOADER ============ -->
+  <!-- Auth check hone tak ye dikhega; logged-out → profile.html redirect -->
+  <div id="authGate">
+    <div class="gate-logo">WEVOX<span class="dot">.</span></div>
+    <div class="gate-spinner"></div>
+    <div class="gate-text">Checking access…</div>
+  </div>
+
   <!-- ============ NAVBAR ============ -->
   <header class="navbar" id="navbar">
     <div class="nav-inner">
       <a href="index.html" class="logo">WEVOX<span class="dot">.</span></a>
       <nav class="nav-links" aria-label="Primary">
         <a href="stories.html">Stories</a>
-        <a href="index.html#videos">Videos</a>
-        <a href="index.html#trending">Trending</a>
+        <a href="media.html">Videos</a>
+        <a href="news.html">News</a>
         <a href="community.html">Community</a>
         <a href="about.html">About</a>
       </nav>
-      <div style="display:flex;align-items:center;gap:12px;">
+      <div class="nav-right">
         <a href="#top" id="navSubmitBtn" class="btn-submit active" aria-current="page" title="You're on the submit page — scroll to top">Submit Story</a>
+        <div class="nav-avatar" id="navAvatar" hidden title="My Profile">W</div>
         <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
       </div>
     </div>
@@ -735,10 +785,11 @@
   <div class="mobile-overlay" id="mobileOverlay" aria-hidden="true">
     <button class="close" id="overlayClose" aria-label="Close menu">✕</button>
     <a href="stories.html">Stories</a>
-    <a href="index.html#videos">Videos</a>
-    <a href="index.html#trending">Trending</a>
+    <a href="media.html">Videos</a>
+    <a href="news.html">News</a>
     <a href="community.html">Community</a>
     <a href="about.html">About</a>
+    <a href="profile.html" id="mobileProfileLink" hidden>My Profile</a>
     <a href="#top" id="mobileSubmitBtn">Submit Story</a>
   </div>
 
@@ -791,6 +842,7 @@
           <div class="field">
             <label for="f-email">Email Address <span class="req">*</span></label>
             <input type="email" class="input" id="f-email" name="email" placeholder="you@university.edu" autocomplete="email" required />
+            <div class="helper" id="email-helper" hidden>Linked to your logged-in account</div>
           </div>
 
           <div class="field">
@@ -915,10 +967,10 @@
         </p>
         <div class="info-box">
           <strong>📋 What happens next?</strong>
-          <p>Our editorial team will review your submission within 24 hours. If approved, it will be published with your byline on WEVOX.</p>
+          <p>Our editorial team will review your submission within 24 hours. If approved, it will be published with your byline on WEVOX — and it'll show up in your Profile dashboard.</p>
         </div>
         <div class="success-actions">
-          <a href="index.html" class="btn-outline">← Back to Home</a>
+          <a href="profile.html" class="btn-outline">View My Profile</a>
           <button type="button" class="btn-filled" id="btnAnother">Submit Another</button>
         </div>
       </div>
@@ -943,8 +995,8 @@
           <div class="footer-heading">Explore</div>
           <ul>
             <li><a href="stories.html">Stories</a></li>
-            <li><a href="index.html#videos">Videos</a></li>
-            <li><a href="index.html#trending">Trending</a></li>
+            <li><a href="media.html">Videos</a></li>
+            <li><a href="news.html">News</a></li>
             <li><a href="community.html">Community</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="submit.html">Submit Story</a></li>
@@ -990,9 +1042,11 @@
     };
 
     let db = null;
+    let auth = null;
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.firestore();
+      auth = firebase.auth();
     } catch (e) {
       console.error("Firebase init error:", e);
     }
@@ -1010,7 +1064,62 @@
     const btnText     = $('#btnText');
     const btnAnother  = $('#btnAnother');
 
-    let selectedType = null; // 'STORY' | 'VIDEO'
+    let selectedType = null;     // 'STORY' | 'VIDEO'
+    let currentUser  = null;     // logged-in Firebase user
+
+    // ==========================================
+    // AUTH GATE
+    // ------------------------------------------
+    // Logged-out users ko login (profile.html) bhej do.
+    // Login ke baad wapas submit.html laane ke liye sessionStorage me flag.
+    // ==========================================
+    function initials(name) {
+      if (!name) return 'W';
+      return name.split(/\s+/).map(p => p[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+    }
+
+    function unlockPage(user) {
+      currentUser = user;
+      // Gate hatao
+      const gate = $('#authGate');
+      gate.classList.add('hide');
+      setTimeout(() => { gate.style.display = 'none'; }, 320);
+
+      // Navbar avatar dikhao
+      const nm = user.displayName || (user.email || 'Reporter').split('@')[0];
+      const av = $('#navAvatar');
+      av.textContent = initials(nm);
+      av.hidden = false;
+      av.addEventListener('click', () => { window.location.href = 'profile.html'; });
+      const mpl = $('#mobileProfileLink');
+      if (mpl) mpl.hidden = false;
+
+      // Account details prefill
+      if (user.displayName) { $('#f-name').value = user.displayName; }
+      if (user.email) {
+        const em = $('#f-email');
+        em.value = user.email;
+        em.setAttribute('readonly', 'readonly');
+        $('#email-helper').hidden = false;
+      }
+    }
+
+    if (auth) {
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          unlockPage(user);
+        } else {
+          // login ke baad yahin wapas aao
+          try { sessionStorage.setItem('redirectAfterLogin', 'submit.html' + window.location.search); } catch (e) {}
+          window.location.replace('profile.html');
+        }
+      });
+    } else {
+      // Firebase init fail — gate hata do taaki page kam se kam dikhe (demo/dev)
+      const gate = $('#authGate');
+      gate.classList.add('hide');
+      setTimeout(() => { gate.style.display = 'none'; }, 320);
+    }
 
     // ==========================================
     // NAVBAR — scroll shadow + mobile overlay
@@ -1041,19 +1150,12 @@
 
     // ==========================================
     // SUBMIT STORY BUTTON (on the submit page itself)
-    // ----------------------------------------------
-    // When the user is already on submit.html, the red "Submit Story"
-    // button must NOT reload the page. Instead it should scroll back
-    // up to the hero so the user gets a clear "you're on the right
-    // page — start here" signal. We also briefly pulse the hero label
-    // to draw the eye to it.
     // ==========================================
     function scrollToHeroWithPulse(e) {
       if (e) e.preventDefault();
       const hero = document.getElementById('top');
       if (!hero) return;
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Pulse the eyebrow label so user sees the page acknowledged the click.
       const eyebrow = hero.querySelector('.hero-eyebrow');
       if (eyebrow) {
         eyebrow.style.transition = 'transform 0.35s ease, color 0.35s ease';
@@ -1084,7 +1186,6 @@
       formEl.dataset.type = type;
       formEl.classList.add('show');
 
-      // Smooth scroll to the form on mobile selection
       setTimeout(() => {
         const top = formEl.getBoundingClientRect().top + window.scrollY - 80;
         if (window.scrollY < top - 200) {
@@ -1096,7 +1197,6 @@
     cardStory.addEventListener('click', () => selectType('STORY'));
     cardVideo.addEventListener('click', () => selectType('VIDEO'));
 
-    // Pre-select via ?type=story|video query (used by FAB on index.html)
     (function preselectFromQuery() {
       const params = new URLSearchParams(window.location.search);
       const t = (params.get('type') || '').toLowerCase();
@@ -1143,7 +1243,6 @@
     function clearErrors() {
       formEl.querySelectorAll('.error').forEach(n => n.classList.remove('error'));
     }
-    // Clear error on input
     formEl.addEventListener('input', (e) => {
       if (e.target.classList && e.target.classList.contains('error')) {
         e.target.classList.remove('error');
@@ -1166,20 +1265,17 @@
         if (!firstInvalid) firstInvalid = el;
       };
 
-      // Required: details
       const required = ['#f-name', '#f-email', '#f-phone', '#f-uni'];
       required.forEach(sel => {
         const el = $(sel);
         if (!el.value.trim()) fail(el);
       });
 
-      // Email basic format
       const emailEl = $('#f-email');
       if (emailEl.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
         fail(emailEl);
       }
 
-      // Type-specific
       if (selectedType === 'STORY') {
         const titleEl = $('#f-title-story');
         const catEl = $('#f-cat-story');
@@ -1198,7 +1294,6 @@
         if (!descEl.value.trim()) fail(descEl);
       }
 
-      // Declarations
       const d1 = $('#decl1');
       const d2 = $('#decl2');
       if (!d1.checked) {
@@ -1235,13 +1330,11 @@
         return;
       }
 
-      // Offline check
       if (typeof navigator !== 'undefined' && navigator.onLine === false) {
         toast('No connection detected. Check your internet.', 'error');
         return;
       }
 
-      // Build payload
       const isStory = selectedType === 'STORY';
       const payload = {
         type: selectedType,
@@ -1256,13 +1349,15 @@
         email: $('#f-email').value.trim(),
         phone: $('#f-phone').value.trim(),
         studentId: $('#f-sid').value.trim(),
+        // Profile dashboard ke liye zaroori fields:
+        authorId: currentUser ? currentUser.uid : null,
+        reads: 0,
         status: 'pending',
         submittedAt: (firebase && firebase.firestore && firebase.firestore.FieldValue)
           ? firebase.firestore.FieldValue.serverTimestamp()
           : new Date()
       };
 
-      // Loading state
       btnSubmit.disabled = true;
       btnText.innerHTML = '<span class="spinner" aria-hidden="true"></span> Submitting...';
 
@@ -1270,7 +1365,6 @@
         if (!db) throw new Error('Firestore not initialized');
         await db.collection('submissions').add(payload);
 
-        // Success
         $('#success-email').textContent = payload.email;
         formEl.classList.remove('show');
         formEl.style.display = 'none';
@@ -1299,7 +1393,16 @@
       charCount.textContent = '0';
       charCounter.classList.remove('warn');
 
-      // Reset type selection
+      // Account details wapas prefill (reset ne mita diye honge)
+      if (currentUser) {
+        if (currentUser.displayName) $('#f-name').value = currentUser.displayName;
+        if (currentUser.email) {
+          const em = $('#f-email');
+          em.value = currentUser.email;
+          em.setAttribute('readonly', 'readonly');
+        }
+      }
+
       selectedType = null;
       cardStory.classList.remove('selected');
       cardVideo.classList.remove('selected');
@@ -1313,7 +1416,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Online/offline status
     window.addEventListener('offline', () => {
       toast('You are offline. Submissions will not work.', 'warning', 4000);
     });

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WEVOX Profile — your student journalist dashboard. Track your stories, videos, reads, points and rank." />
+  <title>My Profile — WEVOX</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============ DESIGN TOKENS (synced to index.html) ============ */
+    :root {
+      --bg: #F9F7F4;
+      --bg-dark: #0D0D0D;
+      --surface: #FFFFFF;
+      --border: #E8E4DF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #6B6B6B;
+      --text-muted: #9A9A9A;
+      --accent: #C8102E;
+      --accent-hover: #A50D26;
+      --tag-bg: #F0EDE8;
+      --font-headline: "Playfair Display", Georgia, serif;
+      --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
+      --font-mono: "IBM Plex Mono", "Courier New", monospace;
+      --max-width: 1240px;
+      --gutter: 32px;
+      --nav-h: 57px;
+      --ok: #1E8E3E;
+      --warn: #C77700;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-weight: 400;
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+    [hidden] { display: none !important; }
+
+    /* ============ NAVBAR ============ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(249,247,244,0.92);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100; transition: box-shadow 0.25s ease;
+    }
+    .navbar.scrolled { box-shadow: 0 2px 14px rgba(0,0,0,0.05); }
+    .nav-inner {
+      max-width: var(--max-width); margin: 0 auto;
+      padding: 14px var(--gutter);
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    }
+    .logo {
+      font-family: var(--font-headline); font-weight: 900; font-size: 22px;
+      color: var(--text-primary); letter-spacing: -0.5px; flex-shrink: 0;
+    }
+    .logo .dot { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      position: relative; font-family: var(--font-body);
+      font-size: 14px; font-weight: 500; color: var(--text-primary);
+      padding: 4px 0; transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a.active { color: var(--accent); }
+    .nav-links a.active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -4px;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .btn-submit {
+      background: var(--accent); color: #fff;
+      padding: 8px 18px; border-radius: 4px;
+      font-family: var(--font-body); font-size: 13px; font-weight: 600;
+      transition: background 0.2s ease; white-space: nowrap;
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+    .nav-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-headline); font-size: 13px; font-weight: 700;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .hamburger {
+      display: none; width: 36px; height: 36px;
+      align-items: center; justify-content: center;
+      font-size: 22px; color: var(--text-primary);
+    }
+
+    /* ============ MOBILE OVERLAY ============ */
+    .mobile-overlay {
+      position: fixed; inset: 0; background: var(--bg-dark);
+      z-index: 200; display: none; flex-direction: column;
+      padding: 80px 32px 32px; opacity: 0; transition: opacity 0.25s ease;
+    }
+    .mobile-overlay.open { display: flex; opacity: 1; }
+    .mobile-overlay .close {
+      position: absolute; top: 22px; right: 24px;
+      font-size: 28px; color: #fff; width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mobile-overlay a {
+      color: #fff; font-family: var(--font-headline);
+      font-size: 32px; font-weight: 700;
+      padding: 14px 0; border-bottom: 1px solid #1f1f1f;
+      transition: color 0.2s ease;
+    }
+    .mobile-overlay a:hover { color: var(--accent); }
+    .mobile-overlay a.active { color: var(--accent); }
+
+    /* ============ PAGE WRAP ============ */
+    .page-wrap { padding-top: var(--nav-h); }
+
+    /* ============ LOGIN GATE ============ */
+    .auth-section {
+      min-height: calc(100vh - var(--nav-h));
+      display: flex; align-items: center; justify-content: center;
+      padding: 48px var(--gutter);
+    }
+    .auth-card {
+      width: 100%; max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px 36px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.05);
+    }
+    .auth-eyebrow {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      color: var(--accent); letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .auth-title {
+      font-family: var(--font-headline); font-weight: 900;
+      font-size: 32px; letter-spacing: -0.8px; line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .auth-sub {
+      font-family: var(--font-body); font-weight: 300;
+      font-size: 15px; color: var(--text-secondary);
+      margin-bottom: 28px; line-height: 1.55;
+    }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 11px 14px; font-family: var(--font-body);
+      font-size: 14px; color: var(--text-primary);
+      outline: none; transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200,16,46,0.12);
+    }
+    .btn-primary {
+      width: 100%; background: var(--accent); color: #fff;
+      padding: 12px; border-radius: 6px;
+      font-family: var(--font-body); font-size: 14px; font-weight: 600;
+      transition: background 0.2s ease; margin-top: 4px;
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary[disabled] { opacity: 0.6; cursor: not-allowed; }
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0; color: var(--text-muted);
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ""; flex: 1; height: 1px; background: var(--border);
+    }
+    .btn-google {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 11px; border-radius: 6px;
+      font-family: var(--font-body); font-size: 14px; font-weight: 500;
+      color: var(--text-primary); transition: border-color 0.18s ease;
+    }
+    .btn-google:hover { border-color: var(--text-muted); }
+    .btn-google svg { width: 18px; height: 18px; }
+    .auth-toggle {
+      margin-top: 20px; text-align: center;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-secondary);
+    }
+    .auth-toggle button { color: var(--accent); font-weight: 600; }
+    .auth-toggle button:hover { text-decoration: underline; }
+    .auth-error {
+      background: rgba(200,16,46,0.08);
+      border: 1px solid rgba(200,16,46,0.25);
+      color: var(--accent); border-radius: 6px;
+      padding: 10px 12px; font-size: 13px; margin-bottom: 16px;
+      font-family: var(--font-body);
+    }
+    .demo-note {
+      margin-top: 18px; text-align: center;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    /* ============ DASHBOARD HEADER ============ */
+    .dash-header { background: var(--bg); padding: 48px 0 28px; }
+    .dash-id {
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .dash-avatar {
+      width: 76px; height: 76px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-headline); font-size: 30px; font-weight: 900;
+      flex-shrink: 0;
+    }
+    .dash-id-text { flex: 1; min-width: 200px; }
+    .dash-eyebrow {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      color: var(--accent); letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .dash-name {
+      font-family: var(--font-headline); font-weight: 900;
+      font-size: 38px; letter-spacing: -1px; line-height: 1.05;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .verified-badge {
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+      letter-spacing: 0.5px; color: var(--ok);
+      border: 1px solid var(--ok); border-radius: 999px;
+      padding: 3px 10px; text-transform: uppercase;
+    }
+    .dash-uni {
+      font-family: var(--font-body); font-size: 14px; color: var(--text-secondary);
+      margin-top: 6px;
+    }
+    .btn-logout {
+      font-family: var(--font-body); font-size: 13px; font-weight: 600;
+      color: var(--accent); border: 1px solid var(--border);
+      background: var(--surface); padding: 8px 16px; border-radius: 6px;
+      transition: border-color 0.18s ease;
+    }
+    .btn-logout:hover { border-color: var(--accent); }
+    .header-divider { height: 1px; background: var(--border); border: 0; width: 100%; }
+
+    /* ============ STATS 2x2 (matches index .stat) ============ */
+    .dash-body { padding: 32px 0 56px; }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 16px; margin-bottom: 16px;
+    }
+    .stat {
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 18px 20px; background: var(--surface);
+    }
+    .stat-number {
+      font-family: var(--font-headline); font-size: 30px; font-weight: 900;
+      color: var(--text-primary); line-height: 1.1;
+    }
+    .stat-label {
+      font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary);
+      letter-spacing: 1px; margin-top: 6px; text-transform: uppercase;
+    }
+
+    /* ============ RANK CARD ============ */
+    .rank-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 4px solid var(--accent); border-radius: 8px;
+      padding: 24px 28px; margin-bottom: 40px;
+      display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center;
+    }
+    .rank-emblem { font-size: 44px; line-height: 1; }
+    .rank-info { min-width: 0; }
+    .rank-tier {
+      font-family: var(--font-headline); font-size: 22px; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 2px;
+    }
+    .rank-points {
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .rank-bar {
+      height: 8px; background: var(--tag-bg); border-radius: 999px; overflow: hidden;
+    }
+    .rank-bar-fill {
+      height: 100%; background: var(--accent);
+      border-radius: 999px; width: 0%; transition: width 0.6s ease;
+    }
+    .rank-next {
+      font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+      margin-top: 8px;
+    }
+    .rank-total {
+      text-align: center; padding-left: 24px; border-left: 1px solid var(--border);
+    }
+    .rank-total .num {
+      font-family: var(--font-headline); font-size: 34px; font-weight: 900;
+      color: var(--accent); line-height: 1;
+    }
+    .rank-total .lbl {
+      font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary);
+      letter-spacing: 1px; text-transform: uppercase; margin-top: 4px;
+    }
+
+    /* ============ SECTION LABEL ============ */
+    .section-label {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 2px; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    }
+    .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .section-label .accent-bar {
+      width: 28px; height: 3px; background: var(--accent);
+      display: inline-block; vertical-align: middle;
+    }
+    .section-block { margin-bottom: 44px; }
+
+    /* ============ SUBMISSION CARDS ============ */
+    .sub-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .sub-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .sub-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .sub-thumb {
+      position: relative; aspect-ratio: 16/9; background: var(--tag-bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sub-thumb::after {
+      content: attr(data-initial);
+      font-family: var(--font-headline); font-weight: 900;
+      font-size: 48px; color: rgba(200,16,46,0.16);
+    }
+    .play-pill {
+      position: absolute; bottom: 8px; right: 8px;
+      background: rgba(0,0,0,0.7); color: #fff;
+      font-family: var(--font-mono); font-size: 10px;
+      padding: 2px 7px; border-radius: 3px;
+    }
+    .status-pill {
+      position: absolute; top: 8px; left: 8px;
+      font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 3px; color: #fff;
+    }
+    .status-pill.published { background: var(--ok); }
+    .status-pill.review { background: var(--warn); }
+    .status-pill.draft { background: var(--text-muted); }
+    .status-pill.rejected { background: var(--accent); }
+    .sub-body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+    .sub-cat {
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+      color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .sub-title {
+      font-family: var(--font-headline); font-size: 16px; font-weight: 700;
+      line-height: 1.4; color: var(--text-primary); margin-bottom: 12px;
+    }
+    .sub-meta {
+      display: flex; justify-content: space-between; gap: 10px;
+      margin-top: auto; font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-muted);
+    }
+    .sub-meta .pts { color: var(--accent); font-weight: 600; }
+
+    .empty-block {
+      grid-column: 1 / -1; text-align: center; padding: 48px 24px;
+      border: 1px dashed var(--border); border-radius: 10px;
+      color: var(--text-secondary);
+    }
+    .empty-block .emoji { font-size: 40px; margin-bottom: 12px; }
+    .empty-block h3 {
+      font-family: var(--font-headline); font-size: 20px; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 8px;
+    }
+    .empty-block a { color: var(--accent); font-weight: 600; }
+    .empty-block a:hover { text-decoration: underline; }
+
+    /* ============ FOOTER ============ */
+    footer { background: var(--bg-dark); color: #F9F7F4; padding: 56px 0 0; }
+    .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px; padding-bottom: 40px; }
+    .footer-logo { font-family: var(--font-headline); font-weight: 900; font-size: 24px; color: #fff; margin-bottom: 12px; }
+    .footer-tagline { font-family: var(--font-body); font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+    .footer-heading { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col a { font-family: var(--font-body); font-size: 14px; color: var(--text-muted); transition: color 0.2s ease; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #1c1c1c; padding: 18px 0;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      font-family: var(--font-mono); font-size: 11px; color: #4A4A4A;
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1024px) {
+      .sub-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      :root { --gutter: 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .rank-card { grid-template-columns: 1fr; gap: 16px; text-align: center; }
+      .rank-emblem { font-size: 40px; }
+      .rank-total { border-left: 0; border-top: 1px solid var(--border); padding-left: 0; padding-top: 16px; }
+      .sub-grid { grid-template-columns: 1fr; }
+      .dash-name { font-size: 30px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .nav-inner { padding: 12px var(--gutter); }
+      .logo { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">WEVOX<span class="dot">.</span></a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="stories.html">Stories</a>
+        <a href="media.html">Videos</a>
+        <a href="index.html#trending">Trending</a>
+        <a href="community.html">Community</a>
+        <a href="about.html">About</a>
+      </nav>
+      <div class="nav-right">
+        <a href="submit.html" class="btn-submit">Submit Story</a>
+        <div class="nav-avatar" id="navAvatar" hidden title="My Profile">W</div>
+        <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ MOBILE OVERLAY ============ -->
+  <div class="mobile-overlay" id="mobileOverlay" aria-hidden="true">
+    <button class="close" id="overlayClose" aria-label="Close menu">✕</button>
+    <a href="stories.html">Stories</a>
+    <a href="media.html">Videos</a>
+    <a href="index.html#trending">Trending</a>
+    <a href="community.html">Community</a>
+    <a href="about.html">About</a>
+    <a href="submit.html">Submit Story</a>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- ============ LOGIN GATE ============ -->
+    <section class="auth-section" id="authSection">
+      <div class="auth-card">
+        <div class="auth-eyebrow">REPORTER ACCESS</div>
+        <h1 class="auth-title" id="authTitle">Welcome back.</h1>
+        <p class="auth-sub" id="authSub">Log in to track your stories, reads, points and rank.</p>
+
+        <div class="auth-error" id="authError" hidden></div>
+
+        <form id="authForm">
+          <div class="field" id="nameField" hidden>
+            <label for="nameInput">Full Name</label>
+            <input type="text" id="nameInput" autocomplete="name" placeholder="Ananya Krishnan" />
+          </div>
+          <div class="field">
+            <label for="emailInput">Email</label>
+            <input type="email" id="emailInput" autocomplete="email" placeholder="you@college.edu" required />
+          </div>
+          <div class="field">
+            <label for="passwordInput">Password</label>
+            <input type="password" id="passwordInput" autocomplete="current-password" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn-primary" id="authSubmit">Log In</button>
+        </form>
+
+        <div class="auth-divider">OR</div>
+
+        <button class="btn-google" id="googleBtn" type="button">
+          <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.5 13.2l7.9 6.2C12.3 13.3 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7C43.7 38.1 46.5 31.9 46.5 24.5z"/><path fill="#FBBC05" d="M10.4 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.9-6.2C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.8l7.9-6.2z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.6l-7.4-5.7c-2 1.4-4.7 2.3-7.9 2.3-6.3 0-11.7-3.8-13.6-9.4l-7.9 6.2C6.5 42.6 14.6 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+
+        <div class="auth-toggle" id="authToggle">
+          New reporter? <button type="button" id="toggleBtn">Create an account</button>
+        </div>
+
+        <div class="demo-note">DEMO MODE — any email/password logs you into a sample dashboard</div>
+      </div>
+    </section>
+
+    <!-- ============ DASHBOARD ============ -->
+    <div id="dashboard" hidden>
+
+      <section class="dash-header">
+        <div class="container">
+          <div class="dash-id">
+            <div class="dash-avatar" id="dashAvatar">A</div>
+            <div class="dash-id-text">
+              <div class="dash-eyebrow">My Newsroom</div>
+              <div class="dash-name">
+                <span id="dashName">Ananya Krishnan</span>
+                <span class="verified-badge" id="verifiedBadge">✓ Verified Reporter</span>
+              </div>
+              <div class="dash-uni" id="dashUni">DU North Campus • Joined 2024</div>
+            </div>
+            <button class="btn-logout" id="logoutBtn">Log Out</button>
+          </div>
+        </div>
+      </section>
+      <hr class="header-divider" />
+
+      <div class="dash-body">
+        <div class="container">
+
+          <!-- STATS 2x2 / 4-up -->
+          <div class="stats-grid">
+            <div class="stat"><div class="stat-number" id="statStories">0</div><div class="stat-label">Stories</div></div>
+            <div class="stat"><div class="stat-number" id="statVideos">0</div><div class="stat-label">Field Videos</div></div>
+            <div class="stat"><div class="stat-number" id="statReads">0</div><div class="stat-label">Total Reads</div></div>
+            <div class="stat"><div class="stat-number" id="statPublished">0</div><div class="stat-label">Published</div></div>
+          </div>
+
+          <!-- RANK CARD -->
+          <div class="rank-card">
+            <div class="rank-emblem" id="rankEmblem">🥈</div>
+            <div class="rank-info">
+              <div class="rank-tier" id="rankTier">Correspondent</div>
+              <div class="rank-points" id="rankPoints">320 points</div>
+              <div class="rank-bar"><div class="rank-bar-fill" id="rankBarFill"></div></div>
+              <div class="rank-next" id="rankNext">280 points to Senior Correspondent</div>
+            </div>
+            <div class="rank-total">
+              <div class="num" id="rankTotalPts">320</div>
+              <div class="lbl">Total Points</div>
+            </div>
+          </div>
+
+          <!-- MY STORIES -->
+          <div class="section-block">
+            <div class="section-label"><span class="accent-bar"></span>My Stories</div>
+            <div class="sub-grid" id="storiesGrid"></div>
+          </div>
+
+          <!-- MY VIDEOS -->
+          <div class="section-block">
+            <div class="section-label"><span class="accent-bar"></span>My Field Videos</div>
+            <div class="sub-grid" id="videosGrid"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.page-wrap -->
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">WEVOX<span style="color:var(--accent)">.</span></div>
+          <p class="footer-tagline">Student journalism. No filters.</p>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading">Explore</div>
+          <ul>
+            <li><a href="stories.html">Stories</a></li>
+            <li><a href="media.html">Videos</a></li>
+            <li><a href="index.html#trending">Trending</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="submit.html">Submit Story</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading">Account</div>
+          <ul>
+            <li><a href="profile.html">My Profile</a></li>
+            <li><a href="submit.html">Submit Story</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© <span id="copy-year">2024</span> WEVOX Network Platforms Inc.</div>
+        <div>contact@wevox.in</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ FIREBASE ============ -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <script>
+    /* ============ FIREBASE CONFIG (same as index.html) ============ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
+      authDomain: "cjnsite-d3f3f.firebaseapp.com",
+      projectId: "cjnsite-d3f3f",
+      storageBucket: "cjnsite-d3f3f.firebasestorage.app",
+      messagingSenderId: "491318197551",
+      appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
+      measurementId: "G-JES3G3L45V"
+    };
+
+    let auth = null, db = null, firebaseReady = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+      firebaseReady = true;
+    } catch (err) {
+      console.warn("Firebase init failed — running in demo mode:", err);
+      firebaseReady = false;
+    }
+
+    const $ = (id) => document.getElementById(id);
+
+    /* ============ RANK SYSTEM ============ */
+    const RANKS = [
+      { tier: "Cub Reporter",          min: 0,    emblem: "🥉" },
+      { tier: "Correspondent",         min: 200,  emblem: "🥈" },
+      { tier: "Senior Correspondent",  min: 600,  emblem: "🥇" },
+      { tier: "Investigative Editor",  min: 1500, emblem: "🏅" },
+      { tier: "Bureau Chief",          min: 3500, emblem: "⭐" }
+    ];
+    /* Points: published story +50, video +40, per 1000 reads +10, verified bonus +100 */
+    function computePoints(stories, videos, reads, verified) {
+      const published = stories.filter(s => s.status === "published").length;
+      let pts = published * 50 + videos.length * 40 + Math.floor(reads / 1000) * 10;
+      if (verified) pts += 100;
+      return pts;
+    }
+    function rankFor(points) {
+      let current = RANKS[0], next = null;
+      for (let i = 0; i < RANKS.length; i++) {
+        if (points >= RANKS[i].min) { current = RANKS[i]; next = RANKS[i + 1] || null; }
+      }
+      return { current, next };
+    }
+
+    /* ============ DEMO FALLBACK DATA ============ */
+    const DEMO_USER = {
+      name: "Ananya Krishnan",
+      university: "DU North Campus",
+      verified: true,
+      joined: 2024
+    };
+    const DEMO_STORIES = [
+      { title: "Inside the hostel mess scam: ₹2.4 crore unaccounted", category: "Campus Fraud", status: "published", reads: 21400, date: "2 May 2026" },
+      { title: "The vanishing scholarships: a paper trail across 4 states", category: "Economy", status: "published", reads: 14200, date: "28 Apr 2026" },
+      { title: "Election campaigns on campus — who's funding the posters?", category: "Politics", status: "review", reads: 0, date: "Submitted 24 May 2026" },
+      { title: "Draft: fake-degree racket near a Tier-2 city", category: "Campus Fraud", status: "draft", reads: 0, date: "Last edited 20 May 2026" }
+    ];
+    const DEMO_VIDEOS = [
+      { title: "Field report: the campus protest no channel covered", category: "Field Reports", status: "published", reads: 8700, duration: "11:24", date: "1 May 2026" },
+      { title: "Why hostel rents doubled in 6 months — investigation", category: "Investigation", status: "published", reads: 5100, duration: "8:42", date: "18 Apr 2026" }
+    ];
+
+    /* ============ STATE ============ */
+    let isSignupMode = false;
+
+    /* ============ AUTH UI ============ */
+    function setSignupMode(on) {
+      isSignupMode = on;
+      $("nameField").hidden = !on;
+      $("authTitle").textContent = on ? "Join the newsroom." : "Welcome back.";
+      $("authSub").textContent = on
+        ? "Create your reporter account to start publishing."
+        : "Log in to track your stories, reads, points and rank.";
+      $("authSubmit").textContent = on ? "Create Account" : "Log In";
+      $("toggleBtn").textContent = on ? "Log in instead" : "Create an account";
+      $("authToggle").childNodes[0].nodeValue = on ? "Already a reporter? " : "New reporter? ";
+      $("authError").hidden = true;
+    }
+    $("toggleBtn").addEventListener("click", () => setSignupMode(!isSignupMode));
+
+    function showError(msg) {
+      const el = $("authError");
+      el.textContent = msg; el.hidden = false;
+    }
+
+    /* ============ DASHBOARD RENDER ============ */
+    function initials(name) {
+      if (!name) return "W";
+      return name.split(/\s+/).map(p => p[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+    }
+    function fmt(n) { return (Number(n) || 0).toLocaleString("en-IN"); }
+
+    function subCardHTML(item, isVideo) {
+      const statusClass = item.status === "published" ? "published"
+        : item.status === "review" ? "review"
+        : item.status === "rejected" ? "rejected" : "draft";
+      const statusText = item.status === "review" ? "Under Review" : item.status;
+      const pts = item.status === "published"
+        ? (isVideo ? 40 : 50) + Math.floor((item.reads || 0) / 1000) * 10
+        : 0;
+      return `
+        <article class="sub-card">
+          <div class="sub-thumb" data-initial="${(item.category || 'W').charAt(0).toUpperCase()}">
+            <span class="status-pill ${statusClass}">${statusText}</span>
+            ${isVideo && item.duration ? `<span class="play-pill">▶ ${item.duration}</span>` : ""}
+          </div>
+          <div class="sub-body">
+            <div class="sub-cat">${item.category || "Stories"}</div>
+            <div class="sub-title">${item.title || "Untitled"}</div>
+            <div class="sub-meta">
+              <span>${item.status === "published" ? fmt(item.reads) + " reads" : item.date}</span>
+              <span class="pts">${pts ? "+" + pts + " pts" : "—"}</span>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function renderGrid(el, items, isVideo, emptyLabel) {
+      if (!items.length) {
+        el.innerHTML = `
+          <div class="empty-block">
+            <div class="emoji">📰</div>
+            <h3>No ${emptyLabel} yet.</h3>
+            <p><a href="submit.html">Submit your first ${emptyLabel.slice(0, -1)} →</a></p>
+          </div>`;
+        return;
+      }
+      el.innerHTML = items.map(i => subCardHTML(i, isVideo)).join("");
+    }
+
+    function renderDashboard(user, stories, videos) {
+      const totalReads = [...stories, ...videos].reduce((sum, x) => sum + (x.reads || 0), 0);
+      const published = stories.filter(s => s.status === "published").length;
+      const points = computePoints(stories, videos, totalReads, user.verified);
+      const { current, next } = rankFor(points);
+
+      // Identity
+      $("dashName").textContent = user.name;
+      $("dashAvatar").textContent = initials(user.name);
+      $("navAvatar").textContent = initials(user.name);
+      $("dashUni").textContent = `${user.university} • Joined ${user.joined}`;
+      $("verifiedBadge").hidden = !user.verified;
+
+      // Stats
+      $("statStories").textContent = stories.length;
+      $("statVideos").textContent = videos.length;
+      $("statReads").textContent = fmt(totalReads);
+      $("statPublished").textContent = published;
+
+      // Rank
+      $("rankEmblem").textContent = current.emblem;
+      $("rankTier").textContent = current.tier;
+      $("rankPoints").textContent = fmt(points) + " points";
+      $("rankTotalPts").textContent = fmt(points);
+      if (next) {
+        const span = next.min - current.min;
+        const prog = Math.min(100, Math.round(((points - current.min) / span) * 100));
+        $("rankBarFill").style.width = prog + "%";
+        $("rankNext").textContent = `${fmt(next.min - points)} points to ${next.tier}`;
+      } else {
+        $("rankBarFill").style.width = "100%";
+        $("rankNext").textContent = "Top rank reached — Bureau Chief 🎉";
+      }
+
+      // Submissions
+      renderGrid($("storiesGrid"), stories, false, "stories");
+      renderGrid($("videosGrid"), videos, true, "videos");
+    }
+
+    /* ============ SHOW / HIDE VIEWS ============ */
+    function showDashboard(user, stories, videos) {
+      $("authSection").hidden = true;
+      $("dashboard").hidden = false;
+      $("navAvatar").hidden = false;
+      renderDashboard(user, stories, videos);
+    }
+    function showLogin() {
+      $("authSection").hidden = false;
+      $("dashboard").hidden = true;
+      $("navAvatar").hidden = true;
+    }
+
+    /* ============ DEMO LOGIN (fallback when no real backend) ============ */
+    function demoLogin(nameOverride) {
+      const user = { ...DEMO_USER };
+      if (nameOverride) user.name = nameOverride;
+      showDashboard(user, DEMO_STORIES, DEMO_VIDEOS);
+    }
+
+    /* ============ FETCH REAL DATA (Firestore-ready) ============ */
+    async function loadUserData(fbUser) {
+      // Structure ready for real Firestore; falls back to demo on any gap.
+      try {
+        if (!firebaseReady) throw new Error("no firebase");
+        const name = fbUser.displayName || (fbUser.email || "Reporter").split("@")[0];
+        const uid = fbUser.uid;
+
+        const storiesSnap = await db.collection("stories").where("authorId", "==", uid).get();
+        const videosSnap  = await db.collection("videos").where("authorId", "==", uid).get();
+        const stories = storiesSnap.docs.map(d => d.data());
+        const videos  = videosSnap.docs.map(d => d.data());
+
+        const user = { name, university: "Independent", verified: false, joined: new Date().getFullYear() };
+        // If user has no real content yet, still show their (empty) dashboard
+        showDashboard(user, stories, videos);
+      } catch (e) {
+        console.warn("Falling back to demo data:", e);
+        demoLogin(fbUser && fbUser.displayName);
+      }
+    }
+
+    /* ============ AUTH HANDLERS ============ */
+    $("authForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = $("emailInput").value.trim();
+      const pass  = $("passwordInput").value;
+      const name  = $("nameInput").value.trim();
+      $("authError").hidden = true;
+
+      if (!firebaseReady) { demoLogin(name); return; } // demo mode
+
+      $("authSubmit").disabled = true;
+      try {
+        if (isSignupMode) {
+          const cred = await auth.createUserWithEmailAndPassword(email, pass);
+          if (name) await cred.user.updateProfile({ displayName: name });
+        } else {
+          await auth.signInWithEmailAndPassword(email, pass);
+        }
+        // onAuthStateChanged will render the dashboard
+      } catch (err) {
+        // Backend not reachable / demo config → graceful demo fallback
+        console.warn("Auth error, using demo:", err);
+        if (/network|configuration|api-key|operation-not-allowed/i.test(err.code || err.message || "")) {
+          demoLogin(name);
+        } else {
+          showError(err.message || "Could not authenticate. Try again.");
+        }
+      } finally {
+        $("authSubmit").disabled = false;
+      }
+    });
+
+    $("googleBtn").addEventListener("click", async () => {
+      if (!firebaseReady) { demoLogin(); return; }
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithPopup(provider);
+      } catch (err) {
+        console.warn("Google auth error, using demo:", err);
+        demoLogin();
+      }
+    });
+
+    $("logoutBtn").addEventListener("click", async () => {
+      try { if (firebaseReady) await auth.signOut(); } catch (e) {}
+      showLogin();
+    });
+    $("navAvatar").addEventListener("click", () => {
+      document.getElementById("dashboard").scrollIntoView({ behavior: "smooth" });
+    });
+
+    /* ============ AUTH STATE ============ */
+    if (firebaseReady) {
+      auth.onAuthStateChanged((user) => {
+        if (user) loadUserData(user);
+        else showLogin();
+      });
+    } else {
+      showLogin(); // demo mode: wait for any login attempt
+    }
+
+    /* ============ NAVBAR / HAMBURGER ============ */
+    const navbar = $("navbar");
+    window.addEventListener("scroll", () => {
+      navbar.classList.toggle("scrolled", window.scrollY > 30);
+    });
+    const hamburger = $("hamburger"), mobileOverlay = $("mobileOverlay"), overlayClose = $("overlayClose");
+    hamburger.addEventListener("click", () => {
+      mobileOverlay.classList.add("open");
+      mobileOverlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    });
+    function closeMenu() {
+      mobileOverlay.classList.remove("open");
+      mobileOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+    overlayClose.addEventListener("click", closeMenu);
+    mobileOverlay.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+
+    /* ============ MISC ============ */
+    const copyYearEl = $("copy-year");
+    if (copyYearEl) copyYearEl.textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>

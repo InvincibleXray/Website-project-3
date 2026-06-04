@@ -329,6 +329,47 @@
     }
     .article-content li { margin-bottom: 8px; }
 
+    /* ============ EMBEDDED MEDIA (images / video / tweets) ============ */
+    .article-content img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 28px 0 8px;
+      background: var(--border);
+    }
+    .article-content figure { margin: 28px 0; }
+    .article-content figure img { margin: 0; }
+    .article-content figcaption {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 8px;
+      font-style: italic;
+    }
+    /* Responsive 16:9 wrapper used for YouTube/Vimeo iframes */
+    .article-content .embed-yt,
+    .article-content .embed-video {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #000;
+      margin: 28px 0;
+    }
+    .article-content .embed-yt iframe,
+    .article-content .embed-video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    /* Center Twitter / X embeds */
+    .article-content .twitter-tweet { margin: 28px auto !important; }
+
     /* ============ TAGS ============ */
     .tags-section {
       margin: 40px 0 32px;
@@ -1874,8 +1915,28 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       }
     }
 
+    /* ===== TWITTER / X EMBED LOADER =====
+       If a published article body contains a <blockquote class="twitter-tweet">,
+       this turns it into a real embedded tweet. Safe to call repeatedly. */
+    function loadTwitterEmbeds() {
+      if (window.twttr && window.twttr.widgets) {
+        window.twttr.widgets.load(document.getElementById('articleBody') || document.body);
+        return;
+      }
+      if (document.getElementById('twitter-wjs')) return;
+      const s = document.createElement('script');
+      s.id = 'twitter-wjs';
+      s.src = 'https://platform.twitter.com/widgets.js';
+      s.async = true;
+      s.charset = 'utf-8';
+      document.body.appendChild(s);
+    }
+
     /* ===== KICK OFF ===== */
-    loadStory();
+    loadStory().finally(() => {
+      // Give the article body a tick to render, then hydrate any tweet embeds
+      setTimeout(loadTwitterEmbeds, 400);
+    });
   </script>
 </body>
 </html>
