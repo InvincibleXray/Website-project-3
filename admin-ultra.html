@@ -12,7 +12,7 @@
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <style>
-/* ============ DESIGN TOKENS (match index.html) =========== */
+/* ============ DESIGN TOKENS (match index.html) ============ */
 :root{
   --bg:#F9F7F4; --bg-dark:#0D0D0D; --surface:#FFFFFF; --border:#E8E4DF;
   --text-primary:#1A1A1A; --text-secondary:#6B6B6B; --text-muted:#9A9A9A;
@@ -477,11 +477,60 @@ function tweetEmbedHtml(u){if(!u||!/twitter\.com|x\.com/.test(u))return '';retur
 /* ============================================================
    SUBMISSIONS
    ============================================================ */
-async function fetchPending(){const el=$('pending-list');if(el)el.innerHTML='<div class="empty">Loading…</div>';try{let snap;try{snap=await db.collection('submissions').where('status','==','pending').orderBy('submittedAt','desc').get();}catch(_){snap=await db.collection('submissions').where('status','==','pending').get();}state.pending=snap.docs.map(d=>({id:d.id,...d.data()}));state.pending.sort((a,b)=>tsMillis(b.submittedAt)-tsMillis(a.submittedAt));}catch(e){fsErr(e,'fetchPending');state.pending=[];}renderPending();renderDashRecent();updateStats();}
-function renderPending(){const el=$('pending-list');if(!el)return;if(!state.pending.length){el.innerHTML='<div class="empty"><div class="ico">✅</div>No pending submissions.</div>';return;}const catOpts='<option value="">Publish in category…</option>'+CATEGORIES.map(c=>'<option>'+c+'</option>').join('');el.innerHTML=state.pending.map(p=>'<div class="pend" id="pend-'+p.id+'"><div class="pend-head"><div style="display:flex;align-items:center;gap:10px"><span class="badge '+(p.type==='STORY'?'badge-red':'badge-blue')+'">'+esc(p.type||'')+'</span><strong>'+esc(p.title)+'</strong></div><span class="t-sub">'+fmtDate(p.submittedAt)+'</span></div><div class="pend-meta"><div class="meta-item"><label>Author</label><span>'+esc(p.authorName||'—')+'</span></div><div class="meta-item"><label>University</label><span>'+esc(p.university||'—')+'</span></div><div class="meta-item"><label>Email</label><a href="mailto:'+esc(p.email||'')+'">'+esc(p.email||'—')+'</a></div><div class="meta-item"><label>Category</label><span>'+esc(p.category||'—')+'</span></div></div><div class="pend-preview">'+esc((p.content||p.description||'').substring(0,300))+((p.content||p.description||'').length>300?'…':'')+'</div><div class="pend-actions"><select class="inp-sm" id="cat-'+p.id+'" style="min-width:200px">'+catOpts+'</select><div class="row-actions"><button class="btn-danger-o" data-reject="'+p.id+'">✕ Reject</button><button class="btn-success" data-approve="'+p.id+'" data-type="'+esc(p.type||'STORY')+'">✓ Approve & Publish</button></div></div></div>').join('');}
-async function approveSubmission(id,type){const cat=$('cat-'+id)&&$('cat-'+id).value;if(!cat){toast('Select a category first.','error');return;}try{const ref=db.collection('submissions').doc(id);const d=(await ref.get()).data()||{};const coll=type==='STORY'?'stories':'videos';const base={title:d.title||'',category:cat,author:d.authorName||'',university:d.university||'',status:'published',views:0,publishedAt:firebase.firestore.FieldValue.serverTimestamp()};if(type==='STORY'){base.content=d.content||'';base.coverImage=d.imageUrl||'';base.readTime='5 min read';}else{base.description=d.description||'';base.thumbnailUrl=d.imageUrl||'';base.videoUrl=d.videoUrl||'';base.duration='';}await db.collection(coll).add(base);await ref.update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});state.pending=state.pending.filter(p=>p.id!==id);const node=$('pend-'+id);if(node)node.remove();updateStats();renderDashRecent();toast('Published!','success');if(type==='STORY')fetchStories();else fetchVideos();}catch(e){fsErr(e,'approve');}}
+async function fetchPending(){const el=$('pending-list');if(el)el.innerHTML='<div class="empty">Loading…</div>';try{let snap;try{snap=await db.collection('submissions').where('status','==','pending').orderBy('submittedAt','desc').get();}catch(_){snap=await db.collection('submissions').where('status','==','pending').get();}state.pending=snap.docs.map(d=>({id:d.id,...d.data()}));state.pending.sort((a,b)=>tsMillis(b.submittedAt)-tsMillis(a.submittedAt));
+  // FIX: BUG-2 diagnostic -- log every submission's raw field set to console so it's obvious
+  // when category is missing AT THE SOURCE (Firestore doc) vs missing in the render layer.
+  // Open DevTools → Console to see this. Remove once verified.
+  if(state.pending.length){console.group('[WEVOX] pending submissions — category audit');state.pending.forEach(p=>console.log({id:p.id,title:p.title,category:p.category,Category:p.Category,articleCategory:p.articleCategory,cat:p.cat,type:p.type}));console.groupEnd();}
+}catch(e){fsErr(e,'fetchPending');state.pending=[];}renderPending();renderDashRecent();updateStats();}
+// FIX: Sanitize submission content for the pending preview. The raw saved HTML contains
+// iframes (YouTube), <blockquote class="twitter-tweet"> with <a> links, and Instagram embed
+// code (which carries its own <script>). Rendering that raw inside the admin pending card
+// caused about:blank#blocked popups whenever the Twitter widget hydrated and reacted to clicks.
+// We strip every iframe/blockquote/script and replace each with a tiny inert placeholder badge,
+// and neutralize anchors so nothing in the preview can navigate.
+function sanitizePendingPreview(html){
+  if(!html)return '';
+  const tmp=document.createElement('div');
+  tmp.innerHTML=String(html);
+  tmp.querySelectorAll('script,style,iframe').forEach(n=>{
+    const tag=n.tagName==='IFRAME'?'<span class="badge badge-soft">\uD83D\uDCFA Embed</span> ':'';
+    const wrap=document.createElement('span');wrap.innerHTML=tag;
+    n.replaceWith(wrap);
+  });
+  tmp.querySelectorAll('blockquote.twitter-tweet').forEach(n=>{
+    const wrap=document.createElement('span');wrap.innerHTML='<span class="badge badge-soft">\uD83D\uDC26 Tweet</span> ';
+    n.replaceWith(wrap);
+  });
+  tmp.querySelectorAll('blockquote.instagram-media').forEach(n=>{
+    const wrap=document.createElement('span');wrap.innerHTML='<span class="badge badge-soft">\uD83D\uDCF7 Instagram</span> ';
+    n.replaceWith(wrap);
+  });
+  // Neutralize anchors so clicking the preview never navigates / opens popups
+  tmp.querySelectorAll('a').forEach(a=>{a.removeAttribute('href');a.removeAttribute('target');a.removeAttribute('rel');a.setAttribute('style','pointer-events:none;color:var(--text-secondary)');});
+  // Strip inline event handlers from anything that survived
+  tmp.querySelectorAll('*').forEach(n=>{Array.from(n.attributes||[]).forEach(at=>{if(/^on/i.test(at.name))n.removeAttribute(at.name);});});
+  return tmp.innerHTML;
+}
+function renderPending(){const el=$('pending-list');if(!el)return;if(!state.pending.length){el.innerHTML='<div class="empty"><div class="ico">✅</div>No pending submissions.</div>';return;}
+  // FIX: BUG-2 (continued) -- read the saved category from multiple possible field names
+  // (some legacy docs may have used different casing) and pre-select it in the Approve dropdown.
+  el.innerHTML=state.pending.map(p=>{
+    // FIX: BUG-2 -- exhaustive read of every plausible category field name (handles any past or future naming drift)
+    const subCat=(p.category||p.Category||p.articleCategory||p.cat||p.storyCategory||p.tag||'').toString().trim();
+    const catOpts='<option value="">Publish in category\u2026</option>'+CATEGORIES.map(c=>'<option value="'+esc(c)+'"'+(c===subCat?' selected':'')+'>'+esc(c)+'</option>').join('')+(subCat&&CATEGORIES.indexOf(subCat)===-1?'<option value="'+esc(subCat)+'" selected>'+esc(subCat)+' (submitter)</option>':'');
+    const safePreview=sanitizePendingPreview(p.content||'')||esc(p.description||'');
+    const truncated=safePreview.length>1200?safePreview.substring(0,1200)+'\u2026':safePreview;
+    // FIX: BUG-2 -- when category is genuinely missing on the doc, show a clear warning chip
+    // instead of a silent dash so admin knows to pick from the dropdown below.
+    const catDisplay=subCat?'<span class="badge badge-soft">'+esc(subCat)+'</span>':'<span class="badge" style="background:#FFF4E5;color:#B45309;border:1px solid #FCD9A5">\u26A0 No category submitted</span>';
+    return '<div class="pend" id="pend-'+p.id+'"><div class="pend-head"><div style="display:flex;align-items:center;gap:10px"><span class="badge '+(p.type==='STORY'?'badge-red':'badge-blue')+'">'+esc(p.type||'')+'</span><strong>'+esc(p.title)+'</strong></div><span class="t-sub">'+fmtDate(p.submittedAt)+'</span></div><div class="pend-meta"><div class="meta-item"><label>Author</label><span>'+esc(p.authorName||'\u2014')+'</span></div><div class="meta-item"><label>University</label><span>'+esc(p.university||'\u2014')+'</span></div><div class="meta-item"><label>Email</label><a href="mailto:'+esc(p.email||'')+'">'+esc(p.email||'\u2014')+'</a></div><div class="meta-item"><label>Category</label><span>'+catDisplay+'</span></div></div><div class="pend-preview" style="max-height:320px;overflow:auto;pointer-events:none">'+(p.coverImage?'<img src="'+esc(p.coverImage)+'" style="width:100%;max-height:180px;object-fit:cover;border-radius:6px;margin-bottom:10px">':'')+truncated+'</div><div class="pend-actions"><select class="inp-sm" id="cat-'+p.id+'" style="min-width:200px">'+catOpts+'</select><div class="row-actions"><button type="button" class="btn-danger-o" data-reject="'+p.id+'">\u2715 Reject</button><button type="button" class="btn-success" data-approve="'+p.id+'" data-type="'+esc(p.type||'STORY')+'">\u2713 Approve &amp; Publish</button></div></div></div>';
+  }).join('');
+}
+async function approveSubmission(id,type){const cat=$('cat-'+id)&&$('cat-'+id).value;if(!cat){toast('Select a category first.','error');return;}try{const ref=db.collection('submissions').doc(id);const d=(await ref.get()).data()||{};const coll=type==='STORY'?'stories':'videos';const base={title:d.title||'',category:cat,author:d.authorName||'',university:d.university||'',status:'published',views:0,publishedAt:firebase.firestore.FieldValue.serverTimestamp()};if(type==='STORY'){base.content=d.content||'';base.coverImage=d.coverImage||d.imageUrl||'';base.readTime=d.readTime||'5 min read';base.tags=d.tags||[];base.excerpt=d.excerpt||'';}else{base.description=d.description||'';base.thumbnailUrl=d.coverImage||d.thumbnailUrl||d.imageUrl||'';base.videoUrl=d.mediaUrl||d.videoUrl||d.mediaEmbed||'';base.duration=d.duration||'';}await db.collection(coll).add(base);await ref.update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});state.pending=state.pending.filter(p=>p.id!==id);const node=$('pend-'+id);if(node)node.remove();updateStats();renderDashRecent();toast('Published!','success');if(type==='STORY')fetchStories();else fetchVideos();}catch(e){fsErr(e,'approve');}}
 function rejectSubmission(id){showConfirm('Reject Submission','Permanently reject this submission?',async()=>{try{await db.collection('submissions').doc(id).update({status:'rejected',rejectedAt:firebase.firestore.FieldValue.serverTimestamp()});state.pending=state.pending.filter(p=>p.id!==id);const n=$('pend-'+id);if(n)n.remove();updateStats();renderDashRecent();toast('Rejected.','info');}catch(e){fsErr(e,'reject');}},'🗑️');}
-$('pending-list').addEventListener('click',e=>{const a=e.target.closest('[data-approve]');const r=e.target.closest('[data-reject]');if(a)approveSubmission(a.getAttribute('data-approve'),a.getAttribute('data-type'));if(r)rejectSubmission(r.getAttribute('data-reject'));});
+// FIX: BUG-3 -- preventDefault on delegated click so no bubbled default behavior can trigger reload/flicker
+$('pending-list').addEventListener('click',e=>{const a=e.target.closest('[data-approve]');const r=e.target.closest('[data-reject]');if(a||r){e.preventDefault();e.stopPropagation();}if(a)approveSubmission(a.getAttribute('data-approve'),a.getAttribute('data-type'));if(r)rejectSubmission(r.getAttribute('data-reject'));});
 
 /* ============================================================
    STORIES
@@ -494,14 +543,324 @@ $('stories-tbody').addEventListener('click',e=>{const ed=e.target.closest('[data
 $('add-story-btn').addEventListener('click',()=>openStoryModal(null));
 
 let _quill=null;
-function storyFormHtml(d){const c=d||{};const catOpts='<option value="">Select category…</option>'+CATEGORIES.map(x=>'<option'+(x===c.category?' selected':'')+'>'+x+'</option>').join('');return '<div class="grid-2"><div class="field"><label>Title *</label><input class="inp" id="f-title" value="'+esc(c.title||'')+'"></div><div class="field"><label>Author *</label><input class="inp" id="f-author" value="'+esc(c.author||'')+'"></div><div class="field"><label>Category *</label><select class="inp" id="f-cat">'+catOpts+'</select></div><div class="field"><label>University</label><input class="inp" id="f-uni" value="'+esc(c.university||'')+'"></div><div class="field"><label>Read Time</label><input class="inp" id="f-readtime" value="'+esc(c.readTime||'5 min read')+'"></div><div class="field"><label>Cover Image URL</label><input class="inp" id="f-cover" value="'+esc(c.coverImage||'')+'"></div></div><div class="field"><label>Article Content <span class="editor-stat" id="f-words">0 words</span></label><div id="f-quill"></div><input type="hidden" id="f-content" value="'+esc(c.content||'')+'"></div><div class="field"><label>Insert image into article (URL)</label><div class="embed-add"><div class="field"><input class="inp" id="f-img-url" placeholder="https://… image url"></div><button type="button" class="btn-ghost" id="ins-img">Insert</button></div></div><div class="field"><label>Embed YouTube video (URL or ID)</label><div class="embed-add"><div class="field"><input class="inp" id="f-yt-url" placeholder="https://youtube.com/watch?v=…"></div><button type="button" class="btn-ghost" id="ins-yt">Embed</button></div><span class="hint">Appends a responsive video into the article.</span></div><div class="field"><label>Embed Tweet / X post (URL)</label><div class="embed-add"><div class="field"><input class="inp" id="f-tw-url" placeholder="https://x.com/user/status/…"></div><button type="button" class="btn-ghost" id="ins-tw">Embed</button></div></div><div class="modal-foot"><button class="btn-ghost" data-close-modal>Cancel</button><button class="btn" id="f-save">'+(c.id?'Save Changes':'🚀 Publish Story')+'</button></div>';}
-function openStoryModal(id){const existing=id?state.stories.find(s=>s.id===id):null;openModal(existing?'Edit Story':'Add New Story',storyFormHtml(existing),true);_quill=new Quill('#f-quill',{theme:'snow',placeholder:'Write the article…',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline'],['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']]}});const init=$('f-content').value;if(init)_quill.clipboard.dangerouslyPasteHTML(init);_quill.on('text-change',()=>{const w=_quill.getText().trim().split(/\s+/).filter(Boolean).length;$('f-words').textContent=w+' words';});
+// FIX: BUG-1 (deepest) -- The saved article HTML contains double quotes (img src="...",
+// iframe src="...", blockquote attributes). The previous `esc()` helper only escapes <,>,&
+// for textContent and DOES NOT escape " -- so embedding the content into
+// value="${esc(content)}" produced broken HTML where the unescaped " terminated the
+// attribute early, silently truncating everything after the first quote. That is why
+// images / iframes / tweet blockquotes / part of the text vanished from the editor.
+// Fix: keep the raw content in a module-scope variable instead of an HTML attribute.
+let _pendingStoryContent='';
+const CL_URL_ADMIN='https://api.cloudinary.com/v1_1/dagtpo1vk/image/upload';
+const CL_PRESET_ADMIN='wevox_unsigned';
+
+// FIX: BUG-1 -- Register the same custom BlockEmbed Blots that submit.html uses,
+// so saved content (YouTube/Tweet/Instagram embeds + images) round-trips into Quill
+// instead of being silently stripped. Must run BEFORE any `new Quill(...)` call.
+function registerAdminEmbedBlots(){
+  if(!window.Quill||window.Quill.__wevoxBlotsRegistered)return;
+  const BlockEmbed=window.Quill.import('blots/block/embed');
+
+  class VideoBlot extends BlockEmbed{
+    static create(value){
+      const node=super.create();
+      const id=(value&&value.id)||'';
+      node.setAttribute('class','embed-yt');
+      node.setAttribute('data-yt-id',id);
+      node.setAttribute('contenteditable','false');
+      const iframe=document.createElement('iframe');
+      iframe.setAttribute('src','https://www.youtube.com/embed/'+id);
+      iframe.setAttribute('frameborder','0');
+      iframe.setAttribute('allowfullscreen','true');
+      iframe.setAttribute('allow','accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture');
+      iframe.setAttribute('loading','lazy');
+      node.appendChild(iframe);
+      return node;
+    }
+    static value(node){return {id:node.getAttribute('data-yt-id')||''};}
+  }
+  VideoBlot.blotName='wevox-yt';VideoBlot.tagName='div';VideoBlot.className='embed-yt';
+
+  class TweetBlot extends BlockEmbed{
+    static create(value){
+      const node=super.create();
+      const url=(value&&value.url)||'';
+      node.setAttribute('contenteditable','false');
+      const bq=document.createElement('blockquote');
+      bq.setAttribute('class','twitter-tweet');
+      bq.setAttribute('data-wevox-tweet','1');
+      const a=document.createElement('a');a.setAttribute('href',url);a.textContent=url;
+      bq.appendChild(a);node.appendChild(bq);
+      return node;
+    }
+    static value(node){const a=node.querySelector('a');return {url:a?a.getAttribute('href'):''};}
+  }
+  TweetBlot.blotName='wevox-tweet';TweetBlot.tagName='div';TweetBlot.className='embed-tweet';
+
+  class InstagramBlot extends BlockEmbed{
+    static create(value){
+      const node=super.create();
+      const html=(value&&value.html)||'';
+      node.setAttribute('contenteditable','false');
+      node.setAttribute('data-ig','1');
+      const wrap=document.createElement('div');wrap.innerHTML=html;
+      const bq=wrap.querySelector('blockquote.instagram-media');
+      if(bq)node.appendChild(bq);
+      else{const fb=document.createElement('div');fb.textContent='[Instagram embed]';node.appendChild(fb);}
+      return node;
+    }
+    static value(node){const bq=node.querySelector('blockquote.instagram-media');return {html:bq?bq.outerHTML:''};}
+  }
+  InstagramBlot.blotName='wevox-ig';InstagramBlot.tagName='div';InstagramBlot.className='embed-ig';
+
+  window.Quill.register(VideoBlot,true);
+  window.Quill.register(TweetBlot,true);
+  window.Quill.register(InstagramBlot,true);
+  window.Quill.__wevoxBlotsRegistered=true;
+}
+
+function storyFormHtml(d){const c=d||{};const catOpts='<option value="">Select category…</option>'+CATEGORIES.map(x=>'<option'+(x===c.category?' selected':'')+'>'+x+'</option>').join('');
+return `<div class="grid-2"><div class="field"><label>Title *</label><input class="inp" id="f-title" value="${esc(c.title||'')}"></div><div class="field"><label>Author *</label><input class="inp" id="f-author" value="${esc(c.author||'')}"></div><div class="field"><label>Category *</label><select class="inp" id="f-cat">${catOpts}</select></div><div class="field"><label>University</label><input class="inp" id="f-uni" value="${esc(c.university||'')}"></div><div class="field"><label>Read Time</label><input class="inp" id="f-readtime" value="${esc(c.readTime||'5 min read')}"></div></div>
+<div class="field"><label>Cover Image</label>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <button type="button" class="btn-ghost btn-sm" id="cover-tab-upload" style="border-color:var(--accent);color:var(--accent)">📁 Upload</button>
+    <button type="button" class="btn-ghost btn-sm" id="cover-tab-url">🔗 URL</button>
+  </div>
+  <div id="cover-panel-upload">
+    <div id="cover-dz" style="border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;background:var(--bg);transition:border-color .2s">
+      <div style="font-size:28px;margin-bottom:6px">🖼️</div>
+      <div style="font-size:13px;color:var(--text-secondary)">Drag & drop or <strong style="color:var(--accent)">click to browse</strong></div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono)">JPG, PNG, WebP — max 10MB</div>
+      <input type="file" id="cover-file" accept="image/*" style="display:none">
+    </div>
+    <div id="cover-prog-wrap" style="display:none;margin-top:8px;background:var(--tag-bg);border-radius:4px;height:5px;overflow:hidden"><div id="cover-prog-bar" style="height:100%;background:var(--accent);width:0%;transition:width .3s"></div></div>
+    <div id="cover-upload-status" style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:4px"></div>
+  </div>
+  <div id="cover-panel-url" style="display:none">
+    <div style="display:flex;gap:8px">
+      <input class="inp" id="cover-url-inp" placeholder="https://example.com/cover.jpg" value="${esc(c.coverImage||'')}">
+      <button type="button" class="btn-ghost" id="cover-url-preview">Preview</button>
+    </div>
+  </div>
+  <div id="cover-preview-wrap" style="margin-top:8px;display:${c.coverImage?'block':'none'}">
+    <img id="cover-preview-img" src="${esc(c.coverImage||'')}" style="width:100%;max-height:180px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:var(--tag-bg);border-radius:0 0 6px 6px;font-size:12px">
+      <span id="cover-preview-label">${c.coverImage?'Cover image set':''}</span>
+      <button type="button" id="cover-clear" style="color:var(--accent);font-size:12px;font-weight:600">✕ Remove</button>
+    </div>
+  </div>
+  <input type="hidden" id="f-cover" value="${esc(c.coverImage||'')}">
+</div>
+<div class="field"><label>Article Content <span class="editor-stat" id="f-words">0 words</span></label><div id="f-quill"></div><input type="hidden" id="f-content-embeds" value=""></div>
+<div class="field"><label>Insert image into article (URL)</label><div class="embed-add"><div class="field"><input class="inp" id="f-img-url" placeholder="https://… image url"></div><button type="button" class="btn-ghost" id="ins-img">Insert</button></div></div>
+<div class="field"><label>Upload image into article (Cloudinary)</label><div class="embed-add"><div class="field"><input type="file" class="inp" id="f-img-file" accept="image/*" style="padding:6px"></div><button type="button" class="btn-ghost" id="ins-img-upload">Upload & Insert</button></div><div id="ins-img-status" style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:4px"></div></div>
+<div class="field"><label>Embed YouTube video (URL or ID)</label><div class="embed-add"><div class="field"><input class="inp" id="f-yt-url" placeholder="https://youtube.com/watch?v=…"></div><button type="button" class="btn-ghost" id="ins-yt">Embed</button></div><span class="hint">Appends a responsive video into the article.</span></div>
+<div class="field"><label>Embed Tweet / X post (URL)</label><div class="embed-add"><div class="field"><input class="inp" id="f-tw-url" placeholder="https://x.com/user/status/…"></div><button type="button" class="btn-ghost" id="ins-tw">Embed</button></div></div>
+<div class="field"><label>Embed Instagram post</label><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Open post → ⋯ → Embed → Copy embed code</div><div class="embed-add" style="align-items:flex-start"><div class="field" style="flex:1"><textarea class="inp" id="f-ig-code" rows="3" placeholder="&lt;blockquote class=&quot;instagram-media&quot;…"></textarea></div><button type="button" class="btn-ghost" id="ins-ig" style="margin-top:0">Embed</button></div></div>
+<div class="modal-foot"><button class="btn-ghost" data-close-modal>Cancel</button><button class="btn" id="f-save">${c.id?'Save Changes':'🚀 Publish Story'}</button></div>`;}
+function openStoryModal(id){
+  const existing=id?state.stories.find(s=>s.id===id):null;
+  // FIX: BUG-1 -- stash raw content in a JS variable so we don't have to round-trip it through
+  // an HTML attribute value (which broke on unescaped double quotes inside iframe/img/blockquote markup)
+  _pendingStoryContent=(existing&&existing.content)||'';
+  openModal(existing?'Edit Story':'Add New Story',storyFormHtml(existing),true);
+  // FIX: BUG-1 -- register Blots BEFORE creating Quill so iframes/blockquotes/images survive paste
+  registerAdminEmbedBlots();
+  _quill=new Quill('#f-quill',{theme:'snow',placeholder:'Write the article…',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline'],['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']]}});
+  // FIX: BUG-1 (deeper) -- Quill 1.3.7's clipboard matcher silently drops formats it doesn't
+  // recognize (iframes, custom blockquotes, even some <img> in some setups). Relying on it
+  // for round-trip loading of full-fidelity saved HTML loses content. Instead we set the
+  // editor's root DOM directly with the raw saved HTML, then call quill.update() so Quill
+  // syncs its internal model from the DOM. On save we read quill.root.innerHTML, so what the
+  // admin sees == what gets saved == what story.html renders.
+  // FIX: BUG-1 -- read content from JS variable, NOT from an HTML attribute (avoids quote-truncation)
+  const rawContent=_pendingStoryContent||'';
+  function loadContentIntoQuill(){
+    if(!_quill)return;
+    const root=_quill.root;
+    if(rawContent&&rawContent.trim()){
+      // Direct DOM write -- preserves images, iframes (.embed-yt), and tweet/IG blockquotes verbatim
+      root.innerHTML=rawContent;
+      // Tell Quill to re-scan the DOM so its internal Delta is in sync with what we just wrote
+      try{_quill.update('silent');}catch(_){ /* update is safe; ignore */ }
+      // Move cursor to end so editing starts at a sensible position
+      try{_quill.setSelection(_quill.getLength()-1,0,'silent');}catch(_){}
+    }
+    // Hydrate Twitter and Instagram embeds inside the editor after load
+    if(root.querySelector('blockquote.twitter-tweet')){
+      const hydrate=()=>{if(window.twttr&&window.twttr.widgets)window.twttr.widgets.load(root);};
+      if(window.twttr&&window.twttr.widgets)hydrate();
+      else{const s=document.createElement('script');s.src='https://platform.twitter.com/widgets.js';s.onload=hydrate;document.head.appendChild(s);}
+    }
+    if(root.querySelector('blockquote.instagram-media')){
+      const hydrate=()=>{if(window.instgrm)window.instgrm.Embeds.process();};
+      if(window.instgrm)hydrate();
+      else{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.onload=hydrate;document.head.appendChild(s);}
+    }
+  }
+  // Run on next frame so Quill has finished mounting; rAF avoids the race condition
+  // where Quill clears the DOM during its own init right after we write to it.
+  requestAnimationFrame(()=>requestAnimationFrame(loadContentIntoQuill));
+  _quill.on('text-change',()=>{const w=_quill.getText().trim().split(/\s+/).filter(Boolean).length;$('f-words').textContent=w+' words';});
+
+  // --- Cover image tabs ---
+  const coverDz=$('cover-dz'),coverFile=$('cover-file');
+  const coverPanelUpload=$('cover-panel-upload'),coverPanelUrl=$('cover-panel-url');
+  const coverPreviewWrap=$('cover-preview-wrap'),coverPreviewImg=$('cover-preview-img');
+  const coverPreviewLabel=$('cover-preview-label'),coverHidden=$('f-cover');
+
+  function setCoverPreview(url,label){
+    coverHidden.value=url;
+    coverPreviewImg.src=url;
+    coverPreviewLabel.textContent=label||'Cover image set';
+    coverPreviewWrap.style.display=url?'block':'none';
+  }
+
+  $('cover-tab-upload').addEventListener('click',()=>{
+    coverPanelUpload.style.display='block';coverPanelUrl.style.display='none';
+    $('cover-tab-upload').style.borderColor='var(--accent)';$('cover-tab-upload').style.color='var(--accent)';
+    $('cover-tab-url').style.borderColor='';$('cover-tab-url').style.color='';
+  });
+  $('cover-tab-url').addEventListener('click',()=>{
+    coverPanelUrl.style.display='block';coverPanelUpload.style.display='none';
+    $('cover-tab-url').style.borderColor='var(--accent)';$('cover-tab-url').style.color='var(--accent)';
+    $('cover-tab-upload').style.borderColor='';$('cover-tab-upload').style.color='';
+  });
+  $('cover-clear').addEventListener('click',()=>setCoverPreview('',''));
+  $('cover-url-preview').addEventListener('click',()=>{
+    const url=$('cover-url-inp').value.trim();
+    if(!url){toast('Enter a URL first.','error');return;}
+    setCoverPreview(url,'URL image');
+    toast('Cover preview set.','success');
+  });
+
+  // Drag & drop + click for cover upload
+  coverDz.addEventListener('click',()=>coverFile.click());
+  coverDz.addEventListener('dragover',e=>{e.preventDefault();coverDz.style.borderColor='var(--accent)';});
+  coverDz.addEventListener('dragleave',()=>coverDz.style.borderColor='');
+  coverDz.addEventListener('drop',e=>{e.preventDefault();coverDz.style.borderColor='';if(e.dataTransfer.files[0])uploadCoverAdmin(e.dataTransfer.files[0]);});
+  coverFile.addEventListener('change',()=>{if(coverFile.files[0])uploadCoverAdmin(coverFile.files[0]);});
+
+  function uploadCoverAdmin(file){
+    if(!file.type.startsWith('image/')){toast('Select an image file.','error');return;}
+    if(file.size>10*1024*1024){toast('Max 10MB.','error');return;}
+    const fd=new FormData();fd.append('file',file);fd.append('upload_preset',CL_PRESET_ADMIN);
+    const xhr=new XMLHttpRequest();xhr.open('POST',CL_URL_ADMIN);
+    $('cover-prog-wrap').style.display='block';$('cover-upload-status').textContent='Uploading…';
+    xhr.upload.addEventListener('progress',e=>{if(e.lengthComputable)$('cover-prog-bar').style.width=Math.round(e.loaded/e.total*100)+'%';});
+    xhr.addEventListener('load',()=>{
+      $('cover-prog-wrap').style.display='none';
+      if(xhr.status===200){
+        const res=JSON.parse(xhr.responseText);
+        setCoverPreview(res.secure_url,file.name);
+        $('cover-upload-status').textContent='✓ Uploaded: '+file.name;
+        toast('Cover uploaded!','success');
+      }else{$('cover-upload-status').textContent='Upload failed.';toast('Upload failed.','error');}
+    });
+    xhr.addEventListener('error',()=>{$('cover-prog-wrap').style.display='none';toast('Network error.','error');});
+    xhr.send(fd);
+  }
+
+  // --- Article body: insert image by URL ---
   $('ins-img').addEventListener('click',()=>{const u=$('f-img-url').value.trim();if(!u)return;const r=_quill.getSelection(true);_quill.insertEmbed(r?r.index:_quill.getLength(),'image',u,'user');$('f-img-url').value='';});
+
+  // --- Article body: upload image via Cloudinary ---
+  $('ins-img-upload').addEventListener('click',()=>{
+    const file=$('f-img-file').files[0];
+    if(!file){toast('Select an image file first.','error');return;}
+    if(!file.type.startsWith('image/')){toast('Select an image file.','error');return;}
+    if(file.size>10*1024*1024){toast('Max 10MB.','error');return;}
+    const fd=new FormData();fd.append('file',file);fd.append('upload_preset',CL_PRESET_ADMIN);
+    const xhr=new XMLHttpRequest();xhr.open('POST',CL_URL_ADMIN);
+    $('ins-img-status').textContent='Uploading…';
+    xhr.upload.addEventListener('progress',e=>{if(e.lengthComputable)$('ins-img-status').textContent='Uploading '+Math.round(e.loaded/e.total*100)+'%…';});
+    xhr.addEventListener('load',()=>{
+      if(xhr.status===200){
+        const res=JSON.parse(xhr.responseText);
+        const r=_quill.getSelection(true);
+        _quill.insertEmbed(r?r.index:_quill.getLength(),'image',res.secure_url,'user');
+        $('ins-img-status').textContent='✓ Inserted: '+file.name;
+        $('f-img-file').value='';
+        toast('Image inserted!','success');
+      }else{$('ins-img-status').textContent='Upload failed.';toast('Upload failed.','error');}
+    });
+    xhr.addEventListener('error',()=>{$('ins-img-status').textContent='Network error.';toast('Network error.','error');});
+    xhr.send(fd);
+  });
+
+  // --- YouTube embed ---
   $('ins-yt').addEventListener('click',()=>{const h=ytEmbedHtml($('f-yt-url').value);if(!h){toast('Enter a valid YouTube URL/ID.','error');return;}appendToQuill(h);$('f-yt-url').value='';toast('Video embedded.','success');});
+
+  // --- Tweet embed ---
   $('ins-tw').addEventListener('click',()=>{const h=tweetEmbedHtml($('f-tw-url').value);if(!h){toast('Enter a valid Twitter/X URL.','error');return;}appendToQuill(h);$('f-tw-url').value='';toast('Tweet embedded.','success');});
-  $('f-save').addEventListener('click',()=>saveStory(id));}
-function appendToQuill(html){const cur=_quill.root.innerHTML;_quill.root.innerHTML=cur+html;}
-async function saveStory(id){const title=$('f-title').value.trim(),author=$('f-author').value.trim(),cat=$('f-cat').value;if(!title||!author||!cat){toast('Title, author and category required.','error');return;}const data={title,author,category:cat,university:$('f-uni').value.trim(),coverImage:$('f-cover').value.trim(),readTime:$('f-readtime').value.trim()||'5 min read',content:_quill.root.innerHTML};try{if(id){await db.collection('stories').doc(id).update({...data,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});toast('Story updated.','success');}else{await db.collection('stories').add({...data,status:'published',views:0,publishedAt:firebase.firestore.FieldValue.serverTimestamp()});toast('🚀 Story published!','success');}closeModal();fetchStories();}catch(e){fsErr(e,'saveStory');}}
+
+  // --- Instagram embed ---
+  $('ins-ig').addEventListener('click',()=>{
+    const code=$('f-ig-code').value.trim();
+    if(!code){toast('Paste the Instagram embed code first.','error');return;}
+    appendToQuill(code);
+    $('f-ig-code').value='';
+    toast('Instagram embed inserted.','success');
+  });
+
+  $('f-save').addEventListener('click',()=>saveStory(id));
+}
+function appendToQuill(html){
+  const embedsEl=$('f-content-embeds');
+  if(embedsEl)embedsEl.value=(embedsEl.value?embedsEl.value+'\n':'')+html;
+  // Render actual embed preview (iframe/blockquote) below the editor
+  const wrap=document.createElement('div');
+  wrap.style.cssText='margin:8px 0;border:1px solid var(--border);border-radius:6px;overflow:hidden';
+  wrap.dataset.html=html;
+  const bar=document.createElement('div');
+  bar.style.cssText='background:var(--tag-bg);padding:4px 10px;font-size:11px;font-family:var(--font-mono);color:var(--text-muted);display:flex;justify-content:space-between;align-items:center';
+  const removeBtn=document.createElement('button');
+  removeBtn.type='button';removeBtn.textContent='\u2715 Remove';
+  removeBtn.style.cssText='color:var(--accent);font-size:11px;font-weight:600';
+  removeBtn.addEventListener('click',()=>{
+    const t=$('f-content-embeds');
+    if(t)t.value=t.value.split('\n').filter(l=>l.trim()&&l.trim()!==html.trim()).join('\n');
+    wrap.remove();
+  });
+  bar.innerHTML='<span>Embed \u2713</span>';bar.appendChild(removeBtn);
+  const body=document.createElement('div');
+  body.style.cssText='padding:12px;background:#fff;max-height:280px;overflow:auto';
+  body.innerHTML=html;
+  wrap.appendChild(bar);wrap.appendChild(body);
+  const editorEl=document.querySelector('#f-quill');
+  if(editorEl)editorEl.after(wrap);
+  if(html.includes('twitter-tweet')){if(window.twttr&&window.twttr.widgets)window.twttr.widgets.load(body);else{const s=document.createElement('script');s.src='https://platform.twitter.com/widgets.js';s.onload=()=>{if(window.twttr)window.twttr.widgets.load(body);};document.head.appendChild(s);}}
+  if(html.includes('instagram-media')){if(window.instgrm)window.instgrm.Embeds.process();else{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.onload=()=>{if(window.instgrm)window.instgrm.Embeds.process();};document.head.appendChild(s);}}
+}
+async function saveStory(id){
+  const title=$('f-title').value.trim(),author=$('f-author').value.trim(),cat=$('f-cat').value;
+  if(!title||!author||!cat){toast('Title, author and category required.','error');return;}
+  // FIX: BUG-1 -- Embeds now live as real Blots inside Quill, so quill.root.innerHTML already
+  // contains every iframe/blockquote/image. The f-content-embeds accumulator is kept only as
+  // a fallback for legacy embeds added via the side buttons, and de-duped against Quill HTML.
+  const embedsEl = $('f-content-embeds');
+  const embeds = embedsEl ? embedsEl.value.trim() : '';
+  const quillHtml = _quill.root.innerHTML;
+  const dedupedEmbeds = embeds.split('\n').filter(line=>{const t=line.trim();return t && quillHtml.indexOf(t)===-1;}).join('\n');
+  const fullContent = quillHtml + (dedupedEmbeds ? '\n' + dedupedEmbeds : '');
+  const data={
+    title,author,category:cat,
+    university:$('f-uni').value.trim(),
+    coverImage:$('f-cover').value.trim(),
+    readTime:$('f-readtime').value.trim()||'5 min read',
+    content: fullContent
+  };
+  try{
+    if(id){
+      await db.collection('stories').doc(id).update({...data,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      toast('Story updated.','success');
+    }else{
+      await db.collection('stories').add({...data,status:'published',views:0,publishedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      toast('🚀 Story published!','success');
+    }
+    closeModal();fetchStories();
+  }catch(e){fsErr(e,'saveStory');}
+}
 
 /* ============================================================
    VIDEOS

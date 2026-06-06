@@ -3,1000 +3,644 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Submit your story or field video to WEVOX — India's youth newsroom. Verified student journalists publishing ground zero reports." />
-  <meta property="og:title" content="Submit Your Story — WEVOX" />
-  <meta property="og:description" content="Verified student journalists publishing ground zero reports. Submit your investigation, campus report, or field video." />
-  <meta property="og:type" content="website" />
+  <meta name="description" content="Submit your story or field video to WEVOX — India's youth newsroom." />
   <title>Submit Your Story — WEVOX</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-
+  <!-- FEATURE: Title font selector — load journalism/news-style families used in the picker -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Lora:wght@600;700&family=Source+Serif+4:wght@700;900&family=Inter:wght@600;700&family=Roboto+Slab:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
   <style>
-    /* =========== DESIGN TOKENS (same as index.html) ============ */
-    :root {
-      --bg: #F9F7F4;
-      --bg-dark: #0D0D0D;
-      --surface: #FFFFFF;
-      --border: #E8E4DF;
-      --text-primary: #1A1A1A;
-      --text-secondary: #6B6B6B;
-      --text-muted: #9A9A9A;
-      --accent: #C8102E;
-      --accent-hover: #A50D26;
-      --tag-bg: #F0EDE8;
-      --input-bg: #FAFAF8;
-      --danger: #EF4444;
-      --success: #16A34A;
+    :root{
+      --bg:#F9F7F4;--bg-dark:#0D0D0D;--surface:#FFFFFF;--border:#E8E4DF;
+      --text-primary:#1A1A1A;--text-secondary:#6B6B6B;--text-muted:#9A9A9A;
+      --accent:#C8102E;--accent-hover:#A50D26;--tag-bg:#F0EDE8;--input-bg:#FAFAF8;
+      --danger:#EF4444;--success:#16A34A;
+      --font-headline:"Playfair Display",Georgia,serif;
+      --font-body:"DM Sans",system-ui,-apple-system,sans-serif;
+      --font-mono:"IBM Plex Mono","Courier New",monospace;
+      --max-width:1240px;--gutter:32px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
+    body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);font-weight:400;line-height:1.5;overflow-x:hidden;min-height:100vh;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+    input,textarea,select{font:inherit;color:inherit}
+    img{max-width:100%;display:block}
+    ul{list-style:none}
+    .container{max-width:var(--max-width);margin:0 auto;padding:0 var(--gutter)}
 
-      --font-headline: "Playfair Display", Georgia, serif;
-      --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
-      --font-mono: "IBM Plex Mono", "Courier New", monospace;
+    /* NAVBAR */
+    .navbar{position:fixed;top:0;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--border);z-index:100;transition:box-shadow .25s ease;opacity:0;animation:fadeIn .3s ease forwards}
+    .navbar.scrolled{box-shadow:0 2px 14px rgba(0,0,0,.05)}
+    .nav-inner{max-width:var(--max-width);margin:0 auto;padding:14px var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .logo{font-family:var(--font-headline);font-weight:900;font-size:22px;color:var(--text-primary);letter-spacing:-.5px;flex-shrink:0}
+    .logo .dot{color:var(--accent)}
+    .nav-links{display:flex;gap:28px;align-items:center}
+    .nav-links a{font-size:14px;font-weight:500;color:var(--text-primary);position:relative;padding:4px 0;transition:color .2s ease}
+    .nav-links a:hover{color:var(--accent)}
+    .btn-submit{background:var(--accent);color:#fff;padding:8px 18px;border-radius:4px;font-size:13px;font-weight:600;transition:background .2s ease;white-space:nowrap;display:inline-block}
+    .btn-submit:hover{background:var(--accent-hover)}
+    .btn-submit.active{box-shadow:0 0 0 2px rgba(200,16,46,.25)}
+    .hamburger{display:none;width:36px;height:36px;align-items:center;justify-content:center;font-size:22px;color:var(--text-primary)}
+    .mobile-overlay{position:fixed;inset:0;background:var(--bg-dark);z-index:200;display:flex;flex-direction:column;padding:80px 32px 32px;opacity:0;pointer-events:none;transform:translateX(100%);transition:opacity .25s ease,transform .3s ease}
+    .mobile-overlay.open{opacity:1;pointer-events:auto;transform:translateX(0)}
+    .mobile-overlay .close{position:absolute;top:22px;right:24px;font-size:28px;color:#fff;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+    .mobile-overlay a{color:#fff;font-family:var(--font-headline);font-size:32px;font-weight:700;padding:14px 0;border-bottom:1px solid #1f1f1f;transition:color .2s ease}
+    .mobile-overlay a:hover{color:var(--accent)}
 
-      --max-width: 1240px;
-      --gutter: 32px;
-    }
+    /* AUTH GATE */
+    .auth-gate{display:none;min-height:100vh;align-items:center;justify-content:center;padding:120px 20px 60px}
+    .auth-gate.show{display:flex}
+    .auth-gate-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:48px 40px;max-width:420px;width:100%;text-align:center}
+    .auth-gate-card .icon{font-size:48px;margin-bottom:16px}
+    .auth-gate-card h2{font-family:var(--font-headline);font-size:26px;font-weight:700;margin-bottom:10px}
+    .auth-gate-card p{font-size:15px;color:var(--text-secondary);margin-bottom:28px;line-height:1.6}
+    .btn-gate{display:inline-block;background:var(--accent);color:#fff;padding:13px 28px;border-radius:8px;font-size:15px;font-weight:600;transition:background .2s}
+    .btn-gate:hover{background:var(--accent-hover)}
 
-    /* ============ RESET ============ */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
-    body {
-      font-family: var(--font-body);
-      background: var(--bg);
-      color: var(--text-primary);
-      font-weight: 400;
-      line-height: 1.5;
-      overflow-x: hidden;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    a { color: inherit; text-decoration: none; }
-    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-    input, textarea, select { font: inherit; color: inherit; }
-    img { max-width: 100%; display: block; }
-    ul { list-style: none; }
+    /* AUTHOR BADGE */
+    .author-badge{display:none;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:28px}
+    .author-badge.show{display:flex}
+    .author-avatar{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-headline);font-size:16px;font-weight:700;flex-shrink:0}
+    .author-info{flex:1;min-width:0}
+    .author-name{font-size:14px;font-weight:600;color:var(--text-primary)}
+    .author-uni{font-size:12px;color:var(--text-secondary);margin-top:2px}
+    .author-verified{font-family:var(--font-mono);font-size:10px;color:var(--success);letter-spacing:1px;margin-top:3px}
+    .author-change{font-size:12px;color:var(--accent);font-weight:500;white-space:nowrap}
+    .author-change:hover{text-decoration:underline}
 
-    .container {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0 var(--gutter);
-    }
+    /* HERO */
+    .hero{padding:120px 0 40px;background:var(--bg);opacity:0;transform:translateY(20px);animation:slideUp .4s ease-out .1s forwards}
+    .hero-eyebrow{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+    .hero h1{font-family:var(--font-headline);font-weight:700;font-size:36px;line-height:1.1;color:var(--text-primary);max-width:720px;letter-spacing:-.5px}
+    .hero-sub{font-weight:300;font-size:16px;color:var(--text-secondary);max-width:560px;margin-top:14px}
+    .hero-divider{width:40px;height:2px;background:var(--accent);margin-top:24px}
 
-    /* ============ AUTH GATE LOADER ============ */
-    /* Page ko tab tak chhupao jab tak auth check na ho jaye (flash avoid) */
-    #authGate {
-      position: fixed; inset: 0; z-index: 9999;
-      background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 16px;
-      transition: opacity 0.3s ease;
-    }
-    #authGate.hide { opacity: 0; pointer-events: none; }
-    #authGate .gate-logo {
-      font-family: var(--font-headline); font-weight: 900; font-size: 28px;
-      color: var(--text-primary); letter-spacing: -0.5px;
-    }
-    #authGate .gate-logo .dot { color: var(--accent); }
-    #authGate .gate-spinner {
-      width: 28px; height: 28px;
-      border: 3px solid var(--border); border-top-color: var(--accent);
-      border-radius: 50%; animation: spin 0.7s linear infinite;
-    }
-    #authGate .gate-text {
-      font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;
-      color: var(--text-muted); text-transform: uppercase;
-    }
+    /* TYPE SELECTOR */
+    .type-section{padding:8px 0 32px}
+    .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:680px}
+    .type-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:24px;cursor:pointer;transition:all .2s ease;position:relative;text-align:left;display:flex;flex-direction:column;gap:6px}
+    .type-card:hover:not(.selected){border-color:rgba(200,16,46,.25);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+    .type-card.selected{border-color:var(--accent);background:rgba(200,16,46,.04)}
+    .type-card .icon{font-size:28px;line-height:1;margin-bottom:6px}
+    .type-card .title{font-size:16px;font-weight:700;color:var(--text-primary)}
+    .type-card .desc{font-size:13px;color:var(--text-secondary);line-height:1.5}
+    .type-card .check{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;display:none;align-items:center;justify-content:center;font-weight:700}
+    .type-card.selected .check{display:flex}
 
-    /* ============ NAVBAR (same as index.html) ============ */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      z-index: 100;
-      transition: box-shadow 0.25s ease, background 0.25s ease;
-      opacity: 0;
-      animation: fadeIn 0.3s ease forwards;
-    }
-    .navbar.scrolled { box-shadow: 0 2px 14px rgba(0,0,0,0.05); }
-    .nav-inner {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 14px var(--gutter);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-    }
-    .logo {
-      font-family: var(--font-headline);
-      font-weight: 900;
-      font-size: 22px;
-      color: var(--text-primary);
-      letter-spacing: -0.5px;
-      flex-shrink: 0;
-    }
-    .logo .dot { color: var(--accent); }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-primary);
-      position: relative;
-      padding: 4px 0;
-      transition: color 0.2s ease;
-    }
-    .nav-links a:hover { color: var(--accent); }
-    .nav-links a.active { color: var(--text-primary); }
-    .nav-links a.active::after {
-      content: ""; position: absolute;
-      left: 0; right: 0; bottom: -4px;
-      height: 2px; background: var(--accent);
-    }
-    .nav-right { display: flex; align-items: center; gap: 12px; }
-    .btn-submit {
-      background: var(--accent);
-      color: #fff;
-      padding: 8px 18px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 600;
-      transition: background 0.2s ease, transform 0.15s ease;
-      white-space: nowrap;
-      display: inline-block;
-    }
-    .btn-submit:hover { background: var(--accent-hover); }
-    .btn-submit:active { transform: scale(0.97); }
-    .btn-submit.active { box-shadow: 0 0 0 2px rgba(200,16,46,0.25); }
+    /* FORM */
+    .form-section{padding:8px 0 80px}
+    .form-wrap{display:none;max-width:680px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px}
+    .form-wrap.show{display:block;animation:formIn .4s ease forwards}
+    @keyframes formIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .section-label{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:20px;margin-top:8px}
+    .form-section-block{margin-bottom:28px}
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:6px}
+    .field label .req{color:var(--accent);margin-left:2px}
+    .field .helper{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:6px}
+    .input,.select{background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:14px;color:var(--text-primary);width:100%;transition:border .2s,box-shadow .2s}
+    .input::placeholder{color:var(--text-muted);font-weight:300}
+    .input:focus,.select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,16,46,.08)}
+    .input.error,.select.error{border-color:var(--danger)}
+    .select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%236B6B6B' d='M6 8L0 0h12z'/></svg>");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
 
-    /* Navbar avatar (logged-in) */
-    .nav-avatar {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--accent); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-headline); font-size: 13px; font-weight: 700;
-      cursor: pointer; flex-shrink: 0;
-    }
+    /* TITLE FONT SELECTOR */
+    .title-font-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+    .title-font-label{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-right:4px}
+    .title-font-pill{background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);font-size:12px;font-weight:600;padding:5px 11px;border-radius:18px;cursor:pointer;transition:all .15s ease;line-height:1.2}
+    .title-font-pill:hover{border-color:var(--accent);color:var(--accent)}
+    .title-font-pill.active{background:rgba(200,16,46,.06);border-color:var(--accent);color:var(--accent)}
+    @media(max-width:480px){.title-font-pill{font-size:11px;padding:4px 9px}.title-font-label{width:100%;margin-bottom:4px}}
 
-    .hamburger {
-      display: none;
-      width: 36px; height: 36px;
-      align-items: center; justify-content: center;
-      font-size: 22px;
-      color: var(--text-primary);
-    }
+    /* TAGS */
+    .tags-wrap{background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:46px;cursor:text;transition:border .2s,box-shadow .2s}
+    .tags-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,16,46,.08)}
+    .tag-chip{background:var(--tag-bg);color:var(--text-primary);font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
+    .tag-chip button{font-size:14px;color:var(--text-muted);line-height:1;padding:0}
+    .tag-chip button:hover{color:var(--accent)}
+    .tags-input{border:none;background:transparent;outline:none;font-size:13px;color:var(--text-primary);min-width:120px;flex:1;padding:3px 0}
+    .tags-input::placeholder{color:var(--text-muted)}
 
-    /* Mobile overlay */
-    .mobile-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-dark);
-      z-index: 200;
-      display: flex;
-      flex-direction: column;
-      padding: 80px 32px 32px;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateX(100%);
-      transition: opacity 0.25s ease, transform 0.3s ease;
-    }
-    .mobile-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateX(0);
-    }
-    .mobile-overlay .close {
-      position: absolute;
-      top: 22px; right: 24px;
-      font-size: 28px;
-      color: #fff;
-      width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .mobile-overlay a {
-      color: #fff;
-      font-family: var(--font-headline);
-      font-size: 32px;
-      font-weight: 700;
-      padding: 14px 0;
-      border-bottom: 1px solid #1f1f1f;
-      transition: color 0.2s ease;
-    }
-    .mobile-overlay a:hover { color: var(--accent); }
+    /* QUILL */
+    .ql-toolbar.ql-snow{border-color:var(--border)!important;border-radius:8px 8px 0 0}
+    .ql-container.ql-snow{border-color:var(--border)!important;border-radius:0 0 8px 8px;min-height:320px;font-family:var(--font-body);font-size:15px}
+    .ql-editor{min-height:320px;line-height:1.7}
+    .ql-editor.ql-blank::before{color:var(--text-muted);font-style:normal}
+    /* Custom Quill BlockEmbeds (YouTube/Tweet/Instagram) rendered inline in article body */
+    .ql-editor .embed-yt{position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;background:#000;margin:18px 0}
+    .ql-editor .embed-yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .ql-editor .embed-tweet,.ql-editor .embed-ig{margin:18px 0;border:1px dashed var(--border);border-radius:8px;padding:10px;background:var(--input-bg)}
+    .ql-editor .embed-tweet blockquote.twitter-tweet,.ql-editor .embed-ig blockquote.instagram-media{margin:0 auto!important}
+    .editor-meta{display:flex;justify-content:flex-end;margin-top:6px}
+    .word-count{font-family:var(--font-mono);font-size:11px;color:var(--text-muted)}
+    .word-count.warn{color:var(--accent);font-weight:600}
 
-    /* ============ HERO (minimal) ============ */
-    .hero {
-      padding: 120px 0 40px;
-      background: var(--bg);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: slideUp 0.4s ease-out 0.1s forwards;
-    }
-    .hero-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--accent);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-    .hero h1 {
-      font-family: var(--font-headline);
-      font-weight: 700;
-      font-size: 36px;
-      line-height: 1.1;
-      color: var(--text-primary);
-      max-width: 720px;
-      letter-spacing: -0.5px;
-    }
-    .hero-sub {
-      font-family: var(--font-body);
-      font-weight: 300;
-      font-size: 16px;
-      color: var(--text-secondary);
-      max-width: 560px;
-      margin-top: 14px;
-    }
-    .hero-divider {
-      width: 40px;
-      height: 2px;
-      background: var(--accent);
-      margin-top: 24px;
-    }
+    /* MEDIA */
+    .media-btn-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+    .media-btn{display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;font-weight:500;color:var(--text-secondary);transition:all .2s ease;cursor:pointer}
+    .media-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .media-btn.active{border-color:var(--accent);background:rgba(200,16,46,.06);color:var(--accent);font-weight:600}
+    .media-panel{display:none}
+    .media-panel.show{display:block;animation:formIn .25s ease forwards}
+    .drop-zone{border:2px dashed var(--border);border-radius:10px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s ease;background:var(--input-bg)}
+    .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(200,16,46,.04)}
+    .drop-zone .dz-icon{font-size:36px;margin-bottom:10px}
+    .drop-zone .dz-text{font-size:14px;color:var(--text-secondary);margin-bottom:6px}
+    .drop-zone .dz-sub{font-family:var(--font-mono);font-size:11px;color:var(--text-muted)}
+    .drop-zone input[type="file"]{display:none}
+    .upload-progress{display:none;margin-top:12px;background:var(--tag-bg);border-radius:6px;overflow:hidden;height:6px}
+    .upload-progress.show{display:block}
+    .upload-bar{height:100%;background:var(--accent);width:0%;transition:width .3s ease}
+    .upload-status{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:6px}
+    .media-preview{display:none;margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+    .media-preview.show{display:block}
+    .media-preview img{width:100%;max-height:240px;object-fit:cover}
+    .media-preview-clear{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--tag-bg);font-size:12px;color:var(--text-secondary)}
+    .media-preview-clear button{font-size:12px;color:var(--accent);font-weight:600}
+    .url-input-row{display:flex;gap:8px}
+    .url-input-row .input{flex:1}
+    .btn-preview-url{background:var(--accent);color:#fff;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;transition:background .2s;white-space:nowrap}
+    .btn-preview-url:hover{background:var(--accent-hover)}
+    .embed-preview{display:none;margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+    .embed-preview.show{display:block}
+    .embed-preview iframe{width:100%;aspect-ratio:16/9;border:none;display:block}
+    .ig-embed-wrap{padding:16px;background:var(--input-bg)}
+    .inp-embed{width:100%;min-height:100px;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;background:var(--input-bg);resize:vertical;font-family:var(--font-mono)}
+    .inp-embed:focus{outline:none;border-color:var(--accent)}
 
-    /* ============ TYPE SELECTOR ============ */
-    .type-section {
-      padding: 8px 0 32px;
-    }
-    .type-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      max-width: 680px;
-    }
-    .type-card {
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .type-card:hover:not(.selected) {
-      border-color: rgba(200,16,46,0.25);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    }
-    .type-card.selected {
-      border-color: var(--accent);
-      background: rgba(200,16,46,0.04);
-    }
-    .type-card .icon { font-size: 28px; line-height: 1; margin-bottom: 6px; }
-    .type-card .title {
-      font-family: var(--font-body);
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .type-card .desc {
-      font-family: var(--font-body);
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-    .type-card .check {
-      position: absolute;
-      top: 12px; right: 12px;
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      font-size: 13px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-    .type-card.selected .check { display: flex; }
+    /* CHECKBOXES */
+    .check-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;cursor:pointer;user-select:none}
+    .check-row input{display:none}
+    .check-box{flex-shrink:0;width:20px;height:20px;border:2px solid var(--border);border-radius:5px;background:var(--surface);transition:all .15s ease;display:flex;align-items:center;justify-content:center;margin-top:1px}
+    .check-box::after{content:"✓";color:#fff;font-size:13px;font-weight:700;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
+    .check-row input:checked~.check-box{background:var(--accent);border-color:var(--accent)}
+    .check-row input:checked~.check-box::after{opacity:1;transform:scale(1)}
+    .check-row.error .check-box{border-color:var(--danger)}
+    .check-row .check-text{font-size:13px;color:var(--text-primary);line-height:1.5}
 
-    /* ============ FORM ============ */
-    .form-section {
-      padding: 8px 0 80px;
-    }
-    .form-wrap {
-      display: none;
-      max-width: 680px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .form-wrap.show {
-      display: block;
-      animation: formIn 0.4s ease forwards;
-    }
-    @keyframes formIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    /* SUBMIT BTN */
+    .btn-primary{width:100%;height:52px;background:var(--accent);color:#fff;border-radius:10px;font-size:16px;font-weight:600;transition:background .2s,box-shadow .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
+    .btn-primary:hover:not(:disabled){background:var(--accent-hover);box-shadow:0 4px 20px rgba(200,16,46,.3)}
+    .btn-primary:active:not(:disabled){transform:scale(.99)}
+    .btn-primary:disabled{opacity:.8;cursor:not-allowed}
+    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .for-story,.for-video{display:none}
+    .form-wrap[data-type="STORY"] .for-story{display:block}
+    .form-wrap[data-type="VIDEO"] .for-video{display:block}
 
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--accent);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-      margin-bottom: 20px;
-      margin-top: 8px;
-    }
-    .form-section-block { margin-bottom: 28px; }
-    .form-section-block:last-of-type { margin-bottom: 16px; }
+    /* SUCCESS */
+    .success-wrap{display:none;max-width:680px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:56px 40px;text-align:center}
+    .success-wrap.show{display:block;animation:formIn .4s ease forwards}
+    .success-check{width:84px;height:84px;border-radius:50%;background:rgba(22,163,74,.12);color:var(--success);font-size:44px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;animation:pop .6s cubic-bezier(.34,1.56,.64,1) forwards;transform:scale(0)}
+    @keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+    .success-wrap h2{font-family:var(--font-headline);font-weight:700;font-size:28px;color:var(--text-primary);margin-bottom:12px}
+    .success-sub{font-size:16px;color:var(--text-secondary);max-width:440px;margin:0 auto 24px;line-height:1.6}
+    .info-box{background:#FFF8E1;border:1px solid #F5E6B3;border-radius:10px;padding:18px 22px;text-align:left;margin-bottom:28px}
+    .info-box strong{display:block;font-size:14px;color:var(--text-primary);margin-bottom:6px}
+    .info-box p{font-size:13px;color:var(--text-secondary);line-height:1.6}
+    .success-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .btn-outline{background:var(--surface);color:var(--accent);border:1.5px solid var(--accent);padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;transition:background .2s}
+    .btn-outline:hover{background:rgba(200,16,46,.06)}
+    .btn-filled{background:var(--accent);color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;transition:background .2s}
+    .btn-filled:hover{background:var(--accent-hover)}
 
-    .field { margin-bottom: 16px; }
-    .field label {
-      display: block;
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-    .field label .req { color: var(--accent); margin-left: 2px; }
-    .field .helper {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 6px;
-      letter-spacing: 0.3px;
-    }
+    /* TOAST */
+    #toast-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+    .toast{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--text-secondary);padding:14px 18px;border-radius:10px;color:var(--text-primary);font-size:13px;font-weight:500;min-width:260px;max-width:360px;box-shadow:0 6px 22px rgba(0,0,0,.10);animation:slideInRight .3s ease forwards;pointer-events:auto}
+    .toast.error{border-left-color:var(--danger)}
+    .toast.success{border-left-color:var(--success)}
+    .toast.warning{border-left-color:#F59E0B}
+    .toast.fade-out{animation:fadeOutRight .3s ease forwards}
+    @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+    @keyframes fadeOutRight{to{opacity:0;transform:translateX(20px)}}
 
-    .input, .textarea, .select {
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-family: var(--font-body);
-      font-size: 14px;
-      color: var(--text-primary);
-      width: 100%;
-      transition: border 0.2s, box-shadow 0.2s;
-    }
-    .input::placeholder, .textarea::placeholder {
-      color: var(--text-muted);
-      font-weight: 300;
-    }
-    .input:focus, .textarea:focus, .select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(200,16,46,0.08);
-    }
-    .input.error, .textarea.error, .select.error {
-      border-color: var(--danger);
-    }
-    /* Read-only prefilled fields (from logged-in account) */
-    .input[readonly] {
-      background: var(--tag-bg);
-      color: var(--text-secondary);
-      cursor: not-allowed;
-    }
-    .select {
-      appearance: none;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%236B6B6B' d='M6 8L0 0h12z'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 16px center;
-      padding-right: 40px;
-    }
-    .textarea {
-      min-height: 320px;
-      resize: vertical;
-      line-height: 1.6;
-    }
-    .textarea-short {
-      min-height: 200px;
-    }
+    /* FOOTER */
+    footer{background:var(--bg-dark);color:#F9F7F4;padding:56px 0 0}
+    .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:48px;padding-bottom:40px}
+    .footer-logo{font-family:var(--font-headline);font-weight:900;font-size:24px;color:#fff;margin-bottom:12px}
+    .footer-tagline{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+    .socials{display:flex;gap:14px}
+    .socials a{width:36px;height:36px;border:1px solid #2a2a2a;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:border-color .2s ease,background .2s ease}
+    .socials a:hover{border-color:var(--accent);background:var(--accent)}
+    .socials svg{width:16px;height:16px;fill:#fff}
+    .footer-heading{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;color:var(--text-secondary);margin-bottom:16px;text-transform:uppercase}
+    .footer-col ul li{margin-bottom:10px}
+    .footer-col a{font-size:14px;color:var(--text-muted);transition:color .2s ease}
+    .footer-col a:hover{color:#fff}
+    .footer-bottom{border-top:1px solid #1c1c1c;padding:18px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--font-mono);font-size:11px;color:#4A4A4A}
 
-    .textarea-wrap { position: relative; }
-    .char-counter {
-      position: absolute;
-      right: 14px;
-      bottom: 10px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      background: var(--input-bg);
-      padding: 2px 6px;
-      border-radius: 4px;
-      pointer-events: none;
-    }
-    .char-counter.warn { color: var(--accent); font-weight: 600; }
+    @keyframes fadeIn{to{opacity:1}}
+    @keyframes slideUp{to{opacity:1;transform:translateY(0)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+    .shake{animation:shake .4s ease}
 
-    /* Custom checkbox */
-    .check-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      user-select: none;
+    @media(max-width:768px){
+      :root{--gutter:20px}
+      .nav-links{display:none}
+      .hamburger{display:flex}
+      .btn-submit{padding:7px 14px;font-size:12px}
+      .hero{padding:100px 0 28px}
+      .hero h1{font-size:26px}
+      .type-grid{grid-template-columns:1fr}
+      .form-wrap{padding:24px 20px;border-radius:12px}
+      .success-wrap{padding:40px 22px;border-radius:12px}
+      .media-btn{padding:8px 10px;font-size:12px}
+      .footer-grid{grid-template-columns:1fr;gap:32px}
+      .footer-bottom{flex-direction:column;align-items:flex-start}
+      .auth-gate-card{padding:36px 24px}
     }
-    .check-row input { display: none; }
-    .check-box {
-      flex-shrink: 0;
-      width: 20px; height: 20px;
-      border: 2px solid var(--border);
-      border-radius: 5px;
-      background: var(--surface);
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 1px;
-    }
-    .check-box::after {
-      content: "✓";
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      opacity: 0;
-      transform: scale(0.6);
-      transition: opacity 0.15s, transform 0.15s;
-    }
-    .check-row input:checked ~ .check-box {
-      background: var(--accent);
-      border-color: var(--accent);
-    }
-    .check-row input:checked ~ .check-box::after {
-      opacity: 1;
-      transform: scale(1);
-    }
-    .check-row.error .check-box {
-      border-color: var(--danger);
-    }
-    .check-row .check-text {
-      font-size: 13px;
-      color: var(--text-primary);
-      line-height: 1.5;
-    }
-
-    /* Shake animation for invalid fields */
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-6px); }
-      40% { transform: translateX(6px); }
-      60% { transform: translateX(-6px); }
-      80% { transform: translateX(6px); }
-    }
-    .shake { animation: shake 0.4s ease; }
-
-    /* Submit button */
-    .btn-primary {
-      width: 100%;
-      height: 52px;
-      background: var(--accent);
-      color: #fff;
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 16px;
-      font-weight: 600;
-      transition: background 0.2s, box-shadow 0.2s, opacity 0.2s, transform 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .btn-primary:hover:not(:disabled) {
-      background: var(--accent-hover);
-      box-shadow: 0 4px 20px rgba(200,16,46,0.3);
-    }
-    .btn-primary:active:not(:disabled) { transform: scale(0.99); }
-    .btn-primary:disabled {
-      opacity: 0.8;
-      cursor: not-allowed;
-    }
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: inline-block;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Conditional fields */
-    .for-story, .for-video { display: none; }
-    .form-wrap[data-type="STORY"] .for-story { display: block; }
-    .form-wrap[data-type="VIDEO"] .for-video { display: block; }
-
-    /* ============ SUCCESS STATE ============ */
-    .success-wrap {
-      display: none;
-      max-width: 680px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 56px 40px;
-      text-align: center;
-    }
-    .success-wrap.show { display: block; animation: formIn 0.4s ease forwards; }
-
-    .success-check {
-      width: 84px;
-      height: 84px;
-      border-radius: 50%;
-      background: rgba(22,163,74,0.12);
-      color: var(--success);
-      font-size: 44px;
-      margin: 0 auto 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      transform: scale(0);
-    }
-    @keyframes pop {
-      0% { transform: scale(0); }
-      60% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-    .success-wrap h2 {
-      font-family: var(--font-headline);
-      font-weight: 700;
-      font-size: 28px;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-    }
-    .success-sub {
-      font-family: var(--font-body);
-      font-size: 16px;
-      color: var(--text-secondary);
-      max-width: 440px;
-      margin: 0 auto 24px;
-      line-height: 1.6;
-    }
-    .info-box {
-      background: #FFF8E1;
-      border: 1px solid #F5E6B3;
-      border-radius: 10px;
-      padding: 18px 22px;
-      text-align: left;
-      margin-bottom: 28px;
-    }
-    .info-box strong {
-      display: block;
-      font-family: var(--font-body);
-      font-size: 14px;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-    .info-box p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-    .success-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .btn-outline {
-      background: var(--surface);
-      color: var(--accent);
-      border: 1.5px solid var(--accent);
-      padding: 12px 22px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: background 0.2s, color 0.2s;
-    }
-    .btn-outline:hover { background: rgba(200,16,46,0.06); }
-    .btn-filled {
-      background: var(--accent);
-      color: #fff;
-      padding: 12px 22px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-    .btn-filled:hover { background: var(--accent-hover); }
-
-    /* ============ TOAST ============ */
-    #toast-container {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 10000;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: none;
-    }
-    .toast {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--text-secondary);
-      padding: 14px 18px;
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-size: 13px;
-      font-weight: 500;
-      min-width: 260px;
-      max-width: 360px;
-      box-shadow: 0 6px 22px rgba(0,0,0,0.10);
-      animation: slideInRight 0.3s ease forwards;
-      pointer-events: auto;
-    }
-    .toast.error { border-left-color: var(--danger); }
-    .toast.success { border-left-color: var(--success); }
-    .toast.warning { border-left-color: #F59E0B; }
-    .toast.fade-out { animation: fadeOutRight 0.3s ease forwards; }
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to   { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeOutRight {
-      to { opacity: 0; transform: translateX(20px); }
-    }
-
-    /* ============ FOOTER (same as index.html) ============ */
-    footer {
-      background: var(--bg-dark);
-      color: #F9F7F4;
-      padding: 56px 0 0;
-    }
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
-      gap: 48px;
-      padding-bottom: 40px;
-    }
-    .footer-logo {
-      font-family: var(--font-headline);
-      font-weight: 900;
-      font-size: 24px;
-      color: #fff;
-      margin-bottom: 12px;
-    }
-    .footer-tagline {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-    }
-    .socials { display: flex; gap: 14px; }
-    .socials a {
-      width: 36px; height: 36px;
-      border: 1px solid #2a2a2a;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color 0.2s ease, background 0.2s ease;
-    }
-    .socials a:hover { border-color: var(--accent); background: var(--accent); }
-    .socials svg { width: 16px; height: 16px; fill: #fff; }
-    .footer-heading {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-      text-transform: uppercase;
-    }
-    .footer-col ul li { margin-bottom: 10px; }
-    .footer-col a {
-      font-size: 14px;
-      color: var(--text-muted);
-      transition: color 0.2s ease;
-    }
-    .footer-col a:hover { color: #fff; }
-    .footer-bottom {
-      border-top: 1px solid #1c1c1c;
-      padding: 18px 0;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: #4A4A4A;
-    }
-
-    /* ============ ANIMATIONS ============ */
-    @keyframes fadeIn { to { opacity: 1; } }
-    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-
-    /* ============ RESPONSIVE ============ */
-    @media (max-width: 768px) {
-      :root { --gutter: 20px; }
-      .nav-links { display: none; }
-      .hamburger { display: flex; }
-      .btn-submit { padding: 7px 14px; font-size: 12px; }
-
-      .hero { padding: 100px 0 28px; }
-      .hero h1 { font-size: 26px; }
-      .hero-sub { font-size: 15px; }
-
-      .type-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-wrap { padding: 24px 20px; border-radius: 12px; }
-      .success-wrap { padding: 40px 22px; border-radius: 12px; }
-      .textarea { min-height: 240px; }
-      .textarea-short { min-height: 180px; }
-
-      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
-      .footer-bottom { flex-direction: column; align-items: flex-start; }
-    }
-    @media (max-width: 480px) {
-      .nav-inner { padding: 12px var(--gutter); }
-      .logo { font-size: 20px; }
-      .success-actions { flex-direction: column; }
-      .success-actions a, .success-actions button { width: 100%; }
+    @media(max-width:480px){
+      .nav-inner{padding:12px var(--gutter)}
+      .logo{font-size:20px}
+      .success-actions{flex-direction:column}
+      .success-actions a,.success-actions button{width:100%}
+      .url-input-row{flex-direction:column}
+      .btn-preview-url{width:100%;padding:12px}
     }
   </style>
 </head>
 <body>
 
-  <!-- ============ AUTH GATE LOADER ============ -->
-  <!-- Auth check hone tak ye dikhega; logged-out → profile.html redirect -->
-  <div id="authGate">
-    <div class="gate-logo">WEVOX<span class="dot">.</span></div>
-    <div class="gate-spinner"></div>
-    <div class="gate-text">Checking access…</div>
-  </div>
-
-  <!-- ============ NAVBAR ============ -->
   <header class="navbar" id="navbar">
     <div class="nav-inner">
       <a href="index.html" class="logo">WEVOX<span class="dot">.</span></a>
       <nav class="nav-links" aria-label="Primary">
         <a href="stories.html">Stories</a>
-        <a href="media.html">Videos</a>
-        <a href="news.html">News</a>
+        <a href="index.html#videos">Videos</a>
+        <a href="index.html#trending">Trending</a>
         <a href="community.html">Community</a>
         <a href="about.html">About</a>
       </nav>
-      <div class="nav-right">
-        <a href="#top" id="navSubmitBtn" class="btn-submit active" aria-current="page" title="You're on the submit page — scroll to top">Submit Story</a>
-        <div class="nav-avatar" id="navAvatar" hidden title="My Profile">W</div>
+      <div>
+        <a href="#top" id="navSubmitBtn" class="btn-submit active">Submit Story</a>
         <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
       </div>
     </div>
   </header>
 
-  <!-- ============ MOBILE OVERLAY ============ -->
-  <div class="mobile-overlay" id="mobileOverlay" aria-hidden="true">
+  <div class="mobile-overlay" id="mobileOverlay">
     <button class="close" id="overlayClose" aria-label="Close menu">✕</button>
     <a href="stories.html">Stories</a>
-    <a href="media.html">Videos</a>
-    <a href="news.html">News</a>
+    <a href="index.html#videos">Videos</a>
+    <a href="index.html#trending">Trending</a>
     <a href="community.html">Community</a>
     <a href="about.html">About</a>
-    <a href="profile.html" id="mobileProfileLink" hidden>My Profile</a>
     <a href="#top" id="mobileSubmitBtn">Submit Story</a>
   </div>
 
-  <!-- ============ HERO ============ -->
-  <section class="hero" id="top">
-    <div class="container">
-      <div class="hero-eyebrow">Submit Your Story</div>
-      <h1>Your voice. Their truth.</h1>
-      <p class="hero-sub">Verified student journalists publishing ground zero reports.</p>
-      <div class="hero-divider"></div>
+  <div class="auth-gate" id="authGate">
+    <div class="auth-gate-card">
+      <div class="icon">📰</div>
+      <h2>Sign in to submit</h2>
+      <p>WEVOX is a verified journalist platform. Sign in to your reporter account to submit stories and videos.</p>
+      <a href="profile.html" class="btn-gate">Sign In / Create Account →</a>
     </div>
-  </section>
+  </div>
 
-  <!-- ============ TYPE SELECTOR ============ -->
-  <section class="type-section">
-    <div class="container">
-      <div class="type-grid" id="typeGrid">
-        <button type="button" class="type-card" data-type="STORY" id="card-story">
-          <div class="check" aria-hidden="true">✓</div>
-          <div class="icon" aria-hidden="true">📝</div>
-          <div class="title">Write a Story</div>
-          <div class="desc">Investigative article, campus report, or opinion piece</div>
-        </button>
-        <button type="button" class="type-card" data-type="VIDEO" id="card-video">
-          <div class="check" aria-hidden="true">✓</div>
-          <div class="icon" aria-hidden="true">🎥</div>
-          <div class="title">Submit a Video</div>
-          <div class="desc">Field report, documentary, or video investigation</div>
-        </button>
+  <div id="mainContent" style="display:none">
+    <section class="hero" id="top">
+      <div class="container">
+        <div class="hero-eyebrow">Submit Your Story</div>
+        <h1>Your voice. Their truth.</h1>
+        <p class="hero-sub">Verified student journalists publishing ground zero reports.</p>
+        <div class="hero-divider"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ============ FORM ============ -->
-  <section class="form-section">
-    <div class="container">
-
-      <!-- FORM -->
-      <form class="form-wrap" id="submitForm" novalidate>
-
-        <!-- SECTION A — YOUR DETAILS -->
-        <div class="form-section-block">
-          <div class="section-label">Your Details</div>
-
-          <div class="field">
-            <label for="f-name">Full Name <span class="req">*</span></label>
-            <input type="text" class="input" id="f-name" name="authorName" placeholder="Ananya Krishnan" autocomplete="name" required />
-          </div>
-
-          <div class="field">
-            <label for="f-email">Email Address <span class="req">*</span></label>
-            <input type="email" class="input" id="f-email" name="email" placeholder="you@university.edu" autocomplete="email" required />
-            <div class="helper" id="email-helper" hidden>Linked to your logged-in account</div>
-          </div>
-
-          <div class="field">
-            <label for="f-phone">Phone Number <span class="req">*</span></label>
-            <input type="tel" class="input" id="f-phone" name="phone" placeholder="+91 98765 43210" autocomplete="tel" required />
-          </div>
-
-          <div class="field">
-            <label for="f-uni">University / College <span class="req">*</span></label>
-            <input type="text" class="input" id="f-uni" name="university" placeholder="Delhi University, North Campus" required />
-          </div>
-
-          <div class="field">
-            <label for="f-sid">Student ID <span style="color:var(--text-muted);font-weight:400;">(Optional)</span></label>
-            <input type="text" class="input" id="f-sid" name="studentId" placeholder="DU/2024/12345" />
-            <div class="helper">Optional but helps us verify faster</div>
-          </div>
+    <section class="type-section">
+      <div class="container">
+        <div class="type-grid" id="typeGrid">
+          <button type="button" class="type-card" id="card-story">
+            <div class="check">✓</div>
+            <div class="icon">📝</div>
+            <div class="title">Write a Story</div>
+            <div class="desc">Investigative article, campus report, or opinion piece</div>
+          </button>
+          <button type="button" class="type-card" id="card-video">
+            <div class="check">✓</div>
+            <div class="icon">🎥</div>
+            <div class="title">Submit a Video</div>
+            <div class="desc">Field report, documentary, or video investigation</div>
+          </button>
         </div>
+      </div>
+    </section>
 
-        <!-- SECTION B — YOUR CONTENT -->
-        <div class="form-section-block">
-          <div class="section-label">Your Content</div>
+    <section class="form-section">
+      <div class="container">
+        <form class="form-wrap" id="submitForm" novalidate>
 
-          <!-- STORY FIELDS -->
+          <div class="author-badge" id="authorBadge">
+            <div class="author-avatar" id="authorAvatar">W</div>
+            <div class="author-info">
+              <div class="author-name" id="authorName">Reporter</div>
+              <div class="author-uni" id="authorUni">—</div>
+              <div class="author-verified" id="authorVerified"></div>
+            </div>
+            <a href="profile.html" class="author-change">Edit Profile →</a>
+          </div>
+
+          <!-- STORY -->
           <div class="for-story">
-            <div class="field">
-              <label for="f-title-story">Story Title <span class="req">*</span></label>
-              <input type="text" class="input" id="f-title-story" placeholder="The Hidden Fees Plaguing State University Hostels" />
+            <div class="form-section-block">
+              <div class="section-label">Story Details</div>
+              <div class="field">
+                <label for="f-title-story">Story Title <span class="req">*</span></label>
+                <input type="text" class="input" id="f-title-story" placeholder="The Hidden Fees Plaguing State University Hostels" />
+                <!-- FEATURE: Title font selector — live preview, saved with story -->
+                <div class="title-font-row" id="titleFontRow" role="radiogroup" aria-label="Title font">
+                  <span class="title-font-label">Title font:</span>
+                  <button type="button" class="title-font-pill active" data-font="Playfair Display" style="font-family:'Playfair Display',Georgia,serif">Playfair</button>
+                  <button type="button" class="title-font-pill" data-font="Merriweather" style="font-family:'Merriweather',Georgia,serif">Merriweather</button>
+                  <button type="button" class="title-font-pill" data-font="Lora" style="font-family:'Lora',Georgia,serif">Lora</button>
+                  <button type="button" class="title-font-pill" data-font="Source Serif 4" style="font-family:'Source Serif 4',Georgia,serif">Source Serif</button>
+                  <button type="button" class="title-font-pill" data-font="Inter" style="font-family:'Inter',system-ui,sans-serif">Inter</button>
+                  <button type="button" class="title-font-pill" data-font="Roboto Slab" style="font-family:'Roboto Slab',Georgia,serif">Roboto Slab</button>
+                </div>
+                <input type="hidden" id="titleFont" name="titleFont" value="Playfair Display">
+              </div>
+              <div class="field">
+                <label for="f-cat-story">Category <span class="req">*</span></label>
+                <!-- FIX: BUG-2 -- explicit value= on every option so select.value always returns the category string -->
+                <select class="select" id="f-cat-story">
+                  <option value="">Select Category</option>
+                  <option value="Campus Fraud">Campus Fraud</option>
+                  <option value="Economy">Economy</option>
+                  <option value="Politics">Politics</option>
+                  <option value="Culture">Culture</option>
+                  <option value="Investigation">Investigation</option>
+                  <option value="Field Reports">Field Reports</option>
+                  <option value="Documentary">Documentary</option>
+                  <option value="Opinion">Opinion</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Tags <span style="color:var(--text-muted);font-weight:400">(Optional — max 5)</span></label>
+                <div class="tags-wrap" id="tags-wrap-story"><input type="text" class="tags-input" id="f-tags-story" placeholder="Add tag, press Enter…" /></div>
+                <div class="helper">Press Enter or comma to add a tag.</div>
+              </div>
             </div>
-            <div class="field">
-              <label for="f-cat-story">Category <span class="req">*</span></label>
-              <select class="select" id="f-cat-story">
-                <option value="">Select Category</option>
-                <option value="Campus Fraud">Campus Fraud</option>
-                <option value="Economy">Economy</option>
-                <option value="Politics">Politics</option>
-                <option value="Culture">Culture</option>
-                <option value="Investigation">Investigation</option>
-                <option value="Field Reports">Field Reports</option>
-                <option value="Documentary">Documentary</option>
-              </select>
+            <div class="form-section-block">
+              <div class="section-label">Cover Image <span style="color:var(--text-muted);font-weight:400;font-size:10px">(Optional)</span></div>
+              <div class="media-btn-group" id="cover-btns">
+                <button type="button" class="media-btn" data-cover="upload">📁 Upload Cover</button>
+                <button type="button" class="media-btn" data-cover="url">🔗 Cover URL</button>
+              </div>
+              <div class="media-panel" id="panel-cover-upload">
+                <div class="drop-zone" id="coverDropZone">
+                  <div class="dz-icon">🖼️</div>
+                  <div class="dz-text">Drag & drop a cover image, or <strong style="color:var(--accent)">click to browse</strong></div>
+                  <div class="dz-sub">JPG, PNG, WebP — max 10MB</div>
+                  <input type="file" id="coverFileInput" accept="image/*" />
+                </div>
+                <div class="upload-progress" id="coverUploadProgress"><div class="upload-bar" id="coverUploadBar"></div></div>
+                <div class="upload-status" id="coverUploadStatus"></div>
+                <div class="media-preview" id="coverCloudinaryPreview">
+                  <img id="coverCloudinaryThumb" src="" alt="Cover preview" />
+                  <div class="media-preview-clear"><span id="coverCloudinaryFilename">cover.jpg</span><button type="button" id="clearCoverCloudinary">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel" id="panel-cover-url">
+                <div class="url-input-row">
+                  <input type="url" class="input" id="f-cover-url" placeholder="https://example.com/cover.jpg" />
+                  <button type="button" class="btn-preview-url" id="btn-preview-cover-url">Preview</button>
+                </div>
+                <div class="media-preview" id="coverUrlPreview">
+                  <img id="coverUrlThumb" src="" alt="Cover preview" />
+                  <div class="media-preview-clear"><span>Cover preview</span><button type="button" id="clearCoverUrl">✕ Remove</button></div>
+                </div>
+              </div>
+              <input type="hidden" id="coverImage" name="coverImage" value="">
+              <input type="hidden" id="coverImageType" name="coverImageType" value="">
             </div>
-            <div class="field">
-              <label for="f-img-story">Cover Image URL <span style="color:var(--text-muted);font-weight:400;">(Optional)</span></label>
-              <input type="url" class="input" id="f-img-story" placeholder="https://..." />
-              <div class="helper">Direct image link (Google Drive, ImgBB, etc)</div>
+            <div class="form-section-block">
+              <div class="section-label">Article Body <span class="req">*</span></div>
+              <div id="story-editor"></div>
+              <div class="editor-meta"><span class="word-count" id="word-count">0 words</span></div>
             </div>
-            <div class="field">
-              <label for="f-content">Your Story <span class="req">*</span></label>
-              <div class="textarea-wrap">
-                <textarea class="textarea" id="f-content" maxlength="5000" placeholder="Write your full investigative report here. Include all facts, quotes, and evidence..."></textarea>
-                <div class="char-counter" id="char-counter"><span id="char-count">0</span> / 5000 characters</div>
+            <div class="form-section-block">
+              <div class="section-label">Media <span style="color:var(--text-muted);font-weight:400;font-size:10px">(Optional)</span></div>
+              <div class="media-btn-group" id="media-btns-story">
+                <button type="button" class="media-btn" data-media="cloudinary">📁 Upload Image</button>
+                <button type="button" class="media-btn" data-media="url_image">🔗 Image from URL</button>
+                <button type="button" class="media-btn" data-media="youtube">▶️ Embed YouTube</button>
+                <button type="button" class="media-btn" data-media="tweet">🐦 Embed Tweet/X</button>
+                <button type="button" class="media-btn" data-media="instagram">📷 Embed Instagram</button>
+              </div>
+              <div class="media-panel" id="panel-cloudinary">
+                <div class="drop-zone" id="dropZone">
+                  <div class="dz-icon">📁</div>
+                  <div class="dz-text">Drag & drop an image, or <strong style="color:var(--accent)">click to browse</strong></div>
+                  <div class="dz-sub">JPG, PNG, WebP — max 10MB</div>
+                  <input type="file" id="fileInput" accept="image/*" />
+                </div>
+                <div class="upload-progress" id="uploadProgress"><div class="upload-bar" id="uploadBar"></div></div>
+                <div class="upload-status" id="uploadStatus"></div>
+                <div class="media-preview" id="cloudinaryPreview">
+                  <img id="cloudinaryThumb" src="" alt="Preview" />
+                  <div class="media-preview-clear"><span id="cloudinaryFilename">image.jpg</span><button type="button" id="clearCloudinary">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel" id="panel-url_image">
+                <div class="url-input-row">
+                  <input type="url" class="input" id="f-img-url" placeholder="https://example.com/image.jpg" />
+                  <button type="button" class="btn-preview-url" id="btn-preview-url">Preview</button>
+                </div>
+                <div class="media-preview" id="urlImagePreview">
+                  <img id="urlImageThumb" src="" alt="Preview" />
+                  <div class="media-preview-clear"><span>Image preview</span><button type="button" id="clearUrlImage">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel" id="panel-youtube">
+                <div class="url-input-row">
+                  <input type="text" class="input" id="f-yt-url" placeholder="https://youtube.com/watch?v=… or video ID" />
+                  <button type="button" class="btn-preview-url" id="btn-preview-yt">Embed</button>
+                </div>
+                <div class="embed-preview" id="ytPreview">
+                  <iframe id="ytFrame" src="" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" loading="lazy"></iframe>
+                  <div class="media-preview-clear"><span>YouTube embedded</span><button type="button" id="clearYt">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel" id="panel-tweet">
+                <div class="url-input-row">
+                  <input type="url" class="input" id="f-tweet-url" placeholder="https://twitter.com/user/status/… or x.com/…" />
+                  <button type="button" class="btn-preview-url" id="btn-preview-tweet">Embed</button>
+                </div>
+                <div class="embed-preview" id="tweetPreview">
+                  <div style="padding:16px" id="tweetContainer"></div>
+                  <div class="media-preview-clear"><span>Tweet embedded</span><button type="button" id="clearTweet">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel" id="panel-instagram">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px">Open the Instagram post → ⋯ → Embed → Copy embed code, then paste below.</p>
+                <div class="ig-embed-wrap" style="border:1px solid var(--border);border-radius:8px">
+                  <textarea class="inp-embed" id="f-ig-embed" placeholder="&lt;blockquote class=&quot;instagram-media&quot;…"></textarea>
+                  <button type="button" class="btn-preview-url" style="margin:8px;width:calc(100% - 16px);padding:10px" id="btn-preview-ig">Apply Embed Code</button>
+                </div>
+                <div id="igPreviewContainer"></div>
               </div>
             </div>
           </div>
 
-          <!-- VIDEO FIELDS -->
+          <!-- VIDEO -->
           <div class="for-video">
-            <div class="field">
-              <label for="f-title-video">Video Title <span class="req">*</span></label>
-              <input type="text" class="input" id="f-title-video" placeholder="The Silent Protest: Voices from the Midnight March" />
+            <div class="form-section-block">
+              <div class="section-label">Video Details</div>
+              <div class="field">
+                <label for="f-title-video">Video Title <span class="req">*</span></label>
+                <input type="text" class="input" id="f-title-video" placeholder="The Silent Protest: Voices from the Midnight March" />
+              </div>
+              <div class="field">
+                <label for="f-cat-video">Category <span class="req">*</span></label>
+                <!-- FIX: BUG-2 -- explicit value= on every option so select.value always returns the category string -->
+                <select class="select" id="f-cat-video">
+                  <option value="">Select Category</option>
+                  <option value="Campus Fraud">Campus Fraud</option>
+                  <option value="Economy">Economy</option>
+                  <option value="Politics">Politics</option>
+                  <option value="Culture">Culture</option>
+                  <option value="Investigation">Investigation</option>
+                  <option value="Field Reports">Field Reports</option>
+                  <option value="Documentary">Documentary</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="f-desc">Video Description <span class="req">*</span></label>
+                <textarea class="input" id="f-desc" rows="4" placeholder="Describe what your video covers, who was interviewed, and key findings…" style="resize:vertical;min-height:120px"></textarea>
+              </div>
+              <div class="field">
+                <label>Tags <span style="color:var(--text-muted);font-weight:400">(Optional)</span></label>
+                <div class="tags-wrap" id="tags-wrap-video"><input type="text" class="tags-input" id="f-tags-video" placeholder="Add tag, press Enter…" /></div>
+              </div>
             </div>
-            <div class="field">
-              <label for="f-cat-video">Category <span class="req">*</span></label>
-              <select class="select" id="f-cat-video">
-                <option value="">Select Category</option>
-                <option value="Campus Fraud">Campus Fraud</option>
-                <option value="Economy">Economy</option>
-                <option value="Politics">Politics</option>
-                <option value="Culture">Culture</option>
-                <option value="Investigation">Investigation</option>
-                <option value="Field Reports">Field Reports</option>
-                <option value="Documentary">Documentary</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="f-vidurl">YouTube / Drive Video Link <span class="req">*</span></label>
-              <input type="url" class="input" id="f-vidurl" placeholder="https://youtube.com/..." />
-              <div class="helper">Paste YouTube, Google Drive, or any public video link</div>
-            </div>
-            <div class="field">
-              <label for="f-img-video">Thumbnail URL <span style="color:var(--text-muted);font-weight:400;">(Optional)</span></label>
-              <input type="url" class="input" id="f-img-video" placeholder="https://..." />
-            </div>
-            <div class="field">
-              <label for="f-desc">Video Description <span class="req">*</span></label>
-              <textarea class="textarea textarea-short" id="f-desc" placeholder="Describe what your video covers, who was interviewed, and key findings..."></textarea>
+            <div class="form-section-block">
+              <div class="section-label">Video / Media <span class="req">*</span></div>
+              <div class="media-btn-group" id="media-btns-video">
+                <button type="button" class="media-btn" data-media-video="cloudinary_v">📁 Upload Thumbnail</button>
+                <button type="button" class="media-btn" data-media-video="url_image_v">🔗 Thumbnail URL</button>
+                <button type="button" class="media-btn active" data-media-video="youtube_v">▶️ Embed YouTube</button>
+                <button type="button" class="media-btn" data-media-video="tweet_v">🐦 Embed Tweet/X</button>
+                <button type="button" class="media-btn" data-media-video="instagram_v">📷 Embed Instagram</button>
+              </div>
+              <div class="media-panel" id="panel-cloudinary_v">
+                <div class="drop-zone" id="dropZoneV">
+                  <div class="dz-icon">📁</div>
+                  <div class="dz-text">Upload a thumbnail image</div>
+                  <div class="dz-sub">JPG, PNG, WebP — max 10MB</div>
+                  <input type="file" id="fileInputV" accept="image/*" />
+                </div>
+                <div class="upload-progress" id="uploadProgressV"><div class="upload-bar" id="uploadBarV"></div></div>
+                <div class="upload-status" id="uploadStatusV"></div>
+                <div class="media-preview" id="cloudinaryPreviewV">
+                  <img id="cloudinaryThumbV" src="" alt="Preview" />
+                  <div class="media-preview-clear"><span id="cloudinaryFilenameV">image.jpg</span><button type="button" id="clearCloudinaryV">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel" id="panel-url_image_v">
+                <div class="url-input-row">
+                  <input type="url" class="input" id="f-thumb-url" placeholder="https://example.com/thumbnail.jpg" />
+                  <button type="button" class="btn-preview-url" id="btn-preview-thumb">Preview</button>
+                </div>
+                <div class="media-preview" id="thumbPreview">
+                  <img id="thumbImg" src="" alt="Thumbnail" />
+                  <div class="media-preview-clear"><span>Thumbnail preview</span><button type="button" id="clearThumb">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel show" id="panel-youtube_v">
+                <div class="url-input-row">
+                  <input type="text" class="input" id="f-yt-url-v" placeholder="https://youtube.com/watch?v=… or video ID" />
+                  <button type="button" class="btn-preview-url" id="btn-preview-yt-v">Embed</button>
+                </div>
+                <div class="embed-preview" id="ytPreviewV">
+                  <iframe id="ytFrameV" src="" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" loading="lazy"></iframe>
+                  <div class="media-preview-clear"><span>YouTube embedded</span><button type="button" id="clearYtV">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel" id="panel-tweet_v">
+                <div class="url-input-row">
+                  <input type="url" class="input" id="f-tweet-url-v" placeholder="https://twitter.com/user/status/…" />
+                  <button type="button" class="btn-preview-url" id="btn-preview-tweet-v">Embed</button>
+                </div>
+                <div class="embed-preview" id="tweetPreviewV">
+                  <div style="padding:16px" id="tweetContainerV"></div>
+                  <div class="media-preview-clear"><span>Tweet embedded</span><button type="button" id="clearTweetV">✕ Remove</button></div>
+                </div>
+              </div>
+              <div class="media-panel" id="panel-instagram_v">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px">Open the Instagram post → ⋯ → Embed → Copy embed code, then paste below.</p>
+                <div class="ig-embed-wrap" style="border:1px solid var(--border);border-radius:8px">
+                  <textarea class="inp-embed" id="f-ig-embed-v" placeholder="&lt;blockquote class=&quot;instagram-media&quot;…"></textarea>
+                  <button type="button" class="btn-preview-url" style="margin:8px;width:calc(100% - 16px);padding:10px" id="btn-preview-ig-v">Apply Embed Code</button>
+                </div>
+                <div id="igPreviewContainerV"></div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- SECTION C — DECLARATION -->
-        <div class="form-section-block">
-          <div class="section-label">Declaration</div>
+          <input type="hidden" id="mediaUrl" name="mediaUrl" value="">
+          <input type="hidden" id="mediaEmbed" name="mediaEmbed" value="">
+          <input type="hidden" id="mediaType" name="mediaType" value="">
+          <input type="hidden" id="allEmbeds" name="allEmbeds" value="">
 
-          <label class="check-row" id="row-decl1">
-            <input type="checkbox" id="decl1" />
-            <span class="check-box" aria-hidden="true"></span>
-            <span class="check-text">I confirm this is my original reporting and all facts are verified to the best of my ability</span>
-          </label>
+          <div class="form-section-block">
+            <div class="section-label">Declaration</div>
+            <label class="check-row" id="row-decl1">
+              <input type="checkbox" id="decl1" /><span class="check-box"></span>
+              <span class="check-text">I confirm this is my original reporting and all facts are verified to the best of my ability</span>
+            </label>
+            <label class="check-row" id="row-decl2">
+              <input type="checkbox" id="decl2" /><span class="check-box"></span>
+              <span class="check-text">I agree that WEVOX may publish, edit for clarity, and share this content across platforms</span>
+            </label>
+          </div>
 
-          <label class="check-row" id="row-decl2">
-            <input type="checkbox" id="decl2" />
-            <span class="check-box" aria-hidden="true"></span>
-            <span class="check-text">I agree that WEVOX may publish, edit for clarity, and share this content across platforms</span>
-          </label>
-        </div>
+          <button type="submit" class="btn-primary" id="btnSubmit">
+            <span id="btnText">Submit for Review →</span>
+          </button>
+        </form>
 
-        <button type="submit" class="btn-primary" id="btnSubmit">
-          <span id="btnText">Submit for Review →</span>
-        </button>
-      </form>
-
-      <!-- SUCCESS STATE -->
-      <div class="success-wrap" id="successWrap" aria-live="polite">
-        <div class="success-check" aria-hidden="true">✓</div>
-        <h2>Submitted Successfully!</h2>
-        <p class="success-sub">
-          Your submission is under review. We'll contact you at
-          <strong id="success-email" style="color:var(--text-primary);">your email</strong>
-          within 24-48 hours.
-        </p>
-        <div class="info-box">
-          <strong>📋 What happens next?</strong>
-          <p>Our editorial team will review your submission within 24 hours. If approved, it will be published with your byline on WEVOX — and it'll show up in your Profile dashboard.</p>
-        </div>
-        <div class="success-actions">
-          <a href="profile.html" class="btn-outline">View My Profile</a>
-          <button type="button" class="btn-filled" id="btnAnother">Submit Another</button>
+        <div class="success-wrap" id="successWrap">
+          <div class="success-check">✓</div>
+          <h2>Submitted Successfully!</h2>
+          <p class="success-sub">Your submission is under review. Our editorial team will contact you within 24–48 hours.</p>
+          <div class="info-box">
+            <strong>📋 What happens next?</strong>
+            <p>Our editorial team will review your submission within 24 hours. If approved, it will be published with your byline on WEVOX.</p>
+          </div>
+          <div class="success-actions">
+            <a href="index.html" class="btn-outline">← Back to Home</a>
+            <button type="button" class="btn-filled" id="btnAnother">Submit Another</button>
+          </div>
         </div>
       </div>
+    </section>
+  </div>
 
-    </div>
-  </section>
-
-  <!-- ============ FOOTER ============ -->
   <footer>
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
           <div class="footer-logo">WEVOX<span style="color:var(--accent)">.</span></div>
           <p class="footer-tagline">Student journalism. No filters.</p>
-          <div class="socials" aria-label="Social media">
-            <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><svg viewBox="0 0 24 24"><path d="M22 5.8c-.7.3-1.5.5-2.4.6.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1-.7-.8-1.8-1.3-3-1.3-2.3 0-4.1 1.8-4.1 4.1 0 .3 0 .6.1.9-3.4-.2-6.4-1.8-8.4-4.3-.4.6-.6 1.3-.6 2.1 0 1.4.7 2.7 1.8 3.4-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2.1 2.8 3.9 2.9-1.4 1.1-3.2 1.8-5.2 1.8H2c1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg></a>
-            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23 12c0-2-.2-3.5-.4-4.4-.2-.6-.8-1.2-1.4-1.4C19.5 5.8 12 5.8 12 5.8s-7.5 0-9.2.4c-.6.2-1.2.8-1.4 1.4-.4 1.7-.4 5.4-.4 5.4s0 3.7.4 5.4c.2.6.8 1.2 1.4 1.4 1.7.4 9.2.4 9.2.4s7.5 0 9.2-.4c.6-.2 1.2-.8 1.4-1.4.2-.9.4-2.4.4-4.4zM9.6 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg></a>
-            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.9.9 1.4.2.4.4 1 .4 2.2.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.9.7-1.4.9-.4.2-1 .4-2.2.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.9-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.9-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 2c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4-1.2-.1-1.6-.1-4.7-.1zm0 3.4a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 7.2a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6zm5.6-7.4a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
+          <div class="socials">
+            <a href="https://twitter.com/"><svg viewBox="0 0 24 24"><path d="M22 5.8c-.7.3-1.5.5-2.4.6.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1-.7-.8-1.8-1.3-3-1.3-2.3 0-4.1 1.8-4.1 4.1 0 .3 0 .6.1.9-3.4-.2-6.4-1.8-8.4-4.3-.4.6-.6 1.3-.6 2.1 0 1.4.7 2.7 1.8 3.4-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2.1 2.8 3.9 2.9-1.4 1.1-3.2 1.8-5.2 1.8H2c1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg></a>
+            <a href="https://www.youtube.com/"><svg viewBox="0 0 24 24"><path d="M23 12c0-2-.2-3.5-.4-4.4-.2-.6-.8-1.2-1.4-1.4C19.5 5.8 12 5.8 12 5.8s-7.5 0-9.2.4c-.6.2-1.2.8-1.4 1.4-.4 1.7-.4 5.4-.4 5.4s0 3.7.4 5.4c.2.6.8 1.2 1.4 1.4 1.7.4 9.2.4 9.2.4s7.5 0 9.2-.4c.6-.2 1.2-.8 1.4-1.4.2-.9.4-2.4.4-4.4zM9.6 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg></a>
+            <a href="https://www.instagram.com/"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.9.9 1.4.2.4.4 1 .4 2.2.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.9.7-1.4.9-.4.2-1 .4-2.2.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.9-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.9-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 2c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4-1.2-.1-1.6-.1-4.7-.1zm0 3.4a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 7.2a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6zm5.6-7.4a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
           </div>
         </div>
         <div class="footer-col">
           <div class="footer-heading">Explore</div>
           <ul>
             <li><a href="stories.html">Stories</a></li>
-            <li><a href="media.html">Videos</a></li>
-            <li><a href="news.html">News</a></li>
+            <li><a href="index.html#videos">Videos</a></li>
+            <li><a href="index.html#trending">Trending</a></li>
             <li><a href="community.html">Community</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="submit.html">Submit Story</a></li>
@@ -1019,406 +663,493 @@
     </div>
   </footer>
 
-  <!-- ============ TOAST CONTAINER ============ -->
-  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <div id="toast-container"></div>
 
-  <!-- Firebase v9 Compat Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
   <script>
-    // ==========================================
-    // FIREBASE CONFIG (same as admin.html)
-    // ==========================================
-    const firebaseConfig = {
-      apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
-      authDomain: "cjnsite-d3f3f.firebaseapp.com",
-      projectId: "cjnsite-d3f3f",
-      storageBucket: "cjnsite-d3f3f.firebasestorage.app",
-      messagingSenderId: "491318197551",
-      appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
-      measurementId: "G-JES3G3L45V"
-    };
+    const firebaseConfig={apiKey:"AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",authDomain:"cjnsite-d3f3f.firebaseapp.com",projectId:"cjnsite-d3f3f",storageBucket:"cjnsite-d3f3f.firebasestorage.app",messagingSenderId:"491318197551",appId:"1:491318197551:web:5a3c8fd938d94d924cf5da",measurementId:"G-JES3G3L45V"};
+    let db=null,auth=null,currentUser=null,currentUserDoc=null;
+    try{firebase.initializeApp(firebaseConfig);db=firebase.firestore();auth=firebase.auth();}catch(e){console.error('Firebase:',e);}
+    const $id=id=>document.getElementById(id);
 
-    let db = null;
-    let auth = null;
-    try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-      auth = firebase.auth();
-    } catch (e) {
-      console.error("Firebase init error:", e);
-    }
-
-    // ==========================================
-    // DOM REFS
-    // ==========================================
-    const $ = (sel) => document.querySelector(sel);
-
-    const cardStory   = $('#card-story');
-    const cardVideo   = $('#card-video');
-    const formEl      = $('#submitForm');
-    const successWrap = $('#successWrap');
-    const btnSubmit   = $('#btnSubmit');
-    const btnText     = $('#btnText');
-    const btnAnother  = $('#btnAnother');
-
-    let selectedType = null;     // 'STORY' | 'VIDEO'
-    let currentUser  = null;     // logged-in Firebase user
-
-    // ==========================================
-    // AUTH GATE
-    // ------------------------------------------
-    // Logged-out users ko login (profile.html) bhej do.
-    // Login ke baad wapas submit.html laane ke liye sessionStorage me flag.
-    // ==========================================
-    function initials(name) {
-      if (!name) return 'W';
-      return name.split(/\s+/).map(p => p[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
-    }
-
-    function unlockPage(user) {
-      currentUser = user;
-      // Gate hatao
-      const gate = $('#authGate');
-      gate.classList.add('hide');
-      setTimeout(() => { gate.style.display = 'none'; }, 320);
-
-      // Navbar avatar dikhao
-      const nm = user.displayName || (user.email || 'Reporter').split('@')[0];
-      const av = $('#navAvatar');
-      av.textContent = initials(nm);
-      av.hidden = false;
-      av.addEventListener('click', () => { window.location.href = 'profile.html'; });
-      const mpl = $('#mobileProfileLink');
-      if (mpl) mpl.hidden = false;
-
-      // Account details prefill
-      if (user.displayName) { $('#f-name').value = user.displayName; }
-      if (user.email) {
-        const em = $('#f-email');
-        em.value = user.email;
-        em.setAttribute('readonly', 'readonly');
-        $('#email-helper').hidden = false;
-      }
-    }
-
-    if (auth) {
-      auth.onAuthStateChanged((user) => {
-        if (user) {
-          unlockPage(user);
-        } else {
-          // login ke baad yahin wapas aao
-          try { sessionStorage.setItem('redirectAfterLogin', 'submit.html' + window.location.search); } catch (e) {}
-          window.location.replace('profile.html');
+    if(auth){
+      // Fallback: if Firebase doesn't respond in 5s, show content anyway
+      const authTimeout=setTimeout(()=>{
+        if($id('mainContent').style.display==='none'&&!$id('authGate').classList.contains('show')){
+          $id('mainContent').style.display='block';
         }
+      },5000);
+      auth.onAuthStateChanged(async user=>{
+        clearTimeout(authTimeout);
+        if(user){currentUser=user;await loadUserDoc(user.uid);showMainContent();}
+        else{showAuthGate();}
       });
-    } else {
-      // Firebase init fail — gate hata do taaki page kam se kam dikhe (demo/dev)
-      const gate = $('#authGate');
-      gate.classList.add('hide');
-      setTimeout(() => { gate.style.display = 'none'; }, 320);
+    }
+    else{showAuthGate();}
+
+    async function loadUserDoc(uid){
+      try{const snap=await db.collection('users').doc(uid).get();currentUserDoc=snap.exists?snap.data():null;}
+      catch(e){console.warn('loadUserDoc:',e);currentUserDoc=null;}
+      renderAuthorBadge();
+    }
+    function initials(name){if(!name)return 'W';return name.split(/\s+/).map(p=>p[0]).filter(Boolean).slice(0,2).join('').toUpperCase();}
+    function renderAuthorBadge(){
+      const u=currentUserDoc||{};
+      const name=u.name||(currentUser&&currentUser.displayName)||(currentUser&&currentUser.email&&currentUser.email.split('@')[0])||'Reporter';
+      $id('authorAvatar').textContent=initials(name);
+      $id('authorName').textContent=name;
+      $id('authorUni').textContent=u.university||'Independent';
+      $id('authorVerified').textContent=u.verified?'✓ VERIFIED REPORTER':'';
+      $id('authorBadge').classList.add('show');
+    }
+    function showAuthGate(){$id('authGate').classList.add('show');$id('mainContent').style.display='none';}
+    function showMainContent(){
+      $id('authGate').classList.remove('show');
+      $id('mainContent').style.display='block';
+      $id('mainContent').style.visibility='visible';
+      const params=new URLSearchParams(window.location.search);
+      const t=(params.get('type')||'').toLowerCase();
+      if(t==='story')selectType('STORY');else if(t==='video')selectType('VIDEO');
     }
 
-    // ==========================================
-    // NAVBAR — scroll shadow + mobile overlay
-    // ==========================================
-    const navbar = $('#navbar');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 12) navbar.classList.add('scrolled');
-      else navbar.classList.remove('scrolled');
-    });
+    window.addEventListener('scroll',()=>$id('navbar').classList.toggle('scrolled',window.scrollY>12));
+    $id('hamburger').addEventListener('click',()=>$id('mobileOverlay').classList.add('open'));
+    $id('overlayClose').addEventListener('click',()=>$id('mobileOverlay').classList.remove('open'));
+    $id('mobileOverlay').querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>$id('mobileOverlay').classList.remove('open')));
+    function scrollToHero(e){if(e)e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});const ey=document.querySelector('.hero-eyebrow');if(ey){ey.style.transition='transform .35s ease';ey.style.transform='scale(1.06)';setTimeout(()=>ey.style.transform='',450);}}
+    $id('navSubmitBtn').addEventListener('click',scrollToHero);
+    $id('mobileSubmitBtn').addEventListener('click',scrollToHero);
+    $id('copy-year').textContent=new Date().getFullYear();
 
-    const hamburger = $('#hamburger');
-    const mobileOverlay = $('#mobileOverlay');
-    const overlayClose = $('#overlayClose');
-    hamburger.addEventListener('click', () => {
-      mobileOverlay.classList.add('open');
-      mobileOverlay.setAttribute('aria-hidden', 'false');
-    });
-    overlayClose.addEventListener('click', () => {
-      mobileOverlay.classList.remove('open');
-      mobileOverlay.setAttribute('aria-hidden', 'true');
-    });
-    mobileOverlay.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        mobileOverlay.classList.remove('open');
-        mobileOverlay.setAttribute('aria-hidden', 'true');
-      });
-    });
-
-    // ==========================================
-    // SUBMIT STORY BUTTON (on the submit page itself)
-    // ==========================================
-    function scrollToHeroWithPulse(e) {
-      if (e) e.preventDefault();
-      const hero = document.getElementById('top');
-      if (!hero) return;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      const eyebrow = hero.querySelector('.hero-eyebrow');
-      if (eyebrow) {
-        eyebrow.style.transition = 'transform 0.35s ease, color 0.35s ease';
-        eyebrow.style.transform = 'scale(1.06)';
-        const orig = eyebrow.style.color;
-        eyebrow.style.color = 'var(--accent-hover)';
-        setTimeout(() => {
-          eyebrow.style.transform = '';
-          eyebrow.style.color = orig;
-        }, 450);
-      }
+    const cardStory=$id('card-story'),cardVideo=$id('card-video'),formEl=$id('submitForm');
+    let selectedType=null;
+    function selectType(type){
+      selectedType=type;
+      cardStory.classList.toggle('selected',type==='STORY');
+      cardVideo.classList.toggle('selected',type==='VIDEO');
+      formEl.dataset.type=type;formEl.classList.add('show');
+      if(type==='STORY')setTimeout(initQuill,100);
+      setTimeout(()=>{const top=formEl.getBoundingClientRect().top+window.scrollY-80;if(window.scrollY<top-200)window.scrollTo({top,behavior:'smooth'});},60);
     }
-    const navSubmitBtn = $('#navSubmitBtn');
-    if (navSubmitBtn) navSubmitBtn.addEventListener('click', scrollToHeroWithPulse);
-    const mobileSubmitBtn = $('#mobileSubmitBtn');
-    if (mobileSubmitBtn) mobileSubmitBtn.addEventListener('click', scrollToHeroWithPulse);
+    cardStory.addEventListener('click',()=>selectType('STORY'));
+    cardVideo.addEventListener('click',()=>selectType('VIDEO'));
 
-    // Footer year
-    $('#copy-year').textContent = new Date().getFullYear();
+    let quill=null;
+    // ===== Custom Quill BlockEmbed Blots for YouTube / Tweet / Instagram =====
+    // Quill 1.3.7 strips raw iframes/blockquotes from delta. Registering proper BlockEmbeds
+    // lets the editor render and persist them inside quill.root.innerHTML so saved content
+    // round-trips correctly (submit -> Firestore -> story.html).
+    function registerEmbedBlots(){
+      if(!window.Quill||window.Quill.__wevoxBlotsRegistered)return;
+      const BlockEmbed=window.Quill.import('blots/block/embed');
 
-    // ==========================================
-    // TYPE SELECTOR
-    // ==========================================
-    function selectType(type) {
-      selectedType = type;
-      cardStory.classList.toggle('selected', type === 'STORY');
-      cardVideo.classList.toggle('selected', type === 'VIDEO');
-      formEl.dataset.type = type;
-      formEl.classList.add('show');
-
-      setTimeout(() => {
-        const top = formEl.getBoundingClientRect().top + window.scrollY - 80;
-        if (window.scrollY < top - 200) {
-          window.scrollTo({ top, behavior: 'smooth' });
+      class VideoBlot extends BlockEmbed{
+        static create(value){
+          const node=super.create();
+          const id=(value&&value.id)||'';
+          node.setAttribute('class','embed-yt');
+          node.setAttribute('data-yt-id',id);
+          node.setAttribute('contenteditable','false');
+          const iframe=document.createElement('iframe');
+          iframe.setAttribute('src','https://www.youtube.com/embed/'+id);
+          iframe.setAttribute('frameborder','0');
+          iframe.setAttribute('allowfullscreen','true');
+          iframe.setAttribute('allow','accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture');
+          iframe.setAttribute('loading','lazy');
+          node.appendChild(iframe);
+          return node;
         }
-      }, 60);
+        static value(node){return {id:node.getAttribute('data-yt-id')||''};}
+      }
+      VideoBlot.blotName='wevox-yt';
+      VideoBlot.tagName='div';
+      VideoBlot.className='embed-yt';
+
+      class TweetBlot extends BlockEmbed{
+        static create(value){
+          const node=super.create();
+          const url=(value&&value.url)||'';
+          node.setAttribute('contenteditable','false');
+          // Match Twitter widget markup so widgets.js can hydrate it
+          const bq=document.createElement('blockquote');
+          bq.setAttribute('class','twitter-tweet');
+          bq.setAttribute('data-wevox-tweet','1');
+          const a=document.createElement('a');
+          a.setAttribute('href',url);
+          a.textContent=url;
+          bq.appendChild(a);
+          node.appendChild(bq);
+          return node;
+        }
+        static value(node){const a=node.querySelector('a');return {url:a?a.getAttribute('href'):''};}
+      }
+      TweetBlot.blotName='wevox-tweet';
+      TweetBlot.tagName='div';
+      TweetBlot.className='embed-tweet';
+
+      class InstagramBlot extends BlockEmbed{
+        static create(value){
+          const node=super.create();
+          const html=(value&&value.html)||'';
+          node.setAttribute('contenteditable','false');
+          node.setAttribute('data-ig','1');
+          // Trust IG official embed code only; render as-is so instgrm.Embeds.process() hydrates it
+          const wrap=document.createElement('div');
+          wrap.innerHTML=html;
+          // Only keep a blockquote.instagram-media if found
+          const bq=wrap.querySelector('blockquote.instagram-media');
+          if(bq)node.appendChild(bq);
+          else{const fb=document.createElement('div');fb.textContent='[Instagram embed]';node.appendChild(fb);}
+          return node;
+        }
+        static value(node){const bq=node.querySelector('blockquote.instagram-media');return {html:bq?bq.outerHTML:''};}
+      }
+      InstagramBlot.blotName='wevox-ig';
+      InstagramBlot.tagName='div';
+      InstagramBlot.className='embed-ig';
+
+      window.Quill.register(VideoBlot,true);
+      window.Quill.register(TweetBlot,true);
+      window.Quill.register(InstagramBlot,true);
+      window.Quill.__wevoxBlotsRegistered=true;
     }
 
-    cardStory.addEventListener('click', () => selectType('STORY'));
-    cardVideo.addEventListener('click', () => selectType('VIDEO'));
+    function initQuill(){
+      if(quill)return;
+      registerEmbedBlots();
+      quill=new Quill('#story-editor',{theme:'snow',placeholder:'Write your full investigative report here. Include all facts, quotes, and evidence…',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline'],['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']]}});
+      quill.on('text-change',()=>{const words=quill.getText().trim().split(/\s+/).filter(Boolean).length;const wc=$id('word-count');wc.textContent=words+' words';wc.classList.toggle('warn',words>2000);});
+    }
 
-    (function preselectFromQuery() {
-      const params = new URLSearchParams(window.location.search);
-      const t = (params.get('type') || '').toLowerCase();
-      if (t === 'story') selectType('STORY');
-      else if (t === 'video') selectType('VIDEO');
+    function initTags(wrapId,inputId){
+      const wrap=$id(wrapId),inp=$id(inputId);const tags=[];
+      wrap.addEventListener('click',()=>inp.focus());
+      inp.addEventListener('keydown',e=>{
+        if((e.key==='Enter'||e.key===',')&&inp.value.trim()){e.preventDefault();const val=inp.value.trim().replace(/,/g,'');if(val&&!tags.includes(val)&&tags.length<5){tags.push(val);renderTags();inp.value='';}}
+        else if(e.key==='Backspace'&&!inp.value&&tags.length){tags.pop();renderTags();}
+      });
+      function renderTags(){wrap.querySelectorAll('.tag-chip').forEach(c=>c.remove());tags.forEach((t,i)=>{const chip=document.createElement('span');chip.className='tag-chip';chip.innerHTML=t+'<button type="button">×</button>';chip.querySelector('button').addEventListener('click',()=>{tags.splice(i,1);renderTags();});wrap.insertBefore(chip,inp);});}
+      return{getTags:()=>[...tags]};
+    }
+    const storyTags=initTags('tags-wrap-story','f-tags-story');
+    const videoTags=initTags('tags-wrap-video','f-tags-video');
+
+    // FEATURE: Title font selector — live preview on title input + save selected family to hidden field
+    (function initTitleFontPicker(){
+      const row=$id('titleFontRow'),titleInp=$id('f-title-story'),hidden=$id('titleFont');
+      if(!row||!titleInp||!hidden)return;
+      function apply(font){
+        hidden.value=font;
+        const fallback=(font==='Inter')?',system-ui,-apple-system,sans-serif':',Georgia,serif';
+        titleInp.style.fontFamily="'"+font+"'"+fallback;
+        row.querySelectorAll('.title-font-pill').forEach(p=>p.classList.toggle('active',p.getAttribute('data-font')===font));
+      }
+      row.addEventListener('click',e=>{
+        const btn=e.target.closest('.title-font-pill');if(!btn)return;
+        apply(btn.getAttribute('data-font'));
+      });
+      apply(hidden.value||'Playfair Display');
     })();
 
-    // ==========================================
-    // CHARACTER COUNTER (Story content)
-    // ==========================================
-    const contentEl = $('#f-content');
-    const charCount = $('#char-count');
-    const charCounter = $('#char-counter');
-    contentEl.addEventListener('input', () => {
-      const len = contentEl.value.length;
-      charCount.textContent = len;
-      if (len >= 4500) charCounter.classList.add('warn');
-      else charCounter.classList.remove('warn');
-    });
+    // Cloudinary constants
+    const CL_URL='https://api.cloudinary.com/v1_1/dagtpo1vk/image/upload';
+    const CL_PRESET='wevox_unsigned';
 
-    // ==========================================
-    // TOAST
-    // ==========================================
-    function toast(msg, type = 'info', duration = 3500) {
-      const container = $('#toast-container');
-      const t = document.createElement('div');
-      t.className = `toast ${type}`;
-      t.textContent = msg;
-      container.appendChild(t);
-      setTimeout(() => {
-        t.classList.add('fade-out');
-        setTimeout(() => t.remove(), 300);
-      }, duration);
-    }
-
-    // ==========================================
-    // VALIDATION HELPERS
-    // ==========================================
-    function markError(el) {
-      if (!el) return;
-      el.classList.add('error', 'shake');
-      setTimeout(() => el.classList.remove('shake'), 450);
-    }
-    function clearErrors() {
-      formEl.querySelectorAll('.error').forEach(n => n.classList.remove('error'));
-    }
-    formEl.addEventListener('input', (e) => {
-      if (e.target.classList && e.target.classList.contains('error')) {
-        e.target.classList.remove('error');
+    // Generic Cloudinary upload — onSuccess callback for extra actions
+    function setupUpload(dzId,fiId,progId,barId,statId,prevId,thumbId,fnId,clearId,onSuccess){
+      const dz=$id(dzId),fi=$id(fiId);
+      dz.addEventListener('click',()=>fi.click());
+      dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+      dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+      dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])doUpload(e.dataTransfer.files[0]);});
+      fi.addEventListener('change',()=>{if(fi.files[0])doUpload(fi.files[0]);});
+      $id(clearId).addEventListener('click',()=>{$id(prevId).classList.remove('show');$id('mediaUrl').value='';fi.value='';});
+      function doUpload(file){
+        if(!file.type.startsWith('image/')){toast('Please select an image file.','error');return;}
+        if(file.size>10*1024*1024){toast('File too large. Max 10MB.','error');return;}
+        const fd=new FormData();fd.append('file',file);fd.append('upload_preset',CL_PRESET);
+        const xhr=new XMLHttpRequest();xhr.open('POST',CL_URL);
+        $id(progId).classList.add('show');$id(statId).textContent='Uploading…';
+        xhr.upload.addEventListener('progress',e=>{if(e.lengthComputable)$id(barId).style.width=Math.round(e.loaded/e.total*100)+'%';});
+        xhr.addEventListener('load',()=>{
+          $id(progId).classList.remove('show');
+          if(xhr.status===200){const res=JSON.parse(xhr.responseText);$id(thumbId).src=res.secure_url;$id(fnId).textContent=file.name;$id(prevId).classList.add('show');$id('mediaUrl').value=res.secure_url;$id('mediaType').value='cloudinary_image';$id(statId).textContent='✓ Uploaded';toast('Image uploaded!','success');if(onSuccess)onSuccess(res.secure_url);}
+          else{$id(statId).textContent='Upload failed.';toast('Upload failed.','error');}
+        });
+        xhr.addEventListener('error',()=>{$id(progId).classList.remove('show');toast('Network error.','error');});
+        xhr.send(fd);
       }
-    });
-    formEl.addEventListener('change', (e) => {
-      if (e.target && e.target.id === 'decl1') {
-        $('#row-decl1').classList.toggle('error', !e.target.checked);
-      }
-      if (e.target && e.target.id === 'decl2') {
-        $('#row-decl2').classList.toggle('error', !e.target.checked);
-      }
-    });
+    }
+    // Article body upload: insert into Quill after upload
+    setupUpload('dropZone','fileInput','uploadProgress','uploadBar','uploadStatus','cloudinaryPreview','cloudinaryThumb','cloudinaryFilename','clearCloudinary',url=>quillInsertImage(url));
+    // Video thumbnail upload: no editor insertion needed
+    setupUpload('dropZoneV','fileInputV','uploadProgressV','uploadBarV','uploadStatusV','cloudinaryPreviewV','cloudinaryThumbV','cloudinaryFilenameV','clearCloudinaryV',null);
 
-    function validate() {
-      clearErrors();
-      let firstInvalid = null;
-      const fail = (el) => {
-        markError(el);
-        if (!firstInvalid) firstInvalid = el;
-      };
-
-      const required = ['#f-name', '#f-email', '#f-phone', '#f-uni'];
-      required.forEach(sel => {
-        const el = $(sel);
-        if (!el.value.trim()) fail(el);
+    // ---- COVER IMAGE ----
+    // Cloudinary upload for cover
+    (function(){
+      const dz=$id('coverDropZone'),fi=$id('coverFileInput');
+      if(!dz||!fi)return;
+      dz.addEventListener('click',()=>fi.click());
+      dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+      dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+      dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])uploadCover(e.dataTransfer.files[0]);});
+      fi.addEventListener('change',()=>{if(fi.files[0])uploadCover(fi.files[0]);});
+      $id('clearCoverCloudinary').addEventListener('click',()=>{
+        $id('coverCloudinaryPreview').classList.remove('show');
+        $id('coverImage').value='';$id('coverImageType').value='';fi.value='';
       });
+      function uploadCover(file){
+        if(!file.type.startsWith('image/')){toast('Please select an image file.','error');return;}
+        if(file.size>10*1024*1024){toast('File too large. Max 10MB.','error');return;}
+        const fd=new FormData();fd.append('file',file);fd.append('upload_preset',CL_PRESET);
+        const xhr=new XMLHttpRequest();xhr.open('POST',CL_URL);
+        $id('coverUploadProgress').classList.add('show');$id('coverUploadStatus').textContent='Uploading…';
+        xhr.upload.addEventListener('progress',e=>{if(e.lengthComputable)$id('coverUploadBar').style.width=Math.round(e.loaded/e.total*100)+'%';});
+        xhr.addEventListener('load',()=>{
+          $id('coverUploadProgress').classList.remove('show');
+          if(xhr.status===200){
+            const res=JSON.parse(xhr.responseText);
+            $id('coverCloudinaryThumb').src=res.secure_url;
+            $id('coverCloudinaryFilename').textContent=file.name;
+            $id('coverCloudinaryPreview').classList.add('show');
+            $id('coverImage').value=res.secure_url;
+            $id('coverImageType').value='cloudinary_image';
+            $id('coverUploadStatus').textContent='✓ Uploaded';
+            toast('Cover uploaded!','success');
+          }else{$id('coverUploadStatus').textContent='Upload failed.';toast('Cover upload failed.','error');}
+        });
+        xhr.addEventListener('error',()=>{$id('coverUploadProgress').classList.remove('show');toast('Network error.','error');});
+        xhr.send(fd);
+      }
+    })();
+    // Cover URL preview
+    $id('btn-preview-cover-url').addEventListener('click',()=>{
+      const url=$id('f-cover-url').value.trim();if(!url){toast('Enter a cover image URL.','warning');return;}
+      const img=$id('coverUrlThumb');img.src=url;
+      img.onerror=()=>{toast('Could not load image.','error');$id('coverUrlPreview').classList.remove('show');};
+      img.onload=()=>{$id('coverUrlPreview').classList.add('show');$id('coverImage').value=url;$id('coverImageType').value='url_image';};
+    });
+    $id('clearCoverUrl').addEventListener('click',()=>{
+      $id('coverUrlPreview').classList.remove('show');$id('f-cover-url').value='';
+      $id('coverImage').value='';$id('coverImageType').value='';
+    });
+    // Cover tab toggle
+    let activeCoverTab=null;
+    document.querySelectorAll('#cover-btns .media-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const tab=btn.getAttribute('data-cover');
+        const panelId='panel-cover-'+tab;
+        if(activeCoverTab===tab){btn.classList.remove('active');$id(panelId).classList.remove('show');activeCoverTab=null;return;}
+        if(activeCoverTab){document.querySelector('#cover-btns .media-btn.active')?.classList.remove('active');$id('panel-cover-'+activeCoverTab)?.classList.remove('show');}
+        btn.classList.add('active');$id(panelId).classList.add('show');activeCoverTab=tab;
+      });
+    });
 
-      const emailEl = $('#f-email');
-      if (emailEl.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
-        fail(emailEl);
-      }
+    // ---- HELPERS: insert into Quill at cursor ----
+    function quillInsertImage(url){
+      if(!quill)return;
+      const range=quill.getSelection(true);
+      const idx=range?range.index:quill.getLength();
+      quill.insertEmbed(idx,'image',url,'user');
+      quill.setSelection(idx+1,'silent');
+    }
+    function quillAppendHtml(html){
+      if(!quill)return;
+      // Insert a newline then paste the raw HTML block
+      const len=quill.getLength();
+      quill.insertText(len,'\n','user');
+      quill.clipboard.dangerouslyPasteHTML(quill.getLength(),html,'user');
+    }
 
-      if (selectedType === 'STORY') {
-        const titleEl = $('#f-title-story');
-        const catEl = $('#f-cat-story');
-        const contentEl2 = $('#f-content');
-        if (!titleEl.value.trim()) fail(titleEl);
-        if (!catEl.value) fail(catEl);
-        if (!contentEl2.value.trim()) fail(contentEl2);
-      } else if (selectedType === 'VIDEO') {
-        const titleEl = $('#f-title-video');
-        const catEl = $('#f-cat-video');
-        const urlEl = $('#f-vidurl');
-        const descEl = $('#f-desc');
-        if (!titleEl.value.trim()) fail(titleEl);
-        if (!catEl.value) fail(catEl);
-        if (!urlEl.value.trim()) fail(urlEl);
-        if (!descEl.value.trim()) fail(descEl);
-      }
+    let activeMediaStory=null;
+    document.querySelectorAll('#media-btns-story .media-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const type=btn.getAttribute('data-media');
+        if(activeMediaStory===type){btn.classList.remove('active');$id('panel-'+type).classList.remove('show');activeMediaStory=null;clearMediaHidden();return;}
+        if(activeMediaStory){document.querySelector('#media-btns-story .media-btn.active')?.classList.remove('active');$id('panel-'+activeMediaStory)?.classList.remove('show');}
+        btn.classList.add('active');$id('panel-'+type).classList.add('show');activeMediaStory=type;$id('mediaType').value=type;
+      });
+    });
+    // FIX: BUG-2 -- also clear allEmbeds accumulator so previous submission's embeds don't leak into next one
+    function clearMediaHidden(){$id('mediaUrl').value='';$id('mediaEmbed').value='';$id('mediaType').value='';const _ae=$id('allEmbeds');if(_ae)_ae.value='';}
 
-      const d1 = $('#decl1');
-      const d2 = $('#decl2');
-      if (!d1.checked) {
-        $('#row-decl1').classList.add('error');
-        if (!firstInvalid) firstInvalid = $('#row-decl1');
-      }
-      if (!d2.checked) {
-        $('#row-decl2').classList.add('error');
-        if (!firstInvalid) firstInvalid = $('#row-decl2');
-      }
+    // Image from URL -> insert into editor + update hidden
+    $id('btn-preview-url').addEventListener('click',()=>{
+      const url=$id('f-img-url').value.trim();if(!url){toast('Enter an image URL.','warning');return;}
+      const img=$id('urlImageThumb');img.src=url;
+      img.onerror=()=>{toast('Could not load image.','error');$id('urlImagePreview').classList.remove('show');};
+      img.onload=()=>{
+        $id('urlImagePreview').classList.add('show');
+        $id('mediaUrl').value=url;$id('mediaType').value='url_image';
+        quillInsertImage(url);
+        toast('Image inserted into article.','success');
+      };
+    });
+    $id('clearUrlImage').addEventListener('click',()=>{$id('urlImagePreview').classList.remove('show');$id('f-img-url').value='';$id('mediaUrl').value='';});
 
-      if (firstInvalid) {
-        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        if (firstInvalid.focus) firstInvalid.focus({ preventScroll: true });
-        return false;
+    function ytId(u){if(!u)return '';const m=u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)?([\w-]{11})/);return m?m[1]:(/^[\w-]{11}$/.test(u.trim())?u.trim():'');}
+    // Insert a real Quill BlockEmbed at the cursor (or end). Returns true on success.
+    function quillInsertBlot(blotName,value){
+      if(!quill)return false;
+      const range=quill.getSelection(true);
+      const idx=range?range.index:quill.getLength();
+      quill.insertEmbed(idx,blotName,value,'user');
+      quill.insertText(idx+1,'\n','user');
+      quill.setSelection(idx+2,'silent');
+      return true;
+    }
+    // YouTube -> insert real iframe blot into Quill body
+    $id('btn-preview-yt').addEventListener('click',()=>{
+      const id=ytId($id('f-yt-url').value.trim());if(!id){toast('Enter a valid YouTube URL or ID.','error');return;}
+      const src='https://www.youtube.com/embed/'+id;
+      $id('ytFrame').src=src;$id('ytPreview').classList.add('show');
+      $id('mediaType').value='youtube';
+      // Insert a proper VideoBlot so the iframe survives in quill.root.innerHTML
+      quillInsertBlot('wevox-yt',{id:id});
+      toast('YouTube video added to article.','success');
+    });
+    $id('clearYt').addEventListener('click',()=>{$id('ytPreview').classList.remove('show');$id('ytFrame').src='';$id('f-yt-url').value='';$id('mediaEmbed').value='';});
+
+    async function fetchTweet(url,containerId,previewId){
+      if(!url||!/twitter\.com|x\.com/.test(url)){toast('Enter a valid Twitter/X URL.','error');return;}
+      try{
+        const res=await fetch('https://publish.twitter.com/oembed?url='+encodeURIComponent(url)+'&omit_script=false');
+        if(!res.ok)throw new Error();
+        const data=await res.json();
+        $id(containerId).innerHTML=data.html;$id(previewId).classList.add('show');
+        $id('mediaType').value='tweet';
+        // Insert real TweetBlot in Quill body (story flow); preview panel keeps its own oembed HTML
+        if(containerId==='tweetContainer'){
+          quillInsertBlot('wevox-tweet',{url:url});
+          // Hydrate the just-inserted blot via twttr.widgets.load on the editor root
+          const root=quill&&quill.root;
+          const hydrate=()=>{if(window.twttr&&window.twttr.widgets&&root)window.twttr.widgets.load(root);};
+          if(window.twttr&&window.twttr.widgets)hydrate();
+          else{const s=document.createElement('script');s.src='https://platform.twitter.com/widgets.js';s.onload=hydrate;document.head.appendChild(s);}
+        }
+        // Also hydrate the side preview
+        if(window.twttr&&window.twttr.widgets)window.twttr.widgets.load($id(containerId));
+        else{const s2=document.createElement('script');s2.src='https://platform.twitter.com/widgets.js';s2.onload=()=>{if(window.twttr&&window.twttr.widgets)window.twttr.widgets.load($id(containerId));};document.head.appendChild(s2);}
+        toast('Tweet added to article.','success');
+      }catch(e){toast('Could not fetch tweet embed.','error');}
+    }
+    $id('btn-preview-tweet').addEventListener('click',()=>fetchTweet($id('f-tweet-url').value.trim(),'tweetContainer','tweetPreview'));
+    $id('clearTweet').addEventListener('click',()=>{$id('tweetPreview').classList.remove('show');$id('tweetContainer').innerHTML='';$id('f-tweet-url').value='';$id('mediaEmbed').value='';});
+
+    function applyIg(codeId,containerId){
+      const code=$id(codeId).value.trim();if(!code){toast('Paste the Instagram embed code first.','warning');return;}
+      $id(containerId).innerHTML=code;$id('mediaType').value='instagram';
+      // Insert real InstagramBlot in Quill body (story flow only)
+      if(containerId==='igPreviewContainer'){
+        quillInsertBlot('wevox-ig',{html:code});
+        const hydrate=()=>{if(window.instgrm)window.instgrm.Embeds.process();};
+        if(window.instgrm)hydrate();
+        else{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.onload=hydrate;document.head.appendChild(s);}
       }
+      if(window.instgrm)window.instgrm.Embeds.process();
+      else{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.onload=()=>{if(window.instgrm)window.instgrm.Embeds.process();};document.head.appendChild(s);}
+      toast('Instagram embed added to article.','success');
+    }
+    $id('btn-preview-ig').addEventListener('click',()=>applyIg('f-ig-embed','igPreviewContainer'));
+
+    let activeMediaVideo='youtube_v';
+    document.querySelectorAll('#media-btns-video .media-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const type=btn.getAttribute('data-media-video');
+        if(activeMediaVideo){document.querySelector('#media-btns-video .media-btn.active')?.classList.remove('active');$id('panel-'+activeMediaVideo)?.classList.remove('show');}
+        btn.classList.add('active');$id('panel-'+type).classList.add('show');activeMediaVideo=type;
+      });
+    });
+    $id('btn-preview-thumb').addEventListener('click',()=>{const url=$id('f-thumb-url').value.trim();if(!url){toast('Enter a thumbnail URL.','warning');return;}const img=$id('thumbImg');img.src=url;img.onerror=()=>{toast('Could not load image.','error');$id('thumbPreview').classList.remove('show');};img.onload=()=>{$id('thumbPreview').classList.add('show');$id('mediaUrl').value=url;$id('mediaType').value='url_image';};});
+    $id('clearThumb').addEventListener('click',()=>{$id('thumbPreview').classList.remove('show');$id('f-thumb-url').value='';$id('mediaUrl').value='';});
+    $id('btn-preview-yt-v').addEventListener('click',()=>{const id=ytId($id('f-yt-url-v').value.trim());if(!id){toast('Enter a valid YouTube URL or ID.','error');return;}const src='https://www.youtube.com/embed/'+id;$id('ytFrameV').src=src;$id('ytPreviewV').classList.add('show');$id('mediaEmbed').value='<iframe src="'+src+'" style="width:100%;aspect-ratio:16/9;border:none" allowfullscreen loading="lazy"></iframe>';$id('mediaType').value='youtube';});
+    $id('clearYtV').addEventListener('click',()=>{$id('ytPreviewV').classList.remove('show');$id('ytFrameV').src='';$id('f-yt-url-v').value='';$id('mediaEmbed').value='';});
+    $id('btn-preview-tweet-v').addEventListener('click',()=>fetchTweet($id('f-tweet-url-v').value.trim(),'tweetContainerV','tweetPreviewV'));
+    $id('clearTweetV').addEventListener('click',()=>{$id('tweetPreviewV').classList.remove('show');$id('tweetContainerV').innerHTML='';$id('f-tweet-url-v').value='';$id('mediaEmbed').value='';});
+    $id('btn-preview-ig-v').addEventListener('click',()=>applyIg('f-ig-embed-v','igPreviewContainerV'));
+
+    function toast(msg,type='info',duration=3500){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$id('toast-container').appendChild(t);setTimeout(()=>{t.classList.add('fade-out');setTimeout(()=>t.remove(),300);},duration);}
+
+    function markError(el){if(!el)return;el.classList.add('error','shake');setTimeout(()=>el.classList.remove('shake'),450);}
+    function clearErrors(){formEl.querySelectorAll('.error').forEach(n=>n.classList.remove('error'));}
+    formEl.addEventListener('input',e=>{if(e.target.classList.contains('error'))e.target.classList.remove('error');});
+    formEl.addEventListener('change',e=>{if(e.target.id==='decl1')$id('row-decl1').classList.toggle('error',!e.target.checked);if(e.target.id==='decl2')$id('row-decl2').classList.toggle('error',!e.target.checked);});
+    function validate(){
+      clearErrors();let first=null;
+      const fail=el=>{markError(el);if(!first)first=el;};
+      if(selectedType==='STORY'){if(!$id('f-title-story').value.trim())fail($id('f-title-story'));if(!$id('f-cat-story').value)fail($id('f-cat-story'));if(!quill||!quill.getText().trim()){toast('Please write your story.','error');if(!first)first=document.querySelector('.ql-editor');}}
+      else if(selectedType==='VIDEO'){if(!$id('f-title-video').value.trim())fail($id('f-title-video'));if(!$id('f-cat-video').value)fail($id('f-cat-video'));if(!$id('f-desc').value.trim())fail($id('f-desc'));if(!$id('mediaUrl').value&&!$id('mediaEmbed').value){toast('Please add a video or media link.','error');if(!first)first=$id('media-btns-video');}}
+      if(!$id('decl1').checked){$id('row-decl1').classList.add('error');if(!first)first=$id('row-decl1');}
+      if(!$id('decl2').checked){$id('row-decl2').classList.add('error');if(!first)first=$id('row-decl2');}
+      if(first){first.scrollIntoView({behavior:'smooth',block:'center'});if(first.focus)first.focus({preventScroll:true});return false;}
       return true;
     }
 
-    // ==========================================
-    // SUBMIT
-    // ==========================================
-    formEl.addEventListener('submit', async (e) => {
+    formEl.addEventListener('submit',async e=>{
       e.preventDefault();
-
-      if (!selectedType) {
-        toast('Please select a submission type first.', 'warning');
-        document.querySelector('.type-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-      }
-
-      if (!validate()) {
-        toast('Please fill all required fields', 'error');
-        return;
-      }
-
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-        toast('No connection detected. Check your internet.', 'error');
-        return;
-      }
-
-      const isStory = selectedType === 'STORY';
-      const payload = {
-        type: selectedType,
-        title: (isStory ? $('#f-title-story') : $('#f-title-video')).value.trim(),
-        category: (isStory ? $('#f-cat-story') : $('#f-cat-video')).value,
-        content: isStory ? $('#f-content').value.trim() : '',
-        videoUrl: isStory ? '' : $('#f-vidurl').value.trim(),
-        description: isStory ? '' : $('#f-desc').value.trim(),
-        imageUrl: (isStory ? $('#f-img-story') : $('#f-img-video')).value.trim(),
-        authorName: $('#f-name').value.trim(),
-        university: $('#f-uni').value.trim(),
-        email: $('#f-email').value.trim(),
-        phone: $('#f-phone').value.trim(),
-        studentId: $('#f-sid').value.trim(),
-        // Profile dashboard ke liye zaroori fields:
-        authorId: currentUser ? currentUser.uid : null,
-        reads: 0,
-        status: 'pending',
-        submittedAt: (firebase && firebase.firestore && firebase.firestore.FieldValue)
-          ? firebase.firestore.FieldValue.serverTimestamp()
-          : new Date()
-      };
-
-      btnSubmit.disabled = true;
-      btnText.innerHTML = '<span class="spinner" aria-hidden="true"></span> Submitting...';
-
-      try {
-        if (!db) throw new Error('Firestore not initialized');
+      if(!selectedType){toast('Please select a submission type.','warning');document.querySelector('.type-grid').scrollIntoView({behavior:'smooth',block:'center'});return;}
+      if(!validate()){toast('Please fill all required fields.','error');return;}
+      if(navigator.onLine===false){toast('You are offline.','error');return;}
+      const u=currentUserDoc||{};
+      const authorName=u.name||(currentUser&&currentUser.displayName)||'Reporter';
+      const authorEmail=(currentUser&&currentUser.email)||u.email||'';
+      const authorId=currentUser?currentUser.uid:'';
+      const isStory=selectedType==='STORY';
+    const embedsBlock=($id('allEmbeds')&&$id('allEmbeds').value.trim())||($id('mediaEmbed')&&$id('mediaEmbed').value.trim())||'';
+    // FIX: BUG-2 -- read category fresh from the active dropdown at submit time, trimmed, never blank
+    const catEl=isStory?$id('f-cat-story'):$id('f-cat-video');
+    const categoryVal=(catEl&&(catEl.value||(catEl.options[catEl.selectedIndex]&&catEl.options[catEl.selectedIndex].text))||'').trim();
+    if(!categoryVal){toast('Please select a category.','error');if(catEl)catEl.focus();return;}
+    // FEATURE: include selected title font (story only; videos keep default)
+    const titleFontVal=isStory&&$id('titleFont')?($id('titleFont').value||'Playfair Display'):'Playfair Display';
+    const payload={type:selectedType,title:(isStory?$id('f-title-story'):$id('f-title-video')).value.trim(),titleFont:titleFontVal,category:categoryVal,tags:isStory?storyTags.getTags():videoTags.getTags(),content:isStory&&quill?(quill.root.innerHTML+(embedsBlock?'\n'+embedsBlock:'')):'',description:isStory?'':$id('f-desc').value.trim(),coverImage:$id('coverImage')?$id('coverImage').value:'',coverImageType:$id('coverImageType')?$id('coverImageType').value:'',mediaUrl:$id('mediaUrl').value,mediaEmbed:$id('mediaEmbed').value,mediaType:$id('mediaType').value,authorId,authorName,email:authorEmail,university:u.university||'',verified:u.verified||false,status:'pending',submittedAt:(firebase&&firebase.firestore&&firebase.firestore.FieldValue)?firebase.firestore.FieldValue.serverTimestamp():new Date()};
+      const btn=$id('btnSubmit'),txt=$id('btnText');
+      btn.disabled=true;txt.innerHTML='<span class="spinner"></span> Submitting…';
+      try{
+        if(!db)throw new Error('Firestore not initialized');
         await db.collection('submissions').add(payload);
-
-        $('#success-email').textContent = payload.email;
-        formEl.classList.remove('show');
-        formEl.style.display = 'none';
-        document.querySelector('.type-section').style.display = 'none';
-        successWrap.classList.add('show');
-        successWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        toast('Submission received!', 'success');
-      } catch (err) {
-        console.error('Submission failed:', err);
-        toast('Submission failed. Please try again.', 'error');
-      } finally {
-        btnSubmit.disabled = false;
-        btnText.textContent = 'Submit for Review →';
-      }
+        formEl.classList.remove('show');formEl.style.display='none';
+        document.querySelector('.type-section').style.display='none';
+        $id('successWrap').classList.add('show');
+        $id('successWrap').scrollIntoView({behavior:'smooth',block:'start'});
+        toast('Submission received!','success');
+      }catch(err){console.error(err);toast('Submission failed. Please try again.','error');}
+      finally{btn.disabled=false;txt.textContent='Submit for Review →';}
     });
 
-    // ==========================================
-    // SUBMIT ANOTHER → reset form
-    // ==========================================
-    btnAnother.addEventListener('click', () => {
-      formEl.reset();
-      clearErrors();
-      $('#row-decl1').classList.remove('error');
-      $('#row-decl2').classList.remove('error');
-      charCount.textContent = '0';
-      charCounter.classList.remove('warn');
-
-      // Account details wapas prefill (reset ne mita diye honge)
-      if (currentUser) {
-        if (currentUser.displayName) $('#f-name').value = currentUser.displayName;
-        if (currentUser.email) {
-          const em = $('#f-email');
-          em.value = currentUser.email;
-          em.setAttribute('readonly', 'readonly');
-        }
-      }
-
-      selectedType = null;
-      cardStory.classList.remove('selected');
-      cardVideo.classList.remove('selected');
-      formEl.removeAttribute('data-type');
-      formEl.classList.remove('show');
-      formEl.style.display = '';
-
-      successWrap.classList.remove('show');
-      document.querySelector('.type-section').style.display = '';
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    $id('btnAnother').addEventListener('click',()=>{
+      formEl.reset();clearErrors();
+      $id('row-decl1').classList.remove('error');$id('row-decl2').classList.remove('error');
+      if(quill)quill.setContents([]);
+      $id('word-count').textContent='0 words';
+      clearMediaHidden();
+      // FEATURE: reset title font picker back to default Playfair Display
+      if($id('titleFont')){$id('titleFont').value='Playfair Display';}
+      if($id('f-title-story')){$id('f-title-story').style.fontFamily="'Playfair Display',Georgia,serif";}
+      document.querySelectorAll('#titleFontRow .title-font-pill').forEach(p=>p.classList.toggle('active',p.getAttribute('data-font')==='Playfair Display'));
+      // Reset cover image
+      if($id('coverImage'))$id('coverImage').value='';
+      if($id('coverImageType'))$id('coverImageType').value='';
+      if($id('coverCloudinaryPreview'))$id('coverCloudinaryPreview').classList.remove('show');
+      if($id('coverUrlPreview'))$id('coverUrlPreview').classList.remove('show');
+      if(activeCoverTab){document.querySelector('#cover-btns .media-btn.active')?.classList.remove('active');$id('panel-cover-'+activeCoverTab)?.classList.remove('show');activeCoverTab=null;}
+      document.querySelectorAll('.media-panel').forEach(p=>p.classList.remove('show'));
+      document.querySelectorAll('.media-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.media-preview,.embed-preview').forEach(p=>p.classList.remove('show'));
+      activeMediaStory=null;activeMediaVideo='youtube_v';
+      selectedType=null;
+      cardStory.classList.remove('selected');cardVideo.classList.remove('selected');
+      formEl.removeAttribute('data-type');formEl.classList.remove('show');formEl.style.display='';
+      $id('successWrap').classList.remove('show');
+      document.querySelector('.type-section').style.display='';
+      window.scrollTo({top:0,behavior:'smooth'});
     });
 
-    window.addEventListener('offline', () => {
-      toast('You are offline. Submissions will not work.', 'warning', 4000);
-    });
+    window.addEventListener('offline',()=>toast('You are offline.','warning',4000));
   </script>
 </body>
 </html>
