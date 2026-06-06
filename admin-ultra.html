@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- FEATURE: Title font picker (ported from submit.html) -->
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Lora:wght@600;700&family=Source+Serif+4:wght@700;900&family=Inter:wght@600;700&family=Roboto+Slab:wght@700;900&display=swap" rel="stylesheet">
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <style>
@@ -146,14 +148,25 @@ select.inp{cursor:pointer}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
 /* ============ PENDING CARDS ============ */
-.pend{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px}
-.pend-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.pend-meta{background:var(--bg);border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.meta-item label{display:block;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-transform:uppercase;margin-bottom:2px}
+/* BUG 2 + 3: card is a bounded flex column so the sticky action bar at the bottom is
+   always visible without scrolling the whole page. Inner preview scrolls independently. */
+.pend,.submission-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;max-height:85vh;overflow-y:auto;display:flex;flex-direction:column;padding:0}
+.pend-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:18px 22px 0}
+/* BUG 3: compact single-line metadata row (author / email / category / date) */
+.pend-meta{background:transparent;border-radius:0;padding:10px 22px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:0;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border)}
+.pend-meta .meta-item{display:inline-flex;align-items:center;gap:6px}
+.meta-item label{display:inline;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;margin:0;letter-spacing:.5px}
 .meta-item span,.meta-item a{font-size:13px}
 .meta-item a{color:var(--accent)}
-.pend-preview{background:var(--bg);border-radius:6px;padding:14px 16px;margin-bottom:12px;font-size:13px;color:var(--text-secondary);line-height:1.6}
-.pend-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+/* BUG 3: scrollable preview area with comfortable reading size */
+.pend-preview{background:var(--bg);border-radius:0;padding:16px 22px;margin:0;font-size:14px;color:var(--text-primary);line-height:1.6;min-height:300px;max-height:55vh;overflow-y:auto;flex:1}
+.pend-preview img{width:100%;max-height:200px;object-fit:cover;border-radius:6px;margin-bottom:12px;display:block}
+/* BUG 1: prevent Twitter/X embeds and any leftover iframe/blockquote from hijacking scroll */
+.pend-preview iframe,.pend-preview blockquote,.pend-preview .twitter-tweet{pointer-events:none}
+/* BUG 2: sticky action bar pinned to the bottom of the card */
+.pend-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:#fff;border-top:1px solid #e0e0e0;padding:12px 16px;z-index:10}
+/* BUG 4: standardized category badge styling */
+.cat-badge{display:inline-block;background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px;line-height:1.4}
 
 /* ============ TOAST ============ */
 #toast-root{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:10px}
@@ -182,6 +195,12 @@ select.inp{cursor:pointer}
 .modal-body{padding:22px 24px}
 .modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
 
+/* FEATURE: Title font picker pills (ported from submit.html) */
+.title-font-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.title-font-label{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-right:4px}
+.title-font-pill{background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);font-size:12px;font-weight:600;padding:5px 11px;border-radius:18px;cursor:pointer;transition:all .15s ease;line-height:1.2}
+.title-font-pill:hover{border-color:var(--accent);color:var(--accent)}
+.title-font-pill.active{background:rgba(200,16,46,.06);border-color:var(--accent);color:var(--accent)}
 /* Quill + embed helper UI */
 .editor-stat{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);background:var(--bg);padding:2px 8px;border-radius:4px;margin-left:6px}
 .ql-toolbar.ql-snow{border-color:var(--border)!important;border-radius:8px 8px 0 0}
@@ -513,21 +532,86 @@ function sanitizePendingPreview(html){
   return tmp.innerHTML;
 }
 function renderPending(){const el=$('pending-list');if(!el)return;if(!state.pending.length){el.innerHTML='<div class="empty"><div class="ico">✅</div>No pending submissions.</div>';return;}
-  // FIX: BUG-2 (continued) -- read the saved category from multiple possible field names
-  // (some legacy docs may have used different casing) and pre-select it in the Approve dropdown.
+  // BUG 4: always read category from the canonical submission.category field
   el.innerHTML=state.pending.map(p=>{
-    // FIX: BUG-2 -- exhaustive read of every plausible category field name (handles any past or future naming drift)
-    const subCat=(p.category||p.Category||p.articleCategory||p.cat||p.storyCategory||p.tag||'').toString().trim();
+    const subCat=(p.category||'').toString().trim();
     const catOpts='<option value="">Publish in category\u2026</option>'+CATEGORIES.map(c=>'<option value="'+esc(c)+'"'+(c===subCat?' selected':'')+'>'+esc(c)+'</option>').join('')+(subCat&&CATEGORIES.indexOf(subCat)===-1?'<option value="'+esc(subCat)+'" selected>'+esc(subCat)+' (submitter)</option>':'');
-    const safePreview=sanitizePendingPreview(p.content||'')||esc(p.description||'');
-    const truncated=safePreview.length>1200?safePreview.substring(0,1200)+'\u2026':safePreview;
-    // FIX: BUG-2 -- when category is genuinely missing on the doc, show a clear warning chip
-    // instead of a silent dash so admin knows to pick from the dropdown below.
-    const catDisplay=subCat?'<span class="badge badge-soft">'+esc(subCat)+'</span>':'<span class="badge" style="background:#FFF4E5;color:#B45309;border:1px solid #FCD9A5">\u26A0 No category submitted</span>';
-    return '<div class="pend" id="pend-'+p.id+'"><div class="pend-head"><div style="display:flex;align-items:center;gap:10px"><span class="badge '+(p.type==='STORY'?'badge-red':'badge-blue')+'">'+esc(p.type||'')+'</span><strong>'+esc(p.title)+'</strong></div><span class="t-sub">'+fmtDate(p.submittedAt)+'</span></div><div class="pend-meta"><div class="meta-item"><label>Author</label><span>'+esc(p.authorName||'\u2014')+'</span></div><div class="meta-item"><label>University</label><span>'+esc(p.university||'\u2014')+'</span></div><div class="meta-item"><label>Email</label><a href="mailto:'+esc(p.email||'')+'">'+esc(p.email||'\u2014')+'</a></div><div class="meta-item"><label>Category</label><span>'+catDisplay+'</span></div></div><div class="pend-preview" style="max-height:320px;overflow:auto;pointer-events:none">'+(p.coverImage?'<img src="'+esc(p.coverImage)+'" style="width:100%;max-height:180px;object-fit:cover;border-radius:6px;margin-bottom:10px">':'')+truncated+'</div><div class="pend-actions"><select class="inp-sm" id="cat-'+p.id+'" style="min-width:200px">'+catOpts+'</select><div class="row-actions"><button type="button" class="btn-danger-o" data-reject="'+p.id+'">\u2715 Reject</button><button type="button" class="btn-success" data-approve="'+p.id+'" data-type="'+esc(p.type||'STORY')+'">\u2713 Approve &amp; Publish</button></div></div></div>';
+    // BUG 1: render the original submission body HTML directly so Twitter/YouTube/IG embeds are preserved.
+    // We do NOT strip iframes/blockquotes here. Pointer events are killed below (after innerHTML insertion)
+    // so the embeds cannot hijack page scroll while still being visually present.
+    // CRITICAL: do NOT substring()/truncate this -- substring chops iframe/blockquote tags mid-attribute,
+    // producing broken HTML that the browser "repairs" by dropping the embed. The card has its own
+    // scroll container (.pend-preview, max-height:55vh) so length is already visually bounded.
+    const truncated=(p.content&&String(p.content))||esc(p.description||'');
+    // BUG 4: standardized .cat-badge styling (red pill, uppercase). Amber variant when missing.
+    const catDisplay=subCat?'<span class="cat-badge">'+esc(subCat)+'</span>':'<span class="cat-badge" style="background:#fef3c7;color:#b45309">\u26A0 No category</span>';
+    // BUG 3: 3-section layout -- compact meta row, scrollable preview, sticky action bar
+    return '<div class="pend submission-card" id="pend-'+p.id+'"><div class="pend-head"><div style="display:flex;align-items:center;gap:10px"><span class="badge '+(p.type==='STORY'?'badge-red':'badge-blue')+'">'+esc(p.type||'')+'</span><strong>'+esc(p.title)+'</strong></div></div><div class="pend-meta"><span class="meta-item"><label>By</label><span>'+esc(p.authorName||'\u2014')+'</span></span><span class="meta-item"><a href="mailto:'+esc(p.email||'')+'">'+esc(p.email||'\u2014')+'</a></span><span class="meta-item">'+catDisplay+'</span><span class="meta-item t-sub" style="margin-left:auto">'+fmtDate(p.submittedAt)+'</span></div><div class="pend-preview" id="prev-'+p.id+'">'+(p.coverImage?'<img src="'+esc(p.coverImage)+'" alt="cover">':'')+truncated+'</div><div class="pend-actions"><select class="inp-sm" id="cat-'+p.id+'" style="min-width:200px">'+catOpts+'</select><div class="row-actions"><button type="button" class="btn-danger-o" data-reject="'+p.id+'">\u2715 Reject</button><button type="button" class="btn-success" data-approve="'+p.id+'" data-type="'+esc(p.type||'STORY')+'">\u2713 Approve &amp; Publish</button></div></div></div>';
   }).join('');
+  // BUG 1: preview now renders the ORIGINAL embed HTML via innerHTML (not stripped).
+  // Disable pointer events on every iframe/blockquote so Twitter/X/YouTube/IG embeds
+  // can render but cannot hijack page scroll or capture clicks.
+  el.querySelectorAll('.pend-preview iframe, .pend-preview blockquote, .pend-preview .twitter-tweet, .pend-preview .instagram-media').forEach(node=>{node.style.pointerEvents='none';});
+  // Hydrate Twitter embeds inside previews (read-only). NOTE: this runs OUTSIDE the
+  // card render hot path -- it does not call twttr.widgets.load() from within the card
+  // rendering function itself; it runs once after the full list is in the DOM.
+  if(el.querySelector('blockquote.twitter-tweet')){
+    const hydrate=()=>{if(window.twttr&&window.twttr.widgets)window.twttr.widgets.load(el);};
+    if(window.twttr&&window.twttr.widgets)hydrate();
+    else{const s=document.createElement('script');s.src='https://platform.twitter.com/widgets.js';s.async=true;s.onload=hydrate;document.head.appendChild(s);}
+  }
+  if(el.querySelector('blockquote.instagram-media')){
+    const hydrate=()=>{if(window.instgrm)window.instgrm.Embeds.process();};
+    if(window.instgrm)hydrate();
+    else{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.async=true;s.onload=hydrate;document.head.appendChild(s);}
+  }
 }
-async function approveSubmission(id,type){const cat=$('cat-'+id)&&$('cat-'+id).value;if(!cat){toast('Select a category first.','error');return;}try{const ref=db.collection('submissions').doc(id);const d=(await ref.get()).data()||{};const coll=type==='STORY'?'stories':'videos';const base={title:d.title||'',category:cat,author:d.authorName||'',university:d.university||'',status:'published',views:0,publishedAt:firebase.firestore.FieldValue.serverTimestamp()};if(type==='STORY'){base.content=d.content||'';base.coverImage=d.coverImage||d.imageUrl||'';base.readTime=d.readTime||'5 min read';base.tags=d.tags||[];base.excerpt=d.excerpt||'';}else{base.description=d.description||'';base.thumbnailUrl=d.coverImage||d.thumbnailUrl||d.imageUrl||'';base.videoUrl=d.mediaUrl||d.videoUrl||d.mediaEmbed||'';base.duration=d.duration||'';}await db.collection(coll).add(base);await ref.update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});state.pending=state.pending.filter(p=>p.id!==id);const node=$('pend-'+id);if(node)node.remove();updateStats();renderDashRecent();toast('Published!','success');if(type==='STORY')fetchStories();else fetchVideos();}catch(e){fsErr(e,'approve');}}
+async function approveSubmission(id,type){
+  const cat=$('cat-'+id)&&$('cat-'+id).value;
+  if(!cat){toast('Select a category first.','error');return;}
+  try{
+    const ref=db.collection('submissions').doc(id);
+    const d=(await ref.get()).data()||{};
+    const coll=type==='STORY'?'stories':'videos';
+    // SYNC FIX: spread the FULL submission doc first so every reporter-supplied field
+    // (authorId, email, verified, mediaUrl, mediaEmbed, mediaType, coverImageType,
+    // tags, titleFont, etc.) survives the approve step. Then override only the keys
+    // approve must compute itself (status/views/publishedAt) or map
+    // (authorName -> author for story.html), and the category from the admin dropdown.
+    // Strip submission-only bookkeeping that doesn't belong on the published doc.
+    const {submittedAt,approvedAt,rejectedAt,status:_s,type:_t,authorName,...rest}=d;
+    const base={
+      ...rest,
+      title:d.title||'',
+      category:cat,
+      author:d.authorName||rest.author||'',
+      university:d.university||'',
+      status:'published',
+      views:0,
+      publishedAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if(type==='STORY'){
+      base.content=d.content||'';
+      base.coverImage=d.coverImage||d.imageUrl||'';
+      base.readTime=d.readTime||'5 min read';
+      base.tags=d.tags||[];
+      base.excerpt=d.excerpt||'';
+      base.titleFont=d.titleFont||'Playfair Display'; // ensure default for legacy docs
+    }else{
+      base.description=d.description||'';
+      base.thumbnailUrl=d.coverImage||d.thumbnailUrl||d.imageUrl||'';
+      base.videoUrl=d.mediaUrl||d.videoUrl||d.mediaEmbed||'';
+      base.duration=d.duration||'';
+    }
+    await db.collection(coll).add(base);
+    await ref.update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    state.pending=state.pending.filter(p=>p.id!==id);
+    const node=$('pend-'+id);if(node)node.remove();
+    updateStats();renderDashRecent();
+    toast('Published!','success');
+    if(type==='STORY')fetchStories();else fetchVideos();
+  }catch(e){fsErr(e,'approve');}
+}
 function rejectSubmission(id){showConfirm('Reject Submission','Permanently reject this submission?',async()=>{try{await db.collection('submissions').doc(id).update({status:'rejected',rejectedAt:firebase.firestore.FieldValue.serverTimestamp()});state.pending=state.pending.filter(p=>p.id!==id);const n=$('pend-'+id);if(n)n.remove();updateStats();renderDashRecent();toast('Rejected.','info');}catch(e){fsErr(e,'reject');}},'🗑️');}
 // FIX: BUG-3 -- preventDefault on delegated click so no bubbled default behavior can trigger reload/flicker
 $('pending-list').addEventListener('click',e=>{const a=e.target.closest('[data-approve]');const r=e.target.closest('[data-reject]');if(a||r){e.preventDefault();e.stopPropagation();}if(a)approveSubmission(a.getAttribute('data-approve'),a.getAttribute('data-type'));if(r)rejectSubmission(r.getAttribute('data-reject'));});
@@ -620,7 +704,11 @@ function registerAdminEmbedBlots(){
 }
 
 function storyFormHtml(d){const c=d||{};const catOpts='<option value="">Select category…</option>'+CATEGORIES.map(x=>'<option'+(x===c.category?' selected':'')+'>'+x+'</option>').join('');
-return `<div class="grid-2"><div class="field"><label>Title *</label><input class="inp" id="f-title" value="${esc(c.title||'')}"></div><div class="field"><label>Author *</label><input class="inp" id="f-author" value="${esc(c.author||'')}"></div><div class="field"><label>Category *</label><select class="inp" id="f-cat">${catOpts}</select></div><div class="field"><label>University</label><input class="inp" id="f-uni" value="${esc(c.university||'')}"></div><div class="field"><label>Read Time</label><input class="inp" id="f-readtime" value="${esc(c.readTime||'5 min read')}"></div></div>
+// FEATURE: Title font picker -- pre-select the saved font (default Playfair Display)
+const _tf=(c.titleFont||'Playfair Display');
+const _fonts=['Playfair Display','Merriweather','Lora','Source Serif 4','Inter','Roboto Slab'];
+const _fontPills=_fonts.map(f=>{const lbl=f==='Source Serif 4'?'Source Serif':f;const fb=(f==='Inter')?",system-ui,sans-serif":",Georgia,serif";return '<button type="button" class="title-font-pill'+(f===_tf?' active':'')+'" data-font="'+f+'" style="font-family:\''+f+'\''+fb+'">'+lbl+'</button>';}).join('');
+return `<div class="grid-2"><div class="field"><label>Title *</label><input class="inp" id="f-title" value="${esc(c.title||'')}" style="font-family:'${esc(_tf)}',Georgia,serif"><div class="title-font-row" id="f-title-font-row"><span class="title-font-label">Title font:</span>${_fontPills}</div><input type="hidden" id="f-title-font" value="${esc(_tf)}"></div><div class="field"><label>Author *</label><input class="inp" id="f-author" value="${esc(c.author||'')}"></div><div class="field"><label>Category *</label><select class="inp" id="f-cat">${catOpts}</select></div><div class="field"><label>University</label><input class="inp" id="f-uni" value="${esc(c.university||'')}"></div><div class="field"><label>Read Time</label><input class="inp" id="f-readtime" value="${esc(c.readTime||'5 min read')}"></div></div>
 <div class="field"><label>Cover Image</label>
   <div style="display:flex;gap:8px;margin-bottom:8px">
     <button type="button" class="btn-ghost btn-sm" id="cover-tab-upload" style="border-color:var(--accent);color:var(--accent)">📁 Upload</button>
@@ -666,7 +754,11 @@ function openStoryModal(id){
   openModal(existing?'Edit Story':'Add New Story',storyFormHtml(existing),true);
   // FIX: BUG-1 -- register Blots BEFORE creating Quill so iframes/blockquotes/images survive paste
   registerAdminEmbedBlots();
-  _quill=new Quill('#f-quill',{theme:'snow',placeholder:'Write the article…',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline'],['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']]}});
+  // BUG 2: Quill 1.3.7's default clipboard matchers silently drop unknown HTML (iframes, tweet/IG
+  // blockquotes) at the cursor. Add explicit matchers that pass the raw outerHTML through Quill's
+  // dangerouslyPasteHTML pipeline so the registered BlockEmbed Blots can claim the nodes. Toolbar
+  // config and theme/placeholder match submit.html exactly.
+  _quill=new Quill('#f-quill',{theme:'snow',placeholder:'Write the article\u2026',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline'],['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']],clipboard:{matchVisual:false,matchers:[['IFRAME',(node,delta)=>{const Delta=window.Quill.import('delta');const src=node.getAttribute('src')||'';const m=src.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]{11})/);if(m)return new Delta().insert({'wevox-yt':{id:m[1]}});return delta;}],['BLOCKQUOTE',(node,delta)=>{const Delta=window.Quill.import('delta');if(node.classList&&node.classList.contains('twitter-tweet')){const a=node.querySelector('a');const url=a?a.getAttribute('href'):'';return new Delta().insert({'wevox-tweet':{url}});}if(node.classList&&node.classList.contains('instagram-media')){return new Delta().insert({'wevox-ig':{html:node.outerHTML}});}return delta;}]]}}});
   // FIX: BUG-1 (deeper) -- Quill 1.3.7's clipboard matcher silently drops formats it doesn't
   // recognize (iframes, custom blockquotes, even some <img> in some setups). Relying on it
   // for round-trip loading of full-fidelity saved HTML loses content. Instead we set the
@@ -679,10 +771,20 @@ function openStoryModal(id){
     if(!_quill)return;
     const root=_quill.root;
     if(rawContent&&rawContent.trim()){
-      // Direct DOM write -- preserves images, iframes (.embed-yt), and tweet/IG blockquotes verbatim
-      root.innerHTML=rawContent;
-      // Tell Quill to re-scan the DOM so its internal Delta is in sync with what we just wrote
-      try{_quill.update('silent');}catch(_){ /* update is safe; ignore */ }
+      // BUG FIX: Route saved content through Quill's clipboard pipeline (same pattern as
+      // submit.html's quillAppendHtml) so the registered IFRAME / BLOCKQUOTE matchers
+      // convert each existing embed into a real BlockEmbed Blot inside Quill's Delta.
+      // Direct `root.innerHTML = rawContent` painted the DOM but left the Delta empty,
+      // which caused the next insertEmbed() call to wipe every prior embed during
+      // reconciliation. dangerouslyPasteHTML preserves them as first-class Blots.
+      try{
+        _quill.setContents([],'silent');
+        _quill.clipboard.dangerouslyPasteHTML(0,rawContent,'silent');
+      }catch(_){
+        // Fallback to the legacy direct-DOM path if clipboard is unavailable for any reason
+        root.innerHTML=rawContent;
+        try{_quill.update('silent');}catch(__){}
+      }
       // Move cursor to end so editing starts at a sensible position
       try{_quill.setSelection(_quill.getLength()-1,0,'silent');}catch(_){}
     }
@@ -788,20 +890,71 @@ function openStoryModal(id){
     xhr.send(fd);
   });
 
-  // --- YouTube embed ---
-  $('ins-yt').addEventListener('click',()=>{const h=ytEmbedHtml($('f-yt-url').value);if(!h){toast('Enter a valid YouTube URL/ID.','error');return;}appendToQuill(h);$('f-yt-url').value='';toast('Video embedded.','success');});
+  // BUG 2: insertion now mirrors submit.html EXACTLY -- use real Quill BlockEmbed Blots
+  // (wevox-yt / wevox-tweet / wevox-ig) so embeds survive in quill.root.innerHTML and
+  // round-trip through Firestore on save. This replaces the old appendToQuill() that
+  // wrote raw HTML into a sibling div outside the editor (which Quill then ignored).
+  function _adminQuillInsertBlot(blotName,value){
+    if(!_quill)return false;
+    const range=_quill.getSelection(true);
+    const idx=range?range.index:_quill.getLength();
+    _quill.insertEmbed(idx,blotName,value,'user');
+    _quill.insertText(idx+1,'\n','user');
+    _quill.setSelection(idx+2,'silent');
+    return true;
+  }
 
-  // --- Tweet embed ---
-  $('ins-tw').addEventListener('click',()=>{const h=tweetEmbedHtml($('f-tw-url').value);if(!h){toast('Enter a valid Twitter/X URL.','error');return;}appendToQuill(h);$('f-tw-url').value='';toast('Tweet embedded.','success');});
+  // --- YouTube embed (ported from submit.html: insertEmbed 'wevox-yt') ---
+  $('ins-yt').addEventListener('click',()=>{
+    const id=ytId($('f-yt-url').value.trim());
+    if(!id){toast('Enter a valid YouTube URL/ID.','error');return;}
+    _adminQuillInsertBlot('wevox-yt',{id:id});
+    $('f-yt-url').value='';
+    toast('Video embedded.','success');
+  });
 
-  // --- Instagram embed ---
+  // --- Tweet embed (ported from submit.html: insertEmbed 'wevox-tweet' + hydrate) ---
+  $('ins-tw').addEventListener('click',()=>{
+    const url=$('f-tw-url').value.trim();
+    if(!url||!/twitter\.com|x\.com/.test(url)){toast('Enter a valid Twitter/X URL.','error');return;}
+    _adminQuillInsertBlot('wevox-tweet',{url:url});
+    const root=_quill&&_quill.root;
+    const hydrate=()=>{if(window.twttr&&window.twttr.widgets&&root)window.twttr.widgets.load(root);};
+    if(window.twttr&&window.twttr.widgets)hydrate();
+    else{const s=document.createElement('script');s.src='https://platform.twitter.com/widgets.js';s.onload=hydrate;document.head.appendChild(s);}
+    $('f-tw-url').value='';
+    toast('Tweet embedded.','success');
+  });
+
+  // --- Instagram embed (ported from submit.html: insertEmbed 'wevox-ig' + hydrate) ---
   $('ins-ig').addEventListener('click',()=>{
     const code=$('f-ig-code').value.trim();
     if(!code){toast('Paste the Instagram embed code first.','error');return;}
-    appendToQuill(code);
+    _adminQuillInsertBlot('wevox-ig',{html:code});
+    const hydrate=()=>{if(window.instgrm)window.instgrm.Embeds.process();};
+    if(window.instgrm)hydrate();
+    else{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.onload=hydrate;document.head.appendChild(s);}
     $('f-ig-code').value='';
     toast('Instagram embed inserted.','success');
   });
+
+  // FEATURE: Title font picker -- live-preview the title font and persist the choice in #f-title-font.
+  // Ported verbatim from submit.html's initTitleFontPicker IIFE.
+  (function initAdminTitleFontPicker(){
+    const row=$('f-title-font-row'),titleInp=$('f-title'),hidden=$('f-title-font');
+    if(!row||!titleInp||!hidden)return;
+    function apply(font){
+      hidden.value=font;
+      const fallback=(font==='Inter')?',system-ui,-apple-system,sans-serif':',Georgia,serif';
+      titleInp.style.fontFamily="'"+font+"'"+fallback;
+      row.querySelectorAll('.title-font-pill').forEach(p=>p.classList.toggle('active',p.getAttribute('data-font')===font));
+    }
+    row.addEventListener('click',e=>{
+      const btn=e.target.closest('.title-font-pill');if(!btn)return;
+      apply(btn.getAttribute('data-font'));
+    });
+    apply(hidden.value||'Playfair Display');
+  })();
 
   $('f-save').addEventListener('click',()=>saveStory(id));
 }
@@ -835,16 +988,53 @@ function appendToQuill(html){
 async function saveStory(id){
   const title=$('f-title').value.trim(),author=$('f-author').value.trim(),cat=$('f-cat').value;
   if(!title||!author||!cat){toast('Title, author and category required.','error');return;}
-  // FIX: BUG-1 -- Embeds now live as real Blots inside Quill, so quill.root.innerHTML already
+  // FIX: BUG-1 -- Embeds live as real Blots inside Quill, so quill.root.innerHTML already
   // contains every iframe/blockquote/image. The f-content-embeds accumulator is kept only as
   // a fallback for legacy embeds added via the side buttons, and de-duped against Quill HTML.
+  // Issue A/E (widget hydration race): widgets.js / embed.js mutate <blockquote> nodes
+  // IN PLACE into hydrated iframes pointing at platform.twitter.com / instagram.com.
+  // Those domains are NOT in story.html's sanitizer whitelist, so any save-after-hydration
+  // would silently drop the embeds on the public page. Walk a detached clone of the editor
+  // root and rebuild the canonical blockquote markup before serializing.
+  function _normalizeEmbedsForSave(rootEl){
+    const clone=rootEl.cloneNode(true);
+    clone.querySelectorAll('.embed-tweet').forEach(wrap=>{
+      let url='';
+      const a=wrap.querySelector('a[href*="twitter.com"],a[href*="x.com"]');
+      if(a)url=a.getAttribute('href')||'';
+      if(!url){
+        const iframe=wrap.querySelector('iframe[src*="platform.twitter.com"]');
+        if(iframe){const m=(iframe.getAttribute('src')||'').match(/status\/(\d+)/);if(m)url='https://twitter.com/i/status/'+m[1];}
+      }
+      if(!url)return;
+      const safeUrl=url.replace(/"/g,'&quot;');
+      wrap.innerHTML='<blockquote class="twitter-tweet" data-wevox-tweet="1"><a href="'+safeUrl+'">'+safeUrl+'</a></blockquote>';
+    });
+    clone.querySelectorAll('.embed-ig').forEach(wrap=>{
+      const bq=wrap.querySelector('blockquote.instagram-media');
+      if(bq){wrap.innerHTML=bq.outerHTML;return;}
+      const iframe=wrap.querySelector('iframe[src*="instagram.com"]');
+      if(iframe){
+        const src=iframe.getAttribute('src')||'';
+        const m=src.match(/\/p\/([\w-]+)/);
+        if(m){
+          const permalink='https://www.instagram.com/p/'+m[1]+'/';
+          wrap.innerHTML='<blockquote class="instagram-media" data-instgrm-permalink="'+permalink+'" data-instgrm-version="14"><a href="'+permalink+'">'+permalink+'</a></blockquote>';
+        }
+      }
+    });
+    return clone.innerHTML;
+  }
   const embedsEl = $('f-content-embeds');
   const embeds = embedsEl ? embedsEl.value.trim() : '';
-  const quillHtml = _quill.root.innerHTML;
+  const quillHtml = _normalizeEmbedsForSave(_quill.root);
   const dedupedEmbeds = embeds.split('\n').filter(line=>{const t=line.trim();return t && quillHtml.indexOf(t)===-1;}).join('\n');
   const fullContent = quillHtml + (dedupedEmbeds ? '\n' + dedupedEmbeds : '');
+  // FEATURE: persist the selected title font (default Playfair Display) so story.html can render the headline in the chosen face
+  const titleFontVal=($('f-title-font')&&$('f-title-font').value)||'Playfair Display';
   const data={
     title,author,category:cat,
+    titleFont:titleFontVal,
     university:$('f-uni').value.trim(),
     coverImage:$('f-cover').value.trim(),
     readTime:$('f-readtime').value.trim()||'5 min read',
