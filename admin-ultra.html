@@ -750,7 +750,7 @@ function openStoryModal(id){
   const existing=id?state.stories.find(s=>s.id===id):null;
   // FIX: BUG-1 -- stash raw content in a JS variable so we don't have to round-trip it through
   // an HTML attribute value (which broke on unescaped double quotes inside iframe/img/blockquote markup)
-  _pendingStoryContent=(existing&&existing.content)||'';
+  _pendingStoryContent=(existing&&(existing.body||existing.content))||'';
   openModal(existing?'Edit Story':'Add New Story',storyFormHtml(existing),true);
   // FIX: BUG-1 -- register Blots BEFORE creating Quill so iframes/blockquotes/images survive paste
   registerAdminEmbedBlots();
@@ -759,6 +759,7 @@ function openStoryModal(id){
   // dangerouslyPasteHTML pipeline so the registered BlockEmbed Blots can claim the nodes. Toolbar
   // config and theme/placeholder match submit.html exactly.
   _quill=new Quill('#f-quill',{theme:'snow',placeholder:'Write the article\u2026',modules:{toolbar:[[{header:[2,3,false]}],['bold','italic','underline'],['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']],clipboard:{matchVisual:false,matchers:[['IFRAME',(node,delta)=>{const Delta=window.Quill.import('delta');const src=node.getAttribute('src')||'';const m=src.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]{11})/);if(m)return new Delta().insert({'wevox-yt':{id:m[1]}});return delta;}],['BLOCKQUOTE',(node,delta)=>{const Delta=window.Quill.import('delta');if(node.classList&&node.classList.contains('twitter-tweet')){const a=node.querySelector('a');const url=a?a.getAttribute('href'):'';return new Delta().insert({'wevox-tweet':{url}});}if(node.classList&&node.classList.contains('instagram-media')){return new Delta().insert({'wevox-ig':{html:node.outerHTML}});}return delta;}]]}}});
+  window._quillInstance = _quill;
   // FIX: BUG-1 (deeper) -- Quill 1.3.7's clipboard matcher silently drops formats it doesn't
   // recognize (iframes, custom blockquotes, even some <img> in some setups). Relying on it
   // for round-trip loading of full-fidelity saved HTML loses content. Instead we set the
@@ -771,33 +772,11 @@ function openStoryModal(id){
     if(!_quill)return;
     const root=_quill.root;
     if(rawContent&&rawContent.trim()){
-      // BUG FIX: Route saved content through Quill's clipboard pipeline (same pattern as
-      // submit.html's quillAppendHtml) so the registered IFRAME / BLOCKQUOTE matchers
-      // convert each existing embed into a real BlockEmbed Blot inside Quill's Delta.
-      // Direct `root.innerHTML = rawContent` painted the DOM but left the Delta empty,
-      // which caused the next insertEmbed() call to wipe every prior embed during
-      // reconciliation. dangerouslyPasteHTML preserves them as first-class Blots.
-      try{
-        _quill.setContents([],'silent');
-        _quill.clipboard.dangerouslyPasteHTML(0,rawContent,'silent');
-      }catch(_){
-        // Fallback to the legacy direct-DOM path if clipboard is unavailable for any reason
-        root.innerHTML=rawContent;
-        try{_quill.update('silent');}catch(__){}
-      }
-      // Move cursor to end so editing starts at a sensible position
-      try{_quill.setSelection(_quill.getLength()-1,0,'silent');}catch(_){}
-    }
-    // Hydrate Twitter and Instagram embeds inside the editor after load
-    if(root.querySelector('blockquote.twitter-tweet')){
-      const hydrate=()=>{if(window.twttr&&window.twttr.widgets)window.twttr.widgets.load(root);};
-      if(window.twttr&&window.twttr.widgets)hydrate();
-      else{const s=document.createElement('script');s.src='https://platform.twitter.com/widgets.js';s.onload=hydrate;document.head.appendChild(s);}
-    }
-    if(root.querySelector('blockquote.instagram-media')){
-      const hydrate=()=>{if(window.instgrm)window.instgrm.Embeds.process();};
-      if(window.instgrm)hydrate();
-      else{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.onload=hydrate;document.head.appendChild(s);}
+      // Load raw HTML directly into editor DOM. Do NOT use dangerouslyPasteHTML (strips embeds)
+      // and do NOT hydrate Twitter/IG widgets (hydration mutates blockquotes into platform
+      // iframes which corrupts the HTML on save). Embeds display as raw markup in the editor
+      // but render correctly in story.html where widgets.js hydrates them for readers.
+      root.innerHTML=rawContent;
     }
   }
   // Run on next frame so Quill has finished mounting; rAF avoids the race condition
@@ -1027,9 +1006,9 @@ async function saveStory(id){
   }
   const embedsEl = $('f-content-embeds');
   const embeds = embedsEl ? embedsEl.value.trim() : '';
-  const quillHtml = _normalizeEmbedsForSave(_quill.root);
-  const dedupedEmbeds = embeds.split('\n').filter(line=>{const t=line.trim();return t && quillHtml.indexOf(t)===-1;}).join('\n');
-  const fullContent = quillHtml + (dedupedEmbeds ? '\n' + dedupedEmbeds : '');
+  const bodyContent = _quill.root.innerHTML;
+  const dedupedEmbeds = embeds.split('\n').filter(line=>{const t=line.trim();return t && bodyContent.indexOf(t)===-1;}).join('\n');
+  const fullContent = bodyContent + (dedupedEmbeds ? '\n' + dedupedEmbeds : '');
   // FEATURE: persist the selected title font (default Playfair Display) so story.html can render the headline in the chosen face
   const titleFontVal=($('f-title-font')&&$('f-title-font').value)||'Playfair Display';
   const data={
@@ -1038,6 +1017,7 @@ async function saveStory(id){
     university:$('f-uni').value.trim(),
     coverImage:$('f-cover').value.trim(),
     readTime:$('f-readtime').value.trim()||'5 min read',
+    body: fullContent,
     content: fullContent
   };
   try{
