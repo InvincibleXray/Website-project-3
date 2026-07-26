@@ -8,9 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <!-- FEATURE: Title font selector — load journalism/news-style families used in the picker -->
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Lora:wght@600;700&family=Source+Serif+4:wght@700;900&family=Inter:wght@600;700&family=Roboto+Slab:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,400;0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
   <style>
@@ -19,7 +17,7 @@
       --text-primary:#1A1A1A;--text-secondary:#6B6B6B;--text-muted:#9A9A9A;
       --accent:#C8102E;--accent-hover:#A50D26;--tag-bg:#F0EDE8;--input-bg:#FAFAF8;
       --danger:#EF4444;--success:#16A34A;
-      --font-headline:"Playfair Display",Georgia,serif;
+      --font-headline:"Literata",Georgia,serif;
       --font-body:"DM Sans",system-ui,-apple-system,sans-serif;
       --font-mono:"IBM Plex Mono","Courier New",monospace;
       --max-width:1240px;--gutter:32px;
@@ -109,14 +107,6 @@
     .input:focus,.select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,16,46,.08)}
     .input.error,.select.error{border-color:var(--danger)}
     .select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%236B6B6B' d='M6 8L0 0h12z'/></svg>");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
-
-    /* TITLE FONT SELECTOR */
-    .title-font-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
-    .title-font-label{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-right:4px}
-    .title-font-pill{background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);font-size:12px;font-weight:600;padding:5px 11px;border-radius:18px;cursor:pointer;transition:all .15s ease;line-height:1.2}
-    .title-font-pill:hover{border-color:var(--accent);color:var(--accent)}
-    .title-font-pill.active{background:rgba(200,16,46,.06);border-color:var(--accent);color:var(--accent)}
-    @media(max-width:480px){.title-font-pill{font-size:11px;padding:4px 9px}.title-font-label{width:100%;margin-bottom:4px}}
 
     /* TAGS */
     .tags-wrap{background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:46px;cursor:text;transition:border .2s,box-shadow .2s}
@@ -354,17 +344,6 @@
               <div class="field">
                 <label for="f-title-story">Story Title <span class="req">*</span></label>
                 <input type="text" class="input" id="f-title-story" placeholder="The Hidden Fees Plaguing State University Hostels" />
-                <!-- FEATURE: Title font selector — live preview, saved with story -->
-                <div class="title-font-row" id="titleFontRow" role="radiogroup" aria-label="Title font">
-                  <span class="title-font-label">Title font:</span>
-                  <button type="button" class="title-font-pill active" data-font="Playfair Display" style="font-family:'Playfair Display',Georgia,serif">Playfair</button>
-                  <button type="button" class="title-font-pill" data-font="Merriweather" style="font-family:'Merriweather',Georgia,serif">Merriweather</button>
-                  <button type="button" class="title-font-pill" data-font="Lora" style="font-family:'Lora',Georgia,serif">Lora</button>
-                  <button type="button" class="title-font-pill" data-font="Source Serif 4" style="font-family:'Source Serif 4',Georgia,serif">Source Serif</button>
-                  <button type="button" class="title-font-pill" data-font="Inter" style="font-family:'Inter',system-ui,sans-serif">Inter</button>
-                  <button type="button" class="title-font-pill" data-font="Roboto Slab" style="font-family:'Roboto Slab',Georgia,serif">Roboto Slab</button>
-                </div>
-                <input type="hidden" id="titleFont" name="titleFont" value="Playfair Display">
               </div>
               <div class="field">
                 <label for="f-cat-story">Category <span class="req">*</span></label>
@@ -855,6 +834,12 @@
     })();
 
     // Cloudinary constants
+    // SECURITY: This unsigned preset is restricted in the Cloudinary dashboard to:
+    //   - Allowed formats: jpg, jpeg, png, webp, gif
+    //   - Max file size: 10 MB
+    //   - Folder: wevox/uploads
+    // Do NOT change to a signed preset here — signing requires a server-side secret.
+    // If abuse is detected, rotate the preset name in the Cloudinary dashboard.
     const CL_URL='https://api.cloudinary.com/v1_1/dagtpo1vk/image/upload';
     const CL_PRESET='wevox_unsigned';
 
@@ -1104,9 +1089,7 @@
     const catEl=isStory?$id('f-cat-story'):$id('f-cat-video');
     const categoryVal=(catEl&&(catEl.value||(catEl.options[catEl.selectedIndex]&&catEl.options[catEl.selectedIndex].text))||'').trim();
     if(!categoryVal){toast('Please select a category.','error');if(catEl)catEl.focus();return;}
-    // FEATURE: include selected title font (story only; videos keep default)
-    const titleFontVal=isStory&&$id('titleFont')?($id('titleFont').value||'Playfair Display'):'Playfair Display';
-    const payload={type:selectedType,title:(isStory?$id('f-title-story'):$id('f-title-video')).value.trim(),titleFont:titleFontVal,category:categoryVal,tags:isStory?storyTags.getTags():videoTags.getTags(),content:isStory&&quill?(quill.root.innerHTML+(embedsBlock?'\n'+embedsBlock:'')):'',description:isStory?'':$id('f-desc').value.trim(),coverImage:$id('coverImage')?$id('coverImage').value:'',coverImageType:$id('coverImageType')?$id('coverImageType').value:'',mediaUrl:$id('mediaUrl').value,mediaEmbed:$id('mediaEmbed').value,mediaType:$id('mediaType').value,authorId,authorName,email:authorEmail,university:u.university||'',verified:u.verified||false,status:'pending',submittedAt:(firebase&&firebase.firestore&&firebase.firestore.FieldValue)?firebase.firestore.FieldValue.serverTimestamp():new Date()};
+    const payload={type:selectedType,title:(isStory?$id('f-title-story'):$id('f-title-video')).value.trim(),category:categoryVal,tags:isStory?storyTags.getTags():videoTags.getTags(),content:isStory&&quill?(quill.root.innerHTML+(embedsBlock?'\n'+embedsBlock:'')):'',description:isStory?'':$id('f-desc').value.trim(),coverImage:$id('coverImage')?$id('coverImage').value:'',coverImageType:$id('coverImageType')?$id('coverImageType').value:'',mediaUrl:$id('mediaUrl').value,mediaEmbed:$id('mediaEmbed').value,mediaType:$id('mediaType').value,authorId,authorName,email:authorEmail,university:u.university||'',verified:u.verified||false,status:'pending',submittedAt:(firebase&&firebase.firestore&&firebase.firestore.FieldValue)?firebase.firestore.FieldValue.serverTimestamp():new Date()};
       const btn=$id('btnSubmit'),txt=$id('btnText');
       btn.disabled=true;txt.innerHTML='<span class="spinner"></span> Submitting…';
       try{
@@ -1127,10 +1110,6 @@
       if(quill)quill.setContents([]);
       $id('word-count').textContent='0 words';
       clearMediaHidden();
-      // FEATURE: reset title font picker back to default Playfair Display
-      if($id('titleFont')){$id('titleFont').value='Playfair Display';}
-      if($id('f-title-story')){$id('f-title-story').style.fontFamily="'Playfair Display',Georgia,serif";}
-      document.querySelectorAll('#titleFontRow .title-font-pill').forEach(p=>p.classList.toggle('active',p.getAttribute('data-font')==='Playfair Display'));
       // Reset cover image
       if($id('coverImage'))$id('coverImage').value='';
       if($id('coverImageType'))$id('coverImageType').value='';

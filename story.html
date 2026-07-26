@@ -12,7 +12,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,400;0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -26,7 +26,7 @@
       --accent: #C8102E;
       --accent-hover: #A50D26;
       --tag-bg: #F0EDE8;
-      --font-headline: "Playfair Display", Georgia, serif;
+      --font-headline: "Literata", Georgia, serif;
       --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
       --font-mono: "IBM Plex Mono", "Courier New", monospace;
       --max-width: 1240px;
@@ -741,7 +741,8 @@
       .author-row { flex-direction: column; align-items: flex-start; gap: 10px; }
       .meta-row { gap: 12px; }
       .share-row { justify-content: center; }
-      .cover { border-radius: 0; margin: 0 calc(var(--gutter) * -1); width: calc(100% + (var(--gutter) * 2)); border-radius: 0; }
+      .cover-wrap { overflow: hidden; margin: 0 calc(var(--gutter) * -1); width: calc(100% + (var(--gutter) * 2)); }
+      .cover { border-radius: 0; margin: 0; width: 100%; }
       .article-content p { font-size: 16px; line-height: 1.75; }
       .article-content h2 { font-size: 22px; margin: 32px 0 12px; }
       .article-content blockquote { font-size: 18px; padding: 14px 18px; margin: 24px 0; }
@@ -890,11 +891,14 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <div>© 2024 WEVOX Network Platforms Inc.</div>
+        <div>© <span id="copy-year">2024</span> WEVOX Network Platforms Inc.</div>
         <div>contact@wevox.in</div>
       </div>
     </div>
   </footer>
+
+  <!-- DOMPURIFY — must load before any user-content rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js" integrity="sha512-jtUA5HHMbdGHPMFMDHMFGFBMCnFGBqFMFGFBMCnFGBqFMFGFBMCnFGBqFMFGFBMCnFGBqFMFGFBMCnFGBqFM==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -1368,7 +1372,27 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       const avatarHTML = story.authorAvatar
         ? `<div class="avatar"><img src="${escapeHtml(story.authorAvatar)}" alt=""/></div>`
         : `<div class="avatar">${escapeHtml(initials(author))}</div>`;
-      const bodyHTML = isHTMLContent(story.content) ? story.content : plainToHTML(story.content || "");
+      // Sanitize Firestore HTML before injecting into the DOM.
+      // Allows standard article formatting, responsive video wrappers,
+      // and the specific blockquote classes used by Twitter/Instagram embeds.
+      // Strips all event handlers (onerror, onclick, etc.) and javascript: hrefs.
+      const rawBody = isHTMLContent(story.content) ? story.content : plainToHTML(story.content || "");
+      const bodyHTML = (typeof DOMPurify !== 'undefined')
+        ? DOMPurify.sanitize(rawBody, {
+            ADD_TAGS: ['iframe', 'blockquote'],
+            ADD_ATTR: [
+              'allowfullscreen', 'allow', 'loading', 'frameborder',
+              'src', 'width', 'height', 'style',
+              'data-wevox-tweet', 'data-instgrm-permalink', 'data-instgrm-version',
+              'class', 'id', 'target', 'rel', 'href'
+            ],
+            ALLOW_DATA_ATTR: false,
+            FORCE_BODY: false,
+            // Allow YouTube / Vimeo iframes only
+            ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
+            FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+          })
+        : rawBody;
 
       el.innerHTML = `
         <div class="reveal" style="animation-delay:0s;">
@@ -1954,6 +1978,10 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       s.charset = 'utf-8';
       document.body.appendChild(s);
     }
+
+    /* ===== COPYRIGHT YEAR ===== */
+    const copyYearEl = document.getElementById('copy-year');
+    if (copyYearEl) copyYearEl.textContent = new Date().getFullYear();
 
     /* ===== KICK OFF ===== */
     loadStory().finally(() => {
