@@ -12,7 +12,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,400;0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..900;1,7..72,300..900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     /* ============ DESIGN TOKENS ============ */
@@ -207,7 +207,9 @@
       line-height: 1.1;
       color: var(--text-primary);
       max-width: 600px;
-      letter-spacing: -1px;
+      letter-spacing: -0.5px;
+      font-optical-sizing: auto;
+      text-rendering: optimizeLegibility;
     }
     .identity-divider {
       width: 48px;
@@ -438,6 +440,8 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       transition: color 0.2s ease;
+      font-optical-sizing: auto;
+      text-rendering: optimizeLegibility;
     }
     .story-meta {
       font-size: 12.5px;
@@ -467,8 +471,8 @@
     .story-card.lead .story-tag { font-size: 11px; letter-spacing: 1.5px; }
     .story-card.lead .story-title {
       font-size: 32px;
-      line-height: 1.15;
-      letter-spacing: -0.5px;
+      line-height: 1.2;
+      letter-spacing: -0.25px;
       -webkit-line-clamp: 3;
     }
     .story-card.lead .story-meta { font-size: 13.5px; }
@@ -569,10 +573,19 @@
       margin-bottom: 3px;
     }
     .video-card:hover .video-title { color: var(--accent); }
+    /* Flex column wrapper — single grid child in col 2 of .video-card.
+       Ensures tag → title → meta always stack vertically at every viewport. */
+    .video-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;   /* allow text to shrink inside the grid cell */
+    }
     .video-meta {
       font-size: 11px;
       color: var(--text-muted);
       font-family: var(--font-mono);
+      margin-top: 2px;  /* slight extra breathing room below title */
     }
 
     /* ============ EMPTY / ERROR STATES ============ */
@@ -636,30 +649,63 @@
     .trending-row::-webkit-scrollbar { display: none; }
     .trending-card {
       background: var(--surface);
-      padding: 16px;
       border-radius: 6px;
-      min-width: 220px;
-      max-width: 220px;
+      min-width: 240px;
+      max-width: 240px;
       position: relative;
       overflow: hidden;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       scroll-snap-align: start;
       flex-shrink: 0;
     }
     .trending-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
     }
+
+    /* Thumbnail sits at the top of the card */
+    .trending-thumb-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .trending-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .trending-card:hover .trending-thumb { transform: scale(1.03); }
+
+    /* Rank badge overlaid on the image — bottom-left, editorial weight */
     .trending-num {
       position: absolute;
-      top: 6px; left: 14px;
+      bottom: 8px; left: 10px;
       font-family: var(--font-headline);
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 900;
-      color: var(--accent);
-      opacity: 0.15;
+      color: #fff;
       line-height: 1;
+      /* dark scrim so number is legible on any image */
+      background: rgba(0,0,0,0.52);
+      padding: 3px 7px 4px;
+      border-radius: 3px;
+      letter-spacing: -0.5px;
+    }
+
+    /* Text block below the image */
+    .trending-body {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
     .trending-tag {
       font-family: var(--font-mono);
@@ -668,20 +714,20 @@
       letter-spacing: 1px;
       text-transform: uppercase;
       font-weight: 600;
-      margin-top: 24px;
       margin-bottom: 6px;
     }
     .trending-title {
       font-family: var(--font-body);
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
       color: var(--text-primary);
       line-height: 1.4;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      flex: 1;
     }
     .trending-count {
       font-family: var(--font-mono);
@@ -944,6 +990,9 @@
       /* Videos collapse below Stories on mobile; drop the sidebar border/sticky styling */
       #videos { position: static; border-left: none; padding: 0; }
       .videos-list { gap: 16px; }
+
+      /* Field Reports: no extra overrides needed — .video-body flex
+         column (added to base styles) handles stacking at all widths. */
 
       .story-card {
         grid-template-columns: 1fr;
@@ -1442,9 +1491,11 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
             <div class="video-overlay"><div class="play-btn">▶</div></div>
             ${v.duration ? `<div class="duration">${v.duration}</div>` : ''}
           </div>
-          <div class="video-tag">Field Reports</div>
-          <h3 class="video-title">${v.title || 'Untitled'}</h3>
-          <div class="video-meta">${formatViewsYT(v.views)} · ${timeAgo(v.publishedAt)}</div>
+          <div class="video-body">
+            <div class="video-tag">Field Reports</div>
+            <h3 class="video-title">${v.title || 'Untitled'}</h3>
+            <div class="video-meta">${formatViewsYT(v.views)} · ${timeAgo(v.publishedAt)}</div>
+          </div>
         </a>
       `).join('');
     }
@@ -1515,6 +1566,18 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
     }
 
     /* ============ TRENDING ============ */
+    function resolveTrendingThumb(t, index) {
+      // 1. Explicit imageUrl on the trending doc (Firestore real data)
+      if (t.imageUrl) return t.imageUrl;
+      // 2. Look up the linked story's coverImage from the already-loaded allStories array
+      if (t.ref_id) {
+        const linked = allStories.find(s => s.id === t.ref_id);
+        if (linked && linked.coverImage) return linked.coverImage;
+      }
+      // 3. Deterministic picsum fallback — unique per card, consistent across renders
+      return `https://picsum.photos/seed/wevox-tr${index}/480/270`;
+    }
+
     function renderTrending(items) {
       const row = $("trendingRow");
       if (!items || !items.length) {
@@ -1528,12 +1591,23 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
         const linkable = t.ref_id && (t.type !== "video");
         const tag = linkable ? "a" : "article";
         const hrefAttr = linkable ? ` href="story.html?id=${encodeURIComponent(t.ref_id)}"` : "";
+        const thumb = resolveTrendingThumb(t, i);
+        const rankLabel = String(i + 1).padStart(2, "0");
         return `
         <${tag} class="trending-card stagger"${hrefAttr} style="animation-delay:${i * 0.06}s">
-          <div class="trending-num">${String(i + 1).padStart(2, "0")}</div>
-          <div class="trending-tag">${escapeHtml(t.tag || t.type || "Trending")}</div>
-          <div class="trending-title">${escapeHtml(t.title || "Untitled")}</div>
-          <div class="trending-count">${(t.readCount || 0).toLocaleString()} reads</div>
+          <div class="trending-thumb-wrap">
+            <img class="trending-thumb"
+              src="${escapeHtml(thumb)}"
+              alt=""
+              loading="lazy"
+              onerror="this.src='https://picsum.photos/seed/wevox-tr-fb${i}/480/270'" />
+            <div class="trending-num">${rankLabel}</div>
+          </div>
+          <div class="trending-body">
+            <div class="trending-tag">${escapeHtml(t.tag || t.type || "Trending")}</div>
+            <div class="trending-title">${escapeHtml(t.title || "Untitled")}</div>
+            <div class="trending-count">${(t.readCount || 0).toLocaleString()} reads</div>
+          </div>
         </${tag}>`;
       }).join("");
     }
