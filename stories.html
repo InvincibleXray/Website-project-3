@@ -1145,6 +1145,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="js/firebase.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/navbar.js"></script>
 
   <script>
     /* ============ STATE ============ */
@@ -1159,10 +1160,6 @@
 
     /* ============ DOM REFS ============ */
     const $ = (id) => document.getElementById(id);
-    const navbar = $('navbar');
-    const hamburger = $('hamburger');
-    const mobileOverlay = $('mobileOverlay');
-    const overlayClose = $('overlayClose');
     const grid = $('storiesGrid');
     const loadMoreBtn = $('loadMoreBtn');
     const endNote = $('endNote');
@@ -1232,23 +1229,6 @@
       const ch = cat.trim().charAt(0).toUpperCase();
       return ch || '·';
     }
-
-    /* ============ NAVBAR / HAMBURGER ============ */
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 30);
-    });
-    hamburger.addEventListener('click', () => {
-      mobileOverlay.classList.add('open');
-      mobileOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    });
-    function closeMenu() {
-      mobileOverlay.classList.remove('open');
-      mobileOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-    overlayClose.addEventListener('click', closeMenu);
-    mobileOverlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
 
     /* ============ SKELETONS / STATES ============ */
     function renderSkeletons(count = PAGE_SIZE) {

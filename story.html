@@ -1235,28 +1235,11 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       return (s || "").split(/\n{2,}/).map(p => `<p>${escapeHtml(p.trim()).replace(/\n/g, "<br>")}</p>`).join("");
     }
 
-    /* ===== NAVBAR / HAMBURGER ===== */
-    const navbar = $("navbar");
+    /* ===== PAGE SCROLL LISTENERS ===== */
     window.addEventListener("scroll", () => {
-      navbar.classList.toggle("scrolled", window.scrollY > 50);
       updateProgress();
       updateActiveTOC();
     });
-    const hamburger = $("hamburger");
-    const mobileOverlay = $("mobileOverlay");
-    const overlayClose = $("overlayClose");
-    hamburger.addEventListener("click", () => {
-      mobileOverlay.classList.add("open");
-      mobileOverlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    });
-    function closeMenu() {
-      mobileOverlay.classList.remove("open");
-      mobileOverlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-    overlayClose.addEventListener("click", closeMenu);
-    mobileOverlay.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
 
     /* ===== READING PROGRESS BAR ===== */
     const progressBar = $("progressBar");

@@ -954,33 +954,8 @@
   </div>
 
   <!-- ============ SCRIPTS ============ -->
+  <script src="js/navbar.js"></script>
   <script>
-    /* Navbar scroll shadow */
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 30);
-    });
-
-    /* Mobile hamburger */
-    const hamburger     = document.getElementById('hamburger');
-    const mobileOverlay = document.getElementById('mobileOverlay');
-    const overlayClose  = document.getElementById('overlayClose');
-
-    function openMenu() {
-      mobileOverlay.classList.add('open');
-      mobileOverlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeMenu() {
-      mobileOverlay.classList.remove('open');
-      mobileOverlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-    hamburger.addEventListener('click', openMenu);
-    overlayClose.addEventListener('click', closeMenu);
-    mobileOverlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
-
     /* FAB */
     const fabWrap = document.getElementById('fabWrap');
     const fab     = document.getElementById('fab');

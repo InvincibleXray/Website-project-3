@@ -1021,35 +1021,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="js/firebase.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/navbar.js"></script>
 
   <script>
     /* ============ HELPERS ============ */
     const $ = (id) => document.getElementById(id);
-
-    /* ============ NAVBAR SCROLL SHADOW (verbatim from index.html) ============ */
-    const navbar = $("navbar");
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 50) navbar.classList.add("scrolled");
-      else navbar.classList.remove("scrolled");
-    });
-
-    /* ============ MOBILE HAMBURGER (verbatim from index.html) ============ */
-    const hamburger = $("hamburger");
-    const mobileOverlay = $("mobileOverlay");
-    const overlayClose = $("overlayClose");
-    function openMenu() {
-      mobileOverlay.classList.add("open");
-      mobileOverlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    }
-    function closeMenu() {
-      mobileOverlay.classList.remove("open");
-      mobileOverlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-    hamburger.addEventListener("click", openMenu);
-    overlayClose.addEventListener("click", closeMenu);
-    mobileOverlay.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
 
     /* ============ COPYRIGHT YEAR ============ */
     const yearEl = document.getElementById("copy-year");

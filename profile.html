@@ -396,6 +396,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="js/firebase.js"></script>
+  <script src="js/navbar.js"></script>
 
   <script>
     if (!firebaseReady) {
@@ -817,25 +818,7 @@
       showLogin();
     }
 
-    /* ============ NAVBAR / HAMBURGER ============ */
-    const navbar = $("navbar");
-    window.addEventListener("scroll", () => {
-      navbar.classList.toggle("scrolled", window.scrollY > 30);
-    });
-    const hamburger = $("hamburger"), mobileOverlay = $("mobileOverlay"), overlayClose = $("overlayClose");
-    hamburger.addEventListener("click", () => {
-      mobileOverlay.classList.add("open");
-      mobileOverlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    });
-    function closeMenu() {
-      mobileOverlay.classList.remove("open");
-      mobileOverlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-    overlayClose.addEventListener("click", closeMenu);
-    mobileOverlay.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeMenu(); closeProfileModal(); } });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeProfileModal(); });
 
     /* ============ MISC ============ */
     const copyYearEl = $("copy-year");
