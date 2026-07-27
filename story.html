@@ -192,6 +192,18 @@
       text-rendering: optimizeLegibility;
       font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     }
+    .summary-quote {
+      background: #000;
+      color: #fff;
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: 19px;
+      line-height: 1.6;
+      padding: 26px 28px;
+      border-radius: 6px;
+      width: 100%;
+      margin: 24px 0;
+    }
     .excerpt {
       font-family: var(--font-body);
       font-weight: 300;
@@ -765,6 +777,11 @@
       .article-page { padding: 70px 0 0; }
       .breadcrumb { margin-top: 20px; font-size: 10px; }
       .headline { font-size: 28px; }
+      .summary-quote {
+        padding: 18px 20px;
+        font-size: 17px;
+        margin: 20px 0;
+      }
       .excerpt { font-size: 17px; }
       .author-row { flex-direction: column; align-items: flex-start; gap: 10px; }
       .meta-row { gap: 12px; }
@@ -1453,6 +1470,8 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
         </div>
 
         <h1 class="headline reveal" style="animation-delay:0.1s;">${escapeHtml(story.title || "Untitled")}</h1>
+
+        ${story.summaryQuote ? `<div class="summary-quote reveal" style="animation-delay:0.11s;">${escapeHtml(story.summaryQuote)}</div>` : ""}
 
         ${story.excerpt ? `<p class="excerpt reveal" style="animation-delay:0.12s;">${escapeHtml(story.excerpt)}</p>` : ""}
 

@@ -695,6 +695,7 @@ function registerAdminEmbedBlots(){
 
 function storyFormHtml(d){const c=d||{};const catOpts='<option value="">Select category…</option>'+CATEGORIES.map(x=>'<option'+(x===c.category?' selected':'')+'>'+x+'</option>').join('');
 return `<div class="grid-2"><div class="field"><label>Title *</label><input class="inp" id="f-title" value="${esc(c.title||'')}"></div><div class="field"><label>Author *</label><input class="inp" id="f-author" value="${esc(c.author||'')}"></div><div class="field"><label>Category *</label><select class="inp" id="f-cat">${catOpts}</select></div><div class="field"><label>University</label><input class="inp" id="f-uni" value="${esc(c.university||'')}"></div><div class="field"><label>Read Time</label><input class="inp" id="f-readtime" value="${esc(c.readTime||'5 min read')}"></div></div>
+<div class="field" style="margin-top:16px"><label>Summary Quote (optional)</label><textarea class="inp" id="f-summaryQuote" rows="3" placeholder="Enter a highlighted summary quote...">${esc(c.summaryQuote||'')}</textarea></div>
 <div class="field"><label>Cover Image</label>
   <div style="display:flex;gap:8px;margin-bottom:8px">
     <button type="button" class="btn-ghost btn-sm" id="cover-tab-upload" style="border-color:var(--accent);color:var(--accent)">📁 Upload</button>
@@ -980,6 +981,7 @@ async function saveStory(id){
   const data={
     title,author,category:cat,
     university:$('f-uni').value.trim(),
+    summaryQuote:$('f-summaryQuote')?$('f-summaryQuote').value.trim():'',
     coverImage:$('f-cover').value.trim(),
     readTime:$('f-readtime').value.trim()||'5 min read',
     body: fullContent,
