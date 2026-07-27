@@ -139,6 +139,10 @@
       margin: 0 auto;
       align-items: flex-start;
     }
+    .article-grid.no-sidebar {
+      grid-template-columns: minmax(0, 720px);
+      max-width: 720px;
+    }
     .article-col { min-width: 0; }
 
     /* ============ BREADCRUMB ============ */
@@ -1452,7 +1456,6 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
 
         <div class="author-row reveal" style="animation-delay:0.15s;">
           <div class="author-block">
-            ${avatarHTML}
             <div>
               <div class="author-name">${escapeHtml(author)}</div>
               <div class="author-uni">${escapeHtml(uni)}</div>
@@ -1596,7 +1599,6 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
         <div class="author-row reveal"
              style="animation-delay:0.15s;">
           <div class="author-block">
-            ${avatarHTML}
             <div>
               <div class="author-name">
                 ${escapeHtml(author)}
@@ -1702,9 +1704,13 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
     }
 
     /* ===== ERROR / NOT FOUND STATES ===== */
+    function hideSidebar() {
+      $("sidebar").style.display = "none";
+      document.querySelector(".article-grid").classList.add("no-sidebar");
+    }
     function showNotFound() {
       $("storySkeleton").style.display = "none";
-      $("sidebar").style.display = "none";
+      hideSidebar();
       $("articleCol").innerHTML = `
         <div class="state-page">
           <h1>Story not found.</h1>
@@ -1715,7 +1721,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
     }
     function showUnderReview() {
       $("storySkeleton").style.display = "none";
-      $("sidebar").style.display = "none";
+      hideSidebar();
       $("articleCol").innerHTML = `
         <div class="state-page">
           <h1>This story is under review.</h1>
@@ -1726,7 +1732,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
     }
     function showError() {
       $("storySkeleton").style.display = "none";
-      $("sidebar").style.display = "none";
+      hideSidebar();
       $("articleCol").innerHTML = `
         <div class="state-page">
           <h1>Something went wrong.</h1>
