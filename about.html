@@ -1020,6 +1020,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="js/firebase.js"></script>
+  <script src="js/auth.js"></script>
 
   <script>
     /* ============ HELPERS ============ */
@@ -1049,52 +1050,6 @@
     hamburger.addEventListener("click", openMenu);
     overlayClose.addEventListener("click", closeMenu);
     mobileOverlay.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
-
-    /* ============ NAV AUTH STATE ============ */
-    (function () {
-      if (!firebaseReady) return;
-      const loginBtn = $("navLoginBtn");
-      const avatarWrap = $("navAvatarWrap");
-      const avatarBtn = $("navAvatarBtn");
-      const avatarDropdown = $("navAvatarDropdown");
-      const signOutBtn = $("navSignOut");
-
-      firebase.auth().onAuthStateChanged(function (user) {
-        if (user) {
-          loginBtn.style.display = "none";
-          avatarWrap.style.display = "block";
-          const name = user.displayName || user.email || "?";
-          avatarBtn.textContent = name.charAt(0).toUpperCase();
-        } else {
-          loginBtn.style.display = "";
-          avatarWrap.style.display = "none";
-        }
-      });
-
-      avatarBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        const isOpen = avatarWrap.classList.toggle("open");
-        avatarBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      });
-
-      document.addEventListener("click", function (e) {
-        if (!avatarWrap.contains(e.target)) {
-          avatarWrap.classList.remove("open");
-          avatarBtn.setAttribute("aria-expanded", "false");
-        }
-      });
-
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape") {
-          avatarWrap.classList.remove("open");
-          avatarBtn.setAttribute("aria-expanded", "false");
-        }
-      });
-
-      signOutBtn.addEventListener("click", function () {
-        firebase.auth().signOut();
-      });
-    }());
 
     /* ============ COPYRIGHT YEAR ============ */
     const yearEl = document.getElementById("copy-year");
