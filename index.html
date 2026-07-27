@@ -245,73 +245,7 @@
       text-transform: uppercase;
     }
 
-    /* ============ TICKER ============ */
-    .ticker {
-      background: #1A1A1A;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-    }
-    .ticker-inner {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0 var(--gutter);
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      height: 100%;
-    }
-    .live-badge {
-      background: var(--accent);
-      color: #fff;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 3px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      letter-spacing: 1px;
-      flex-shrink: 0;
-    }
-    .live-dot {
-      width: 6px; height: 6px;
-      background: #fff;
-      border-radius: 50%;
-      animation: blink 1.2s infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
-    }
-    .ticker-track {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-      mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%);
-    }
-    .ticker-content {
-      display: inline-flex;
-      gap: 32px;
-      white-space: nowrap;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: #E8E4DF;
-      animation: marquee 40s linear infinite;
-    }
-    .ticker-track:hover .ticker-content { animation-play-state: paused; }
-    .ticker-content span::after {
-      content: " • ";
-      color: var(--accent);
-      margin-left: 32px;
-    }
-    @keyframes marquee {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
+
 
     /* ============ CATEGORY FILTER BAR ============ */
     .filter-bar {
@@ -1139,17 +1073,6 @@
     </div>
   </section>
 
-  <!-- ============ TICKER ============ -->
-  <div class="ticker" aria-label="Breaking news">
-    <div class="ticker-inner">
-      <span class="live-badge"><span class="live-dot"></span>LIVE</span>
-      <div class="ticker-track">
-        <div class="ticker-content" id="tickerContent">
-          <span>Loading trending topics</span>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- ============ CATEGORY FILTER BAR ============ -->
   <div class="filter-bar" id="filterBar">
@@ -1561,17 +1484,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
     modal.addEventListener("click", (e) => { if (e.target === modal) closeVideo(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("open")) closeVideo(); });
 
-    /* ============ TICKER ============ */
-    function renderTicker(items) {
-      const el = $("tickerContent");
-      if (!items || !items.length) {
-        el.innerHTML = `<span>WEVOX Verified Reporter Network is live</span><span>200+ campuses across India</span><span>Submit your story today</span>`;
-        return;
-      }
-      // Duplicate for smooth loop
-      const html = items.map(t => `<span>${escapeHtml(t.tag ? "[" + t.tag.toUpperCase() + "] " : "")}${escapeHtml(t.title || "")}</span>`).join("");
-      el.innerHTML = html + html;
-    }
+
 
     /* ============ TRENDING ============ */
     function resolveTrendingThumb(t, index) {
@@ -1674,7 +1587,6 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
         }
       }
       if (!docs.length) docs = SAMPLE_TRENDING;
-      renderTicker(docs);
       renderTrending(docs);
     }
 
