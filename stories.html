@@ -1143,35 +1143,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase.js"></script>
 
   <script>
-    /* ============ FIREBASE CONFIG (same as index.html) ============ */
-    const firebaseConfig = {
-      apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
-      authDomain: "cjnsite-d3f3f.firebaseapp.com",
-      projectId: "cjnsite-d3f3f",
-      storageBucket: "cjnsite-d3f3f.firebasestorage.app",
-      messagingSenderId: "491318197551",
-      appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
-      measurementId: "G-JES3G3L45V"
-    };
-
-    let db = null;
-    let firebaseReady = false;
-    try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-      firebaseReady = true;
-    } catch (err) {
-      console.warn("Firebase init failed:", err);
-      firebaseReady = false;
-    }
-    const isRealConfig = firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('YOUR_');
-    if (!isRealConfig) {
-      console.warn('Firebase placeholder config detected — using empty state only');
-      firebaseReady = false;
-    }
-
     /* ============ STATE ============ */
     const PAGE_SIZE = 9;
     let lastDoc = null;
