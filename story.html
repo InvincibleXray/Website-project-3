@@ -1779,7 +1779,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       grid.innerHTML = candidates.map(s => `
         <a class="more-card" href="story.html?id=${encodeURIComponent(s.id)}">
           <div class="more-card-thumb-wrap">
-            <img class="more-card-thumb" src="${escapeHtml(s.coverImage || placeholderImg('m-' + s.id))}" alt="" loading="lazy" />
+            <img class="more-card-thumb" src="${escapeHtml(s.coverImage || placeholderImg('m-' + s.id))}" onerror="this.onerror=null; this.src='img/placeholder.jpg';" alt="" loading="lazy" />
           </div>
           <div class="more-card-body">
             <div class="more-card-tag">${escapeHtml(s.category || "Stories")}</div>
@@ -1807,7 +1807,14 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       const r = candidates[0];
       $("sidebarRelated").style.display = "block";
       $("relatedTeaser").href = "story.html?id=" + encodeURIComponent(r.id);
-      $("relatedThumb").src = r.coverImage || placeholderImg("r-" + r.id);
+      
+      const thumb = $("relatedThumb");
+      thumb.onerror = function() {
+        this.onerror = null;
+        this.src = "img/placeholder.jpg";
+      };
+      thumb.src = r.coverImage || placeholderImg("r-" + r.id);
+      
       $("relatedTitle").textContent = r.title || "Untitled";
     }
 
