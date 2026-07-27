@@ -16,7 +16,7 @@
 
   <style>
     :root {
-      --bg: #F9F7F4;
+      --bg: #F2F2F2;
       --bg-dark: #0D0D0D;
       --surface: #FFFFFF;
       --border: #E8E4DF;
@@ -133,17 +133,23 @@
     }
     .article-grid {
       display: grid;
-      grid-template-columns: minmax(0, 720px) 260px;
+      grid-template-columns: minmax(0, 2.5fr) 1fr;
       gap: 60px;
-      max-width: 1080px;
+      max-width: 1240px;
       margin: 0 auto;
       align-items: flex-start;
     }
     .article-grid.no-sidebar {
-      grid-template-columns: minmax(0, 720px);
-      max-width: 720px;
+      grid-template-columns: minmax(0, 1000px);
+      max-width: 1000px;
     }
-    .article-col { min-width: 0; }
+    .article-col {
+      min-width: 0;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.03);
+    }
 
     /* ============ BREADCRUMB ============ */
     .breadcrumb {
@@ -176,10 +182,10 @@
     .headline {
       font-family: var(--font-headline);
       font-weight: 700;
-      font-size: 44px;
+      font-size: 38px;
       line-height: 1.2;
       color: var(--text-primary);
-      max-width: 720px;
+      max-width: 100%;
       margin-bottom: 20px;
       letter-spacing: -0.5px;
       font-optical-sizing: auto;
@@ -192,7 +198,7 @@
       font-size: 20px;
       line-height: 1.6;
       color: var(--text-secondary);
-      max-width: 620px;
+      max-width: 100%;
       margin-bottom: 24px;
     }
     .divider {
@@ -280,8 +286,8 @@
 
     /* ============ ARTICLE BODY ============ */
     .article-content {
-      max-width: 680px;
-      margin: 0 auto;
+      max-width: 100%;
+      margin: 0;
     }
     .article-content p {
       font-family: var(--font-body);
@@ -464,6 +470,10 @@
       position: sticky;
       top: 88px;
       align-self: flex-start;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.03);
     }
     .sidebar-block {
       margin-bottom: 32px;
@@ -735,12 +745,18 @@
 
     /* ============ RESPONSIVE ============ */
     @media (max-width: 1024px) {
-      .article-grid { grid-template-columns: 1fr; gap: 0; max-width: 720px; }
+      .article-grid { grid-template-columns: 1fr; gap: 24px; max-width: 860px; }
       .sidebar { display: none; }
-      .headline { font-size: 36px; }
+      .headline { font-size: 34px; }
     }
     @media (max-width: 768px) {
       :root { --gutter: 20px; }
+      .article-col {
+        padding: 32px var(--gutter);
+        border-radius: 0;
+        margin: 0 calc(var(--gutter) * -1);
+        width: calc(100% + (var(--gutter) * 2));
+      }
       .nav-links { display: none; }
       .hamburger { display: flex; }
       .btn-submit { padding: 7px 14px; font-size: 12px; }
@@ -895,23 +911,9 @@
 
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
-          <div class="sidebar-block">
-            <div class="sidebar-heading">In This Story</div>
-            <nav class="toc-list" id="tocList">
-              <span style="font-size:13px;color:var(--text-muted);">Loading…</span>
-            </nav>
-          </div>
-          <div class="sidebar-block">
-            <div class="sidebar-heading">Share This Story</div>
-            <div class="sidebar-share" id="sidebarShare"></div>
-          </div>
           <div class="sidebar-block" id="sidebarRelated" style="display:none;">
-            <div class="sidebar-heading">Read Next</div>
-            <a class="related-teaser" id="relatedTeaser" href="#">
-              <img id="relatedThumb" src="" alt="" />
-              <div class="related-teaser-title" id="relatedTitle"></div>
-              <span class="related-teaser-link">Read next →</span>
-            </a>
+            <div class="sidebar-heading">OTHER STORIES</div>
+            <div id="sidebarRelatedList" style="display:flex; flex-direction:column; gap:16px;"></div>
           </div>
         </aside>
 
@@ -1306,6 +1308,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       const tw = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
       const wa = `https://wa.me/?text=${text}%20${url}`;
       const el = $("sidebarShare");
+      if (!el) return;
       el.innerHTML = `
         <a class="sidebar-share-btn" href="${tw}" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24"><path d="M22 5.8c-.7.3-1.5.5-2.4.6.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1-.7-.8-1.8-1.3-3-1.3-2.3 0-4.1 1.8-4.1 4.1 0 .3 0 .6.1.9-3.4-.2-6.4-1.8-8.4-4.3-.4.6-.6 1.3-.6 2.1 0 1.4.7 2.7 1.8 3.4-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2.1 2.8 3.9 2.9-1.4 1.1-3.2 1.8-5.2 1.8H2c1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg>
@@ -1334,6 +1337,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
     function buildTOC(articleEl) {
       const headings = articleEl.querySelectorAll("h2, h3");
       const tocList = $("tocList");
+      if (!tocList) return;
       if (!headings.length) {
         tocList.innerHTML = `<span style="font-size:13px;color:var(--text-muted);">No sections.</span>`;
         return;
@@ -1357,7 +1361,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       });
     }
     function updateActiveTOC() {
-      if (!tocSections.length) return;
+      if (!tocSections.length || !tocLinks.length) return;
       const top = window.scrollY + 120;
       let active = 0;
       for (let i = 0; i < tocSections.length; i++) {
@@ -1705,8 +1709,10 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
 
     /* ===== ERROR / NOT FOUND STATES ===== */
     function hideSidebar() {
-      $("sidebar").style.display = "none";
-      document.querySelector(".article-grid").classList.add("no-sidebar");
+      const sidebar = $("sidebar");
+      if (sidebar) sidebar.style.display = "none";
+      const grid = document.querySelector(".article-grid");
+      if (grid) grid.classList.add("no-sidebar");
     }
     function showNotFound() {
       $("storySkeleton").style.display = "none";
@@ -1809,19 +1815,19 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       }, { threshold: 0.15 });
       cards.forEach(c => obs.observe(c));
 
-      // Sidebar related teaser (1st card)
-      const r = candidates[0];
-      $("sidebarRelated").style.display = "block";
-      $("relatedTeaser").href = "story.html?id=" + encodeURIComponent(r.id);
-      
-      const thumb = $("relatedThumb");
-      thumb.onerror = function() {
-        this.onerror = null;
-        this.src = "img/placeholder.jpg";
-      };
-      thumb.src = r.coverImage || placeholderImg("r-" + r.id);
-      
-      $("relatedTitle").textContent = r.title || "Untitled";
+      // Sidebar related list
+      const sidebarRelated = $("sidebarRelated");
+      const listEl = $("sidebarRelatedList");
+      if (sidebarRelated && listEl && candidates.length > 0) {
+        sidebarRelated.style.display = "block";
+        listEl.innerHTML = candidates.map(r => `
+          <a class="related-teaser" href="story.html?id=${encodeURIComponent(r.id)}">
+            <img src="${escapeHtml(r.coverImage || r.thumbnailUrl || r.imageUrl || placeholderImg('r-' + r.id))}" onerror="this.onerror=null; this.src='${placeholderImg('fallback')}';" alt="" />
+            <div class="related-teaser-title">${escapeHtml(r.title || "Untitled")}</div>
+            <span class="related-teaser-link">Read next →</span>
+          </a>
+        `).join("");
+      }
     }
 
     /* ===== MORE VIDEOS ===== */
