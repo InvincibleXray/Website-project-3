@@ -232,57 +232,66 @@
     }
     .mobile-overlay a:hover { color: var(--accent); }
 
-    /* ============ HERO (community-hero, mirrors .identity) ============ */
-    .community-hero {
-      padding: 100px 0 32px;
+    /* ============ PAGE HEADER ============ */
+    .page-header {
       background: var(--bg);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: slideUp 0.4s ease-out 0.1s forwards;
+      padding: 100px 0 32px;
     }
-    .hero-content {
-      max-width: 760px;
+    .page-header-inner {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
     }
-    .hero-label {
+    .page-eyebrow {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 11px; font-weight: 600;
       color: var(--accent);
-      letter-spacing: 2px;
-      margin-bottom: 14px;
+      letter-spacing: 3px;
       text-transform: uppercase;
+      margin-bottom: 12px;
     }
-    .community-hero h1 {
+    .page-title {
       font-family: var(--font-headline);
-      font-weight: 700;
+      font-weight: 900;
       font-size: 52px;
-      line-height: 1.1;
       color: var(--text-primary);
-      letter-spacing: -1px;
-      margin-bottom: 18px;
+      letter-spacing: -1.2px;
+      line-height: 1.05;
+      margin-bottom: 16px;
     }
-    .community-hero h1 .accent-italic {
+    .page-title .accent-italic {
       color: var(--accent);
       font-style: italic;
-      font-weight: 700;
+      font-weight: 900;
     }
-    .hero-divider {
-      width: 48px;
-      height: 2px;
+    .page-title-rule {
+      width: 48px; height: 2px;
       background: var(--accent);
-      margin-bottom: 22px;
+      margin-bottom: 16px;
     }
-    .hero-paragraph {
-      font-size: 16px;
+    .page-sub {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 18px;
       color: var(--text-secondary);
-      max-width: 620px;
-      margin-bottom: 28px;
-      line-height: 1.6;
+      max-width: 540px;
+      line-height: 1.55;
+    }
+    .count-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 16px;
+      background: var(--surface);
+      white-space: nowrap;
     }
     .hero-ctas {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       align-items: center;
+      margin-top: 24px;
     }
     .btn-outline {
       display: inline-block;
@@ -299,35 +308,6 @@
       border-color: var(--text-primary);
       color: var(--text-primary);
       background: var(--surface);
-    }
-
-    /* Hero stats grid (4-up) */
-    .hero-stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 36px;
-    }
-    .stat {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 16px 20px;
-      background: var(--surface);
-    }
-    .stat-number {
-      font-family: var(--font-headline);
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1.1;
-    }
-    .stat-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--text-secondary);
-      letter-spacing: 1px;
-      margin-top: 6px;
-      text-transform: uppercase;
     }
 
     /* ============ TICKER (verbatim from index.html) ============ */
@@ -816,12 +796,9 @@
 
     /* ============ RESPONSIVE ============ */
     @media (max-width: 1024px) {
-      .community-hero h1 { font-size: 42px; }
+      .page-title { font-size: 42px; }
       .section-h2 { font-size: 30px; }
       .join-cta h2 { font-size: 30px; }
-      .hero-stats { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-      .stat { padding: 12px 14px; }
-      .stat-number { font-size: 22px; }
       .footer-grid { grid-template-columns: 1.2fr 1fr 1fr; }
       .footer-grid .footer-col:nth-child(4) { display: none; }
     }
@@ -832,23 +809,19 @@
       .hamburger { display: flex; }
       .btn-submit { padding: 7px 14px; font-size: 12px; }
 
-      .community-hero { padding: 88px 0 24px; }
-      .community-hero h1 { font-size: 30px; }
-      .hero-paragraph { font-size: 15px; }
-      .hero-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-      .hero-ctas { gap: 10px; }
-      .hero-ctas .btn-submit, .hero-ctas .btn-outline {
-        flex: 1 1 auto;
-        text-align: center;
-      }
+      .page-title { font-size: 40px; }
+      .page-sub { font-size: 16px; }
 
       .section { padding: 56px 0; }
       .section-h2 { font-size: 26px; }
       .join-cta { padding: 56px 0; }
       .join-cta h2 { font-size: 26px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    @media (max-width: 480px) {
+      .page-title { font-size: 32px; }
+      .join-cta h2 { font-size: 24px; }
 
       .contributors-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -915,36 +888,20 @@
   </div>
 
   <!-- ============ HERO ============ -->
-  <section class="community-hero">
+  <section class="page-header">
     <div class="container">
-      <div class="hero-content">
-        <div class="hero-label">BUILT BY THE COMMUNITY</div>
-        <h1>Powered by <span class="accent-italic">young voices.</span></h1>
-        <div class="hero-divider"></div>
-        <p class="hero-paragraph">WEVOX is powered by reporters, storytellers, students, and young voices from different cities and campuses across India.</p>
-        <div class="hero-ctas">
-          <a href="join.html" class="btn-submit">Join the Community →</a>
-          <a href="#contributors" class="btn-outline">View All Contributors</a>
+      <div class="page-header-inner">
+        <div>
+          <div class="page-eyebrow">BUILT BY THE COMMUNITY</div>
+          <h1 class="page-title">Powered by <span class="accent-italic">young voices.</span></h1>
+          <div class="page-title-rule"></div>
+          <p class="page-sub">WEVOX is powered by reporters, storytellers, students, and young voices from different cities and campuses across India.</p>
+          <div class="hero-ctas">
+            <a href="join.html" class="btn-submit">Join the Community →</a>
+            <a href="#contributors" class="btn-outline">View All Contributors</a>
+          </div>
         </div>
-      </div>
-
-      <div class="hero-stats" aria-label="Community statistics">
-        <div class="stat stagger" style="animation-delay:0.15s">
-          <div class="stat-number">2,400+</div>
-          <div class="stat-label">Active Members</div>
-        </div>
-        <div class="stat stagger" style="animation-delay:0.25s">
-          <div class="stat-number">38</div>
-          <div class="stat-label">Cities Represented</div>
-        </div>
-        <div class="stat stagger" style="animation-delay:0.35s">
-          <div class="stat-number">900+</div>
-          <div class="stat-label">Stories Published</div>
-        </div>
-        <div class="stat stagger" style="animation-delay:0.45s">
-          <div class="stat-number">18</div>
-          <div class="stat-label">States &amp; UTs</div>
-        </div>
+        <div class="count-pill" aria-label="Community statistics">2,400+ Members · 900+ Stories · 38 Cities · 18 States</div>
       </div>
     </div>
   </section>
