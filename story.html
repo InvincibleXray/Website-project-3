@@ -765,6 +765,57 @@
       .nav-inner { padding: 12px var(--gutter); }
       .logo { font-size: 20px; }
     }
+
+    /* ============ NAV AVATAR (auth state) ============ */
+    .nav-avatar-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+    .nav-avatar-btn:hover { background: var(--accent-hover); }
+    .nav-avatar-dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      min-width: 160px;
+      display: none;
+      flex-direction: column;
+      z-index: 200;
+    }
+    .nav-avatar-wrap.open .nav-avatar-dropdown { display: flex; }
+    .nav-avatar-item {
+      display: block;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-align: left;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: background 0.15s ease, color 0.15s ease;
+      border-radius: 0;
+      width: 100%;
+    }
+    .nav-avatar-item:hover { background: var(--tag-bg); color: var(--accent); }
+    .nav-avatar-signout { color: var(--text-secondary); }
   </style>
 </head>
 <body>
@@ -781,7 +832,15 @@
         <a href="about.html">About</a>
       </nav>
       <div style="display:flex;align-items:center;gap:12px;">
-        <a href="submit.html" class="btn-submit">Submit Story</a>
+        <a href="profile.html" class="btn-submit" id="navLoginBtn" style="background:transparent;color:var(--accent);border:1.5px solid var(--accent);">Log In</a>
+        <div class="nav-avatar-wrap" id="navAvatarWrap" style="display:none;position:relative;">
+          <button class="nav-avatar-btn" id="navAvatarBtn" aria-label="Account menu" aria-expanded="false"></button>
+          <div class="nav-avatar-dropdown" id="navAvatarDropdown">
+            <a href="profile.html" class="nav-avatar-item">Profile</a>
+            <a href="submit.html" class="nav-avatar-item">Submit Story</a>
+            <button class="nav-avatar-item nav-avatar-signout" id="navSignOut">Log Out</button>
+          </div>
+        </div>
         <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
       </div>
     </div>
@@ -1990,6 +2049,51 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
     /* ===== COPYRIGHT YEAR ===== */
     const copyYearEl = document.getElementById('copy-year');
     if (copyYearEl) copyYearEl.textContent = new Date().getFullYear();
+
+    /* ============ NAV AUTH STATE ============ */
+    (function () {
+      if (!firebaseReady) return;
+      const loginBtn = $("navLoginBtn");
+      const avatarWrap = $("navAvatarWrap");
+      const avatarBtn = $("navAvatarBtn");
+      const signOutBtn = $("navSignOut");
+
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          loginBtn.style.display = "none";
+          avatarWrap.style.display = "block";
+          const name = user.displayName || user.email || "?";
+          avatarBtn.textContent = name.charAt(0).toUpperCase();
+        } else {
+          loginBtn.style.display = "";
+          avatarWrap.style.display = "none";
+        }
+      });
+
+      avatarBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        const isOpen = avatarWrap.classList.toggle("open");
+        avatarBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!avatarWrap.contains(e.target)) {
+          avatarWrap.classList.remove("open");
+          avatarBtn.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          avatarWrap.classList.remove("open");
+          avatarBtn.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      signOutBtn.addEventListener("click", function () {
+        firebase.auth().signOut();
+      });
+    }());
 
     /* ===== KICK OFF ===== */
     loadStory().finally(() => {

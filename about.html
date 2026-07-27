@@ -135,6 +135,57 @@
     .btn-submit:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
     .btn-submit:active { transform: scale(0.97); }
 
+    /* ============ NAV AVATAR (auth state) ============ */
+    .nav-avatar-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+    .nav-avatar-btn:hover { background: var(--accent-hover); }
+    .nav-avatar-dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      min-width: 160px;
+      display: none;
+      flex-direction: column;
+      z-index: 200;
+    }
+    .nav-avatar-wrap.open .nav-avatar-dropdown { display: flex; }
+    .nav-avatar-item {
+      display: block;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-align: left;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: background 0.15s ease, color 0.15s ease;
+      border-radius: 0;
+      width: 100%;
+    }
+    .nav-avatar-item:hover { background: var(--tag-bg); color: var(--accent); }
+    .nav-avatar-signout { color: var(--text-secondary); }
+
     .hamburger {
       display: none;
       width: 36px; height: 36px;
@@ -732,13 +783,21 @@
       <a href="index.html" class="logo">WEVOX<span class="dot">.</span></a>
       <nav class="nav-links" aria-label="Primary">
         <a href="stories.html">Stories</a>
-        <a href="index.html#videos">Videos</a>
+        <a href="media.html">Videos</a>
         <a href="index.html#trending">Trending</a>
         <a href="community.html">Community</a>
         <a href="about.html" class="active">About</a>
       </nav>
       <div style="display:flex;align-items:center;gap:12px;">
-        <a href="submit.html" class="btn-submit">Submit Story</a>
+        <a href="profile.html" class="btn-submit" id="navLoginBtn" style="background:transparent;color:var(--accent);border:1.5px solid var(--accent);">Log In</a>
+        <div class="nav-avatar-wrap" id="navAvatarWrap" style="display:none;position:relative;">
+          <button class="nav-avatar-btn" id="navAvatarBtn" aria-label="Account menu" aria-expanded="false"></button>
+          <div class="nav-avatar-dropdown" id="navAvatarDropdown">
+            <a href="profile.html" class="nav-avatar-item">Profile</a>
+            <a href="submit.html" class="nav-avatar-item">Submit Story</a>
+            <button class="nav-avatar-item nav-avatar-signout" id="navSignOut">Log Out</button>
+          </div>
+        </div>
         <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
       </div>
     </div>
@@ -748,11 +807,10 @@
   <div class="mobile-overlay" id="mobileOverlay" aria-hidden="true">
     <button class="close" id="overlayClose" aria-label="Close menu">✕</button>
     <a href="stories.html">Stories</a>
-    <a href="index.html#videos">Videos</a>
+    <a href="media.html">Videos</a>
     <a href="index.html#trending">Trending</a>
     <a href="community.html">Community</a>
     <a href="about.html">About</a>
-    <a href="submit.html">Submit Story</a>
   </div>
 
   <!-- ============ HERO ============ -->
@@ -957,7 +1015,40 @@
     </div>
   </footer>
 
+  <!-- ============ FIREBASE ============ -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
   <script>
+    /* ============ FIREBASE CONFIG ============ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjMv5lhUQxDQdC3mihSH4Ep3ctFGxUZQY",
+      authDomain: "cjnsite-d3f3f.firebaseapp.com",
+      projectId: "cjnsite-d3f3f",
+      storageBucket: "cjnsite-d3f3f.firebasestorage.app",
+      messagingSenderId: "491318197551",
+      appId: "1:491318197551:web:5a3c8fd938d94d924cf5da",
+      measurementId: "G-JES3G3L45V"
+    };
+
+    let db = null;
+    let firebaseReady = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      firebaseReady = true;
+    } catch (err) {
+      console.warn("Firebase init failed (placeholder config?):", err);
+      firebaseReady = false;
+    }
+
+    const isRealConfig = firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('YOUR_');
+    if (!isRealConfig) {
+      console.warn('Firebase placeholder config detected — using demo data only');
+      firebaseReady = false;
+    }
+
     /* ============ HELPERS ============ */
     const $ = (id) => document.getElementById(id);
 
@@ -985,6 +1076,52 @@
     hamburger.addEventListener("click", openMenu);
     overlayClose.addEventListener("click", closeMenu);
     mobileOverlay.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
+
+    /* ============ NAV AUTH STATE ============ */
+    (function () {
+      if (!firebaseReady) return;
+      const loginBtn = $("navLoginBtn");
+      const avatarWrap = $("navAvatarWrap");
+      const avatarBtn = $("navAvatarBtn");
+      const avatarDropdown = $("navAvatarDropdown");
+      const signOutBtn = $("navSignOut");
+
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          loginBtn.style.display = "none";
+          avatarWrap.style.display = "block";
+          const name = user.displayName || user.email || "?";
+          avatarBtn.textContent = name.charAt(0).toUpperCase();
+        } else {
+          loginBtn.style.display = "";
+          avatarWrap.style.display = "none";
+        }
+      });
+
+      avatarBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        const isOpen = avatarWrap.classList.toggle("open");
+        avatarBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!avatarWrap.contains(e.target)) {
+          avatarWrap.classList.remove("open");
+          avatarBtn.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          avatarWrap.classList.remove("open");
+          avatarBtn.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      signOutBtn.addEventListener("click", function () {
+        firebase.auth().signOut();
+      });
+    }());
 
     /* ============ COPYRIGHT YEAR ============ */
     const yearEl = document.getElementById("copy-year");
