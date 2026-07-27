@@ -364,6 +364,10 @@
                 <div class="tags-wrap" id="tags-wrap-story"><input type="text" class="tags-input" id="f-tags-story" placeholder="Add tag, press Enter…" /></div>
                 <div class="helper">Press Enter or comma to add a tag.</div>
               </div>
+              <div class="field" style="margin-top:16px">
+                <label for="f-summaryQuote-story">Summary Quote <span style="color:var(--text-muted);font-weight:400">(Optional)</span></label>
+                <textarea class="input" id="f-summaryQuote-story" rows="3" placeholder="Enter a highlighted summary quote..."></textarea>
+              </div>
             </div>
             <div class="form-section-block">
               <div class="section-label">Cover Image <span style="color:var(--text-muted);font-weight:400;font-size:10px">(Optional)</span></div>
@@ -697,7 +701,8 @@
     $id('overlayClose').addEventListener('click',()=>$id('mobileOverlay').classList.remove('open'));
     $id('mobileOverlay').querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>$id('mobileOverlay').classList.remove('open')));
     function scrollToHero(e){if(e)e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});const ey=document.querySelector('.hero-eyebrow');if(ey){ey.style.transition='transform .35s ease';ey.style.transform='scale(1.06)';setTimeout(()=>ey.style.transform='',450);}}
-    $id('navSubmitBtn').addEventListener('click',scrollToHero);
+    const navSubmitBtn=$id('navSubmitBtn');
+    if(navSubmitBtn)navSubmitBtn.addEventListener('click',scrollToHero);
     $id('mobileSubmitBtn').addEventListener('click',scrollToHero);
     $id('copy-year').textContent=new Date().getFullYear();
 
@@ -1087,7 +1092,7 @@
     const catEl=isStory?$id('f-cat-story'):$id('f-cat-video');
     const categoryVal=(catEl&&(catEl.value||(catEl.options[catEl.selectedIndex]&&catEl.options[catEl.selectedIndex].text))||'').trim();
     if(!categoryVal){toast('Please select a category.','error');if(catEl)catEl.focus();return;}
-    const payload={type:selectedType,title:(isStory?$id('f-title-story'):$id('f-title-video')).value.trim(),category:categoryVal,tags:isStory?storyTags.getTags():videoTags.getTags(),content:isStory&&quill?(quill.root.innerHTML+(embedsBlock?'\n'+embedsBlock:'')):'',description:isStory?'':$id('f-desc').value.trim(),coverImage:$id('coverImage')?$id('coverImage').value:'',coverImageType:$id('coverImageType')?$id('coverImageType').value:'',mediaUrl:$id('mediaUrl').value,mediaEmbed:$id('mediaEmbed').value,mediaType:$id('mediaType').value,authorId,authorName,email:authorEmail,university:u.university||'',verified:u.verified||false,status:'pending',submittedAt:(firebase&&firebase.firestore&&firebase.firestore.FieldValue)?firebase.firestore.FieldValue.serverTimestamp():new Date()};
+    const payload={type:selectedType,title:(isStory?$id('f-title-story'):$id('f-title-video')).value.trim(),category:categoryVal,tags:isStory?storyTags.getTags():videoTags.getTags(),content:isStory&&quill?(quill.root.innerHTML+(embedsBlock?'\n'+embedsBlock:'')):'',description:isStory?'':$id('f-desc').value.trim(),summaryQuote:isStory&&$id('f-summaryQuote-story')?$id('f-summaryQuote-story').value.trim():'',coverImage:$id('coverImage')?$id('coverImage').value:'',coverImageType:$id('coverImageType')?$id('coverImageType').value:'',mediaUrl:$id('mediaUrl').value,mediaEmbed:$id('mediaEmbed').value,mediaType:$id('mediaType').value,authorId,authorName,email:authorEmail,university:u.university||'',verified:u.verified||false,status:'pending',submittedAt:(firebase&&firebase.firestore&&firebase.firestore.FieldValue)?firebase.firestore.FieldValue.serverTimestamp():new Date()};
       const btn=$id('btnSubmit'),txt=$id('btnText');
       btn.disabled=true;txt.innerHTML='<span class="spinner"></span> Submitting…';
       try{
