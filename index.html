@@ -1165,15 +1165,6 @@
             <li><a href="submit.html">Submit Story</a></li>
           </ul>
         </div>
-        <div class="footer-col">
-          <div class="footer-heading">Network</div>
-          <ul>
-            <li><a href="#">North Desk Hub</a></li>
-            <li><a href="#">Southern Grid Frontiers</a></li>
-            <li><a href="#">Verification Protocol Ledger</a></li>
-            <li><a href="#">Public Transparency Index</a></li>
-          </ul>
-        </div>
       </div>
       <div class="footer-bottom">
         <div>© <span id="copy-year">2024</span> WEVOX Network Platforms Inc.</div>
@@ -1393,7 +1384,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
       // Editorial hierarchy: first story is the lead/hero card, rest are the standard list
       list.innerHTML = filtered.map((s, i) => `
         <a class="story-card stagger${i === 0 ? ' lead' : ''}" href="${s.id ? 'story.html?id=' + encodeURIComponent(s.id) : '#'}" style="animation-delay:${i * 0.08}s">
-          <img class="story-thumb" src="${escapeHtml(s.coverImage || placeholderImg('s' + (s.id || i)))}" alt="" loading="lazy"
+          <img class="story-thumb" src="${escapeHtml(s.coverImage || placeholderImg('s' + (s.id || i)))}" alt="${escapeHtml(s.title || 'WEVOX story thumbnail')}" loading="lazy"
                onerror="this.src='${placeholderImg('fallback' + i)}'" />
           <div class="story-body">
             <div class="story-tag">${escapeHtml(s.category || "Uncategorized")}</div>
@@ -1417,7 +1408,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
           <div class="video-thumb-wrap">
             <img class="video-thumb"
               src="${getThumb(v.youtubeId, 'hqdefault')}"
-              alt="" loading="lazy"
+              alt="${escapeHtml(v.title || 'WEVOX video thumbnail')}" loading="lazy"
               onerror="this.src='${getThumb(v.youtubeId, 'mqdefault')}'" />
             <div class="video-overlay"><div class="play-btn">▶</div></div>
             ${v.duration ? `<div class="duration">${v.duration}</div>` : ''}
@@ -1519,7 +1510,7 @@ const YOUTUBE_CHANNEL_ID = "UCJdKr0Bgd_5saZYqLCa9mng";
           <div class="trending-thumb-wrap">
             <img class="trending-thumb"
               src="${escapeHtml(thumb)}"
-              alt=""
+              alt="${escapeHtml(t.title || 'WEVOX story thumbnail')}"
               loading="lazy"
               onerror="this.src='https://picsum.photos/seed/wevox-tr-fb${i}/480/270'" />
             <div class="trending-num">${rankLabel}</div>

@@ -832,7 +832,7 @@
     <section class="featured-banner" id="featuredBanner" hidden>
       <a class="featured-link" id="featuredLink" href="#">
         <div class="featured-thumb-wrap">
-          <img id="featuredThumb" alt="" loading="lazy" />
+          <img id="featuredThumb" alt="WEVOX video thumbnail" loading="lazy" />
           <div class="featured-thumb-fallback" id="featuredFallback" hidden>🎬</div>
           <div class="featured-play" aria-hidden="true"></div>
         </div>
@@ -890,15 +890,7 @@
             <li><a href="submit.html">Submit Story</a></li>
           </ul>
         </div>
-        <div class="footer-col">
-          <div class="footer-heading">Network</div>
-          <ul>
-            <li><a href="#">North Desk Hub</a></li>
-            <li><a href="#">Southern Grid Frontiers</a></li>
-            <li><a href="#">Verification Protocol Ledger</a></li>
-            <li><a href="#">Public Transparency Index</a></li>
-          </ul>
-        </div>
+
       </div>
       <div class="footer-bottom">
         <div>© <span id="copy-year">2024</span> WEVOX Network Platforms Inc.</div>
@@ -1106,7 +1098,7 @@
       return `
         <a class="video-card" href="story.html?ytid=${encodeURIComponent(v.youtubeId)}">
           <div class="video-thumb">
-            <img src="${thumb}" alt="" loading="lazy" onerror="this.src='${mqThumb}'" />
+            <img src="${thumb}" alt="${escapeHtml(v.title || 'WEVOX video thumbnail')}" loading="lazy" onerror="this.src='${mqThumb}'" />
             ${v.duration ? `<div class="video-duration">${v.duration}</div>` : ''}
             <div class="video-play" aria-hidden="true"></div>
           </div>

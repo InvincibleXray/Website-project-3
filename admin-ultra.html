@@ -491,7 +491,7 @@ async function fetchPending(){const el=$('pending-list');if(el)el.innerHTML='<di
   // FIX: BUG-2 diagnostic -- log every submission's raw field set to console so it's obvious
   // when category is missing AT THE SOURCE (Firestore doc) vs missing in the render layer.
   // Open DevTools → Console to see this. Remove once verified.
-  if(state.pending.length){console.group('[WEVOX] pending submissions — category audit');state.pending.forEach(p=>console.log({id:p.id,title:p.title,category:p.category,Category:p.Category,articleCategory:p.articleCategory,cat:p.cat,type:p.type}));console.groupEnd();}
+  if(state.pending.length){}
 }catch(e){fsErr(e,'fetchPending');state.pending=[];}renderPending();renderDashRecent();updateStats();}
 // FIX: Sanitize submission content for the pending preview. The raw saved HTML contains
 // iframes (YouTube), <blockquote class="twitter-tweet"> with <a> links, and Instagram embed

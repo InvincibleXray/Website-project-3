@@ -170,7 +170,7 @@
 
     /* FOOTER */
     footer { background: var(--bg-dark); color: #fff; padding: 60px 0 32px; }
-    .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 32px; }
+    .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px; margin-bottom: 32px; }
     .footer-logo { font-family: var(--font-headline); font-size: 28px; font-weight: 900; margin-bottom: 10px; }
     .footer-logo span { color: var(--accent); }
     .footer-tagline { color: var(--text-muted); font-size: 14px; }
@@ -231,7 +231,12 @@
 
   <div class="page-wrap">
 
-    <section class="auth-section" id="authSection">
+    <div id="loadingState" style="min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
+      <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+      <div style="width: 36px; height: 36px; border: 3px solid var(--bg); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+      <div style="font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-secondary);">Loading your profile…</div>
+    </div>
+    <section class="auth-section" id="authSection" hidden>
       <div class="auth-card">
         <div class="auth-eyebrow">REPORTER ACCESS</div>
         <h1 class="auth-title" id="authTitle">Welcome back.</h1>
@@ -378,13 +383,7 @@
             <li><a href="submit.html">Submit Story</a></li>
           </ul>
         </div>
-        <div class="footer-col">
-          <div class="footer-heading">Network</div>
-          <ul>
-            <li><a href="#">North Desk Hub</a></li>
-            <li><a href="#">Verification Ledger</a></li>
-          </ul>
-        </div>
+
       </div>
       <div class="footer-bottom">
         <div>© <span id="copy-year">2024</span> WEVOX Network Platforms Inc.</div>
@@ -526,11 +525,23 @@
       const pts = item.status === "published"
         ? (isVideo ? 40 : 50) + Math.floor((item.reads || 0) / 1000) * 10
         : 0;
-      return `
-        <article class="sub-card">
-          <div class="sub-thumb">
-            <span class="status-pill ${statusClass}">${statusText}</span>
-            ${isVideo && item.duration ? `<span class="play-pill">▶ ${item.duration}</span>` : ""}
+      const thumbUrl = item.coverImage || item.thumbnailUrl || (item.youtubeId ? `https://img.youtube.com/vi/${item.youtubeId}/hqdefault.jpg` : '');
+      const imgTag = thumbUrl ? `<img src="${thumbUrl}" alt="${(item.title || 'Untitled').replace(/"/g, '&quot;')}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;">` : '';
+      
+      let linkUrl = '';
+      if (item.status === 'published' && item.id) {
+        if (isVideo) {
+          linkUrl = `story.html?ytid=${encodeURIComponent(item.youtubeId || item.id)}`;
+        } else {
+          linkUrl = `story.html?id=${encodeURIComponent(item.id)}`;
+        }
+      }
+
+      const cardInner = `
+          <div class="sub-thumb" style="position:relative;">
+            ${imgTag}
+            <span class="status-pill ${statusClass}" style="position:relative;z-index:1;">${statusText}</span>
+            ${isVideo && item.duration ? `<span class="play-pill" style="position:relative;z-index:1;">▶ ${item.duration}</span>` : ""}
           </div>
           <div class="sub-body">
             <div class="sub-cat">${item.category || "Stories"}</div>
@@ -539,8 +550,11 @@
               <span>${item.status === "published" ? fmt(item.reads) + " reads" : item.date || ""}</span>
               <span class="pts">${pts ? "+" + pts + " pts" : "—"}</span>
             </div>
-          </div>
-        </article>`;
+          </div>`;
+
+      return linkUrl 
+        ? `<a href="${linkUrl}" class="sub-card" style="text-decoration:none;color:inherit;display:block;">${cardInner}</a>`
+        : `<article class="sub-card">${cardInner}</article>`;
     }
 
     function renderGrid(el, items, isVideo, emptyLabel) {
@@ -598,12 +612,16 @@
 
     /* ============ SHOW / HIDE VIEWS ============ */
     function showDashboard(user, stories, videos) {
+      const ls = $("loadingState");
+      if (ls) ls.hidden = true;
       $("authSection").hidden = true;
       $("dashboard").hidden = false;
       $("navAvatar").hidden = false;
       renderDashboard(user, stories, videos);
     }
     function showLogin() {
+      const ls = $("loadingState");
+      if (ls) ls.hidden = true;
       $("authSection").hidden = false;
       $("dashboard").hidden = true;
       $("navAvatar").hidden = true;
@@ -638,8 +656,8 @@
           db.collection("stories").where("authorId", "==", uid).get().catch(() => ({ docs: [] })),
           db.collection("videos").where("authorId", "==", uid).get().catch(() => ({ docs: [] }))
         ]);
-        const stories = storiesSnap.docs.map(d => d.data());
-        const videos = videosSnap.docs.map(d => d.data());
+        const stories = storiesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const videos = videosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
         showDashboard(userDoc, stories, videos);
 
@@ -650,8 +668,16 @@
           openProfileModal(true);
         }
       } catch (e) {
-        console.warn("Falling back to demo data:", e);
-        demoLogin(fbUser && fbUser.displayName);
+        console.error("Dashboard load error:", e);
+        const main = document.querySelector('main.container');
+        if (main) main.innerHTML = `
+          <div style="min-height:50vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;">
+            <div style="font-size:48px;">⚠️</div>
+            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1A1A1A;">Couldn't load your dashboard.</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:#6B6B6B;">Please refresh or try again.</div>
+            <button onclick="window.location.reload()" style="margin-top:8px;border:2px solid #C8102E;color:#C8102E;background:transparent;padding:10px 24px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Refresh Page</button>
+          </div>
+        `;
       }
     }
 
@@ -765,20 +791,16 @@
         }
       } catch (err) {
         console.warn("Auth error:", err);
-        if (/network|configuration|api-key|operation-not-allowed/i.test(err.code || err.message || "")) {
-          demoLogin(name);
-        } else {
-          const m = {
-            'auth/invalid-email': 'Invalid email address.',
-            'auth/user-not-found': 'No account with that email.',
-            'auth/wrong-password': 'Wrong password.',
-            'auth/invalid-credential': 'Wrong email or password.',
-            'auth/email-already-in-use': 'That email is already registered.',
-            'auth/weak-password': 'Password should be at least 6 characters.',
-            'auth/too-many-requests': 'Too many attempts. Try again later.'
-          };
-          showError(m[err.code] || err.message || "Could not authenticate.");
-        }
+        const m = {
+          'auth/invalid-email': 'Invalid email address.',
+          'auth/user-not-found': 'No account with that email.',
+          'auth/wrong-password': 'Wrong password.',
+          'auth/invalid-credential': 'Wrong email or password.',
+          'auth/email-already-in-use': 'That email is already registered.',
+          'auth/weak-password': 'Password should be at least 6 characters.',
+          'auth/too-many-requests': 'Too many attempts. Try again later.'
+        };
+        showError(m[err.code] || "Could not authenticate. Please try again.");
       } finally {
         $("authSubmit").disabled = false;
       }
@@ -794,7 +816,7 @@
         if (!existing) await createUserDoc(result.user);
       } catch (err) {
         console.warn("Google auth error:", err);
-        demoLogin();
+        showError("Google sign-in failed. Please try again.");
       }
     });
 
