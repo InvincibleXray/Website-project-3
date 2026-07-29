@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEVOX — Editorial Typography Laboratory</title>
+
+  <!-- Google Fonts Preconnect & Imports -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Merriweather:ital,wght@0,700;0,900;1,700&family=Newsreader:ital,opsz,wght@0,6..72,600;0,6..72,700;1,6..72,600&family=Lora:ital,wght@0,600;0,700;1,600&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800&family=Bodoni+Moda:ital,opsz,wght@0,6..96,700;0,6..96,800&family=Inter:wght@600;700;800;900&family=IBM+Plex+Sans:ital,wght@0,600;0,700;1,600&family=Source+Sans+3:ital,wght@0,600;0,700;1,600&family=Literata:ital,opsz,wght@0,7..72,600;0,7..72,700&family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============ WEVOX DESIGN TOKENS (EXACT MATCH TO STORY.HTML) ============ */
+    :root {
+      --bg: #F9F7F4;
+      --bg-dark: #0D0D0D;
+      --surface: #FFFFFF;
+      --border: #E8E4DF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #6B6B6B;
+      --text-muted: #9A9A9A;
+      --accent: #C8102E;
+      --accent-hover: #A50D26;
+      --tag-bg: #F0EDE8;
+
+      --font-headline: "Playfair Display", Georgia, serif;
+      --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
+      --font-mono: "IBM Plex Mono", "Courier New", monospace;
+      --max-width: 1080px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-weight: 400;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-top: 100px;
+    }
+
+    /* ============ TOP SWITCHER BAR ============ */
+    .lab-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      background: rgba(249, 247, 244, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 14px rgba(0,0,0,0.03);
+    }
+
+    .nav-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px 6px;
+    }
+
+    .logo {
+      font-family: "Playfair Display", Georgia, serif;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+    .logo .dot { color: var(--accent); }
+    .lab-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: 8px;
+      letter-spacing: 1px;
+    }
+
+    /* MODE TOGGLE SWITCH (SINGLE VS A/B SPLIT) */
+    .mode-toggle-group {
+      display: flex;
+      background: rgba(0,0,0,0.05);
+      border-radius: 20px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .mode-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 14px;
+      border-radius: 18px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mode-btn.active {
+      background: var(--text-primary);
+      color: #FFFFFF;
+    }
+
+    /* SEGMENTED CONTROL BAR */
+    .segmented-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 24px 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .segmented-bar::-webkit-scrollbar { display: none; }
+
+    .seg-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 5px 13px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .seg-btn:hover {
+      color: var(--text-primary);
+      background: rgba(0,0,0,0.04);
+    }
+    .seg-btn.active {
+      background: var(--text-primary);
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+
+    .more-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      outline: none;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+    .more-select:focus { border-color: var(--accent); color: var(--text-primary); }
+
+    /* ============ MODE A: SINGLE ARTICLE PREVIEW ============ */
+    .article-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 20px 24px 80px;
+    }
+
+    .article-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 720px) 260px;
+      gap: 60px;
+      align-items: flex-start;
+    }
+    @media (max-width: 900px) {
+      .article-grid { grid-template-columns: 1fr; }
+      .article-sidebar { display: none; }
+    }
+
+    .breadcrumb {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    .breadcrumb .arrow { color: var(--accent); margin: 0 6px; }
+    .breadcrumb .current { color: var(--accent); }
+
+    .cat-tag {
+      display: inline-block;
+      background: var(--tag-bg);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 3px;
+      margin-bottom: 16px;
+    }
+
+    /* THE HEADLINE (DYNAMICALLY TARGETED) */
+    .headline {
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      word-wrap: break-word;
+      transition: font-size 0.15s ease, line-height 0.15s ease, letter-spacing 0.15s ease;
+    }
+
+    .excerpt {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 20px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin-bottom: 24px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      border: 0;
+      width: 100%;
+    }
+
+    /* AUTHOR & META ROW */
+    .author-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .author-block { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-headline);
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .author-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .author-uni { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+    .meta-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .meta-item {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-muted);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    /* SHARE ROW */
+    .share-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0 20px;
+      flex-wrap: wrap;
+    }
+    .share-label { font-size: 12px; color: var(--text-muted); }
+    .share-btn {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+      background: transparent;
+    }
+    .share-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .share-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+    /* COVER IMAGE */
+    .cover-wrap { margin: 24px 0; }
+    .cover-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: 8px;
+      background: var(--border);
+    }
+    .cover-caption {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* ARTICLE BODY */
+    .article-content { max-width: 680px; }
+    .article-content p {
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+    .article-content h2 {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 26px;
+      color: var(--text-primary);
+      margin: 40px 0 16px;
+    }
+    .article-content blockquote {
+      border-left: 4px solid var(--accent);
+      padding: 16px 24px;
+      margin: 32px 0;
+      background: var(--tag-bg);
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-style: italic;
+      font-size: 22px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    /* TAGS & AUTHOR CARD */
+    .tags-section {
+      margin: 40px 0 32px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .tags-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .tags-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-pill {
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .author-card {
+      background: var(--tag-bg);
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .author-card .avatar { width: 48px; height: 48px; font-size: 18px; }
+    .author-card-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .author-card-uni { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .author-card-role { color: var(--accent); font-size: 11px; font-family: var(--font-mono); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+    .author-card-bio { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* SIDEBAR */
+    .article-sidebar {
+      position: sticky;
+      top: 110px;
+      align-self: flex-start;
+    }
+    .sidebar-block {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-heading {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .sidebar-brief {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .sidebar-fact {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border);
+    }
+    .sidebar-fact:last-child { border-bottom: none; }
+
+    /* ============ MODE B: SPLIT COMPARE (A/B) ============ */
+    .split-container {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      padding: 20px 24px 80px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    .split-container.active { display: grid; }
+
+    .split-pane {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .pane-badge {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--text-primary);
+      color: #FFFFFF;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .pane-badge.alt { background: var(--accent); }
+
+    @media (max-width: 1000px) {
+      .split-container.active { grid-template-columns: 1fr; }
+      .split-pane { height: auto; }
+    }
+
+    /* ============ COMPACT FLOATING TYPOGRAPHY PANEL ============ */
+    .typo-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 600;
+      background: rgba(26, 26, 26, 0.94);
+      backdrop-filter: blur(10px);
+      color: #FFFFFF;
+      padding: 10px 18px;
+      border-radius: 30px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .panel-spec { display: flex; gap: 10px; align-items: center; }
+    .panel-spec span { color: #A0A0A0; }
+    .panel-spec strong { color: #FFFFFF; font-weight: 600; }
+
+    .panel-copy-btn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #FFFFFF;
+      padding: 3px 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      transition: background 0.2s ease;
+    }
+    .panel-copy-btn:hover { background: var(--accent); }
+
+    .shortcut-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 600;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.8);
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 768px) { .shortcut-hint { display: none; } }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============ TOP SWITCHER & CONTROL BAR ============ -->
+  <header class="lab-nav">
+    <div class="nav-top-row">
+      <div style="display: flex; align-items: center;">
+        <span class="logo">WEVOX<span class="dot">.</span></span>
+        <span class="lab-tag">TYPOGRAPHY EVALUATOR</span>
+      </div>
+
+      <!-- MODE TOGGLE SWITCH (SINGLE VS SPLIT COMPARE) -->
+      <div class="mode-toggle-group">
+        <button class="mode-btn active" id="btnSingleMode" onclick="setMode('single')">Single</button>
+        <button class="mode-btn" id="btnSplitMode" onclick="setMode('split')">Split A/B</button>
+      </div>
+    </div>
+
+    <!-- PRIMARY EDITORIAL PRESETS STRIP -->
+    <div class="segmented-bar" id="segmentedBar">
+      <button class="seg-btn active" onclick="selectPreset(0, this)">1. WEVOX</button>
+      <button class="seg-btn" onclick="selectPreset(1, this)">2. Reuters</button>
+      <button class="seg-btn" onclick="selectPreset(2, this)">3. BBC</button>
+      <button class="seg-btn" onclick="selectPreset(3, this)">4. Bloomberg</button>
+      <button class="seg-btn" onclick="selectPreset(4, this)">5. Financial Times</button>
+      <button class="seg-btn" onclick="selectPreset(5, this)">6. Axios</button>
+      <button class="seg-btn" onclick="selectPreset(6, this)">7. New York Times</button>
+      <button class="seg-btn" onclick="selectPreset(7, this)">8. The Verge</button>
+
+      <!-- SECONDARY PRESET DROPDOWN -->
+      <select class="more-select" id="morePresetSelect" onchange="selectDropdownPreset(this.value)">
+        <option value="" disabled selected>More Presets...</option>
+        <option value="8">9. Arial Proposal</option>
+        <option value="9">10. Inter Proposal</option>
+        <option value="10">11. IBM Plex Sans</option>
+        <option value="11">12. Newsreader</option>
+        <option value="12">13. Source Sans</option>
+        <option value="13">14. Literata</option>
+        <option value="14">15. Fraunces Expressive</option>
+        <option value="15">16. Bodoni Modern</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- ============ MODE A: SINGLE ARTICLE PREVIEW ============ -->
+  <main class="article-container" id="singleArticleContainer">
+    <div class="article-grid">
+      
+      <!-- MAIN ARTICLE COLUMN -->
+      <article class="article-col">
+        <div class="breadcrumb">
+          WEVOX <span class="arrow">›</span> STUDENT INVESTIGATION <span class="arrow">›</span> <span class="current">CAMPUS FRAUD</span>
+        </div>
+
+        <div class="cat-tag">Campus Fraud</div>
+
+        <!-- HEADLINE TARGET (DYNAMICALLY UPDATED) -->
+        <h1 class="headline" id="headlineTarget">
+          Inside the hostel mess scam: ₹2.4 crore unaccounted across 6 colleges
+        </h1>
+
+        <p class="excerpt">
+          A six-month investigation across hostels in three states reveals a pattern of falsified mess registers, ghost tenders, and missing audit trails — and how students have been paying for it.
+        </p>
+
+        <hr class="divider" />
+
+        <div class="author-row">
+          <div class="author-block">
+            <div class="avatar">AK</div>
+            <div>
+              <div class="author-name">Ananya Krishnan</div>
+              <div class="author-uni">DU North Campus</div>
+            </div>
+          </div>
+          <div class="meta-row">
+            <div class="meta-item">📅 JULY 26, 2026</div>
+            <div class="meta-item">⏱ 8 MIN READ</div>
+          </div>
+        </div>
+
+        <div class="share-row">
+          <span class="share-label">SHARE STORY:</span>
+          <button class="share-btn" title="Copy Link" onclick="copyLink(this)">
+            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          </button>
+          <button class="share-btn" title="Share on Twitter">
+            <svg viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.05c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.58 8.58 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/></svg>
+          </button>
+          <button class="share-btn" title="Share on LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+          </button>
+        </div>
+
+        <div class="cover-wrap">
+          <svg class="cover-img" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="#1F2937" />
+            <g opacity="0.12" stroke="#FFFFFF" stroke-width="1">
+              <line x1="0" y1="100" x2="800" y2="100" />
+              <line x1="0" y1="200" x2="800" y2="200" />
+              <line x1="0" y1="300" x2="800" y2="300" />
+              <line x1="200" y1="0" x2="200" y2="450" />
+              <line x1="400" y1="0" x2="400" y2="450" />
+              <line x1="600" y1="0" x2="600" y2="450" />
+            </g>
+            <text x="50%" y="46%" dominant-baseline="middle" text-anchor="middle" fill="#F3F4F6" font-family="DM Sans, sans-serif" font-size="18" font-weight="600">WEVOX FORENSIC INVESTIGATION AUDIT</text>
+            <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#9CA3AF" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="2">6 HOSTELS • 3 STATES • 42 REGISTERS</text>
+          </svg>
+          <div class="cover-caption">A hostel mess register obtained during the six-month WEVOX investigation in Lucknow.</div>
+        </div>
+
+        <div class="article-content">
+          <p>It started with a simple complaint. A first-year student at a prominent Delhi University college noticed her mess register had been signed for breakfast on a day she'd been home with a fever. When she pointed it out, the warden told her the system was "automatic." It wasn't.</p>
+
+          <p>Over the next six months, WEVOX correspondents pulled mess registers, vendor invoices, and audit notes from six colleges across three states. What we found is not a single rogue contractor. It's a pattern.</p>
+
+          <h2>The numbers that don't add up</h2>
+
+          <p>At three of the six colleges examined, the registered student count for mess attendance exceeded the actual hostel occupancy by between 11% and 23%. In rupees, that's a delta of <strong>₹2.4 crore</strong> across one academic year — money billed to administrations for meals that were never served.</p>
+
+          <blockquote>"The signatures on the register are real. The students are real. They just weren't there that day."</blockquote>
+
+          <p>That quote, from a former kitchen supervisor at one of the colleges, sits at the heart of the scheme. Mess contractors aren't inventing fake students. They're <em>over-counting real ones</em> — using stamps, photocopied signatures, and end-of-month "catch up" entries when no one is watching.</p>
+        </div>
+
+        <!-- TAGS -->
+        <div class="tags-section">
+          <div class="tags-label">Story Tags</div>
+          <div class="tags-list">
+            <span class="tag-pill">#CampusFraud</span>
+            <span class="tag-pill">#Investigation</span>
+            <span class="tag-pill">#Hostels</span>
+            <span class="tag-pill">#Audit</span>
+          </div>
+        </div>
+
+        <!-- AUTHOR CARD -->
+        <div class="author-card">
+          <div class="avatar">AK</div>
+          <div class="author-card-info">
+            <div class="author-card-name">Ananya Krishnan</div>
+            <div class="author-card-uni">DU North Campus</div>
+            <div class="author-card-role">Investigative Fellow</div>
+            <div class="author-card-bio">Ananya is a senior investigative fellow at WEVOX covering higher education policy, campus governance, and financial audits across North India.</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- SIDEBAR -->
+      <aside class="article-sidebar">
+        <div class="sidebar-block">
+          <div class="sidebar-heading">Investigation Brief</div>
+          <div class="sidebar-fact"><strong>₹2.4 Crore</strong> Total unaccounted billing across 6 campus mess contracts.</div>
+          <div class="sidebar-fact"><strong>23% Delta</strong> Peak discrepancy between mess register signatures and hostel occupancy.</div>
+          <div class="sidebar-fact"><strong>3 States</strong> Investigation covered Delhi, Uttar Pradesh, and Bihar.</div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ============ MODE B: SPLIT COMPARE (A/B) ============ -->
+  <div class="split-container" id="splitContainer">
+    <!-- LEFT PANE: CURRENT WEVOX -->
+    <div class="split-pane" id="paneLeft">
+      <span class="pane-badge">A: CURRENT WEVOX (PLAYFAIR DISPLAY 900)</span>
+
+      <div class="cat-tag">Campus Fraud</div>
+      <h1 class="headline" style="font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 44px; line-height: 1.22; letter-spacing: -1px;">
+        Inside the hostel mess scam: ₹2.4 crore unaccounted across 6 colleges
+      </h1>
+      <p class="excerpt">A six-month investigation across hostels in three states reveals a pattern of falsified mess registers, ghost tenders, and missing audit trails.</p>
+      <hr class="divider" />
+      <div class="author-row">
+        <div class="author-block">
+          <div class="avatar">AK</div>
+          <div>
+            <div class="author-name">Ananya Krishnan</div>
+            <div class="author-uni">DU North Campus</div>
+          </div>
+        </div>
+        <div class="meta-item">JULY 26, 2026 • 8 MIN READ</div>
+      </div>
+      <div class="article-content">
+        <p>It started with a simple complaint. A first-year student at a prominent Delhi University college noticed her mess register had been signed for breakfast on a day she'd been home with a fever.</p>
+        <p>Over the next six months, WEVOX correspondents pulled mess registers, vendor invoices, and audit notes from six colleges across three states.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT PANE: SELECTED TYPOGRAPHY -->
+    <div class="split-pane" id="paneRight">
+      <span class="pane-badge alt" id="splitRightBadge">B: SELECTED PRESET</span>
+
+      <div class="cat-tag">Campus Fraud</div>
+      <h1 class="headline" id="splitHeadlineTarget">
+        Inside the hostel mess scam: ₹2.4 crore unaccounted across 6 colleges
+      </h1>
+      <p class="excerpt">A six-month investigation across hostels in three states reveals a pattern of falsified mess registers, ghost tenders, and missing audit trails.</p>
+      <hr class="divider" />
+      <div class="author-row">
+        <div class="author-block">
+          <div class="avatar">AK</div>
+          <div>
+            <div class="author-name">Ananya Krishnan</div>
+            <div class="author-uni">DU North Campus</div>
+          </div>
+        </div>
+        <div class="meta-item">JULY 26, 2026 • 8 MIN READ</div>
+      </div>
+      <div class="article-content">
+        <p>It started with a simple complaint. A first-year student at a prominent Delhi University college noticed her mess register had been signed for breakfast on a day she'd been home with a fever.</p>
+        <p>Over the next six months, WEVOX correspondents pulled mess registers, vendor invoices, and audit notes from six colleges across three states.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ COMPACT FLOATING TYPOGRAPHY PANEL ============ -->
+  <div class="typo-panel" id="typoPanel">
+    <div class="panel-spec">
+      <span>Font:</span> <strong id="panelFont">Playfair Display</strong>
+      <span>Weight:</span> <strong id="panelWeight">900</strong>
+      <span>Size:</span> <strong id="panelSize">44px</strong>
+      <span>LH:</span> <strong id="panelLH">1.22</strong>
+      <span>LS:</span> <strong id="panelLS">-1px</strong>
+    </div>
+    <button class="panel-copy-btn" onclick="copyActiveCss()">Copy CSS</button>
+  </div>
+
+  <!-- KEYBOARD SHORTCUTS HINT -->
+  <div class="shortcut-hint">
+    Shortcuts: ← → Change Preset | 1-8 Quick Select | Tab/Space Toggle Split
+  </div>
+
+  <!-- ============ INTERACTIVE LAB JAVASCRIPT ============ -->
+  <script>
+    /* ============ EDITORIAL PRESETS DATA ============ */
+    const PRESETS = [
+      {
+        id: "wevox",
+        name: "WEVOX (Current)",
+        fontFamily: '"Playfair Display", Georgia, serif',
+        fontWeight: 900,
+        fontSize: "44px",
+        lineHeight: "1.22",
+        letterSpacing: "-1px",
+        maxWidth: "720px",
+        textTransform: "none"
+      },
+      {
+        id: "reuters",
+        name: "Reuters Inspired",
+        fontFamily: '"Merriweather", Georgia, serif',
+        fontWeight: 700,
+        fontSize: "38px",
+        lineHeight: "1.28",
+        letterSpacing: "-0.4px",
+        maxWidth: "700px",
+        textTransform: "none"
+      },
+      {
+        id: "bbc",
+        name: "BBC News",
+        fontFamily: '"Inter", system-ui, sans-serif',
+        fontWeight: 700,
+        fontSize: "40px",
+        lineHeight: "1.20",
+        letterSpacing: "-0.8px",
+        maxWidth: "720px",
+        textTransform: "none"
+      },
+      {
+        id: "bloomberg",
+        name: "Bloomberg",
+        fontFamily: '"IBM Plex Sans", system-ui, sans-serif',
+        fontWeight: 700,
+        fontSize: "44px",
+        lineHeight: "1.15",
+        letterSpacing: "-1.2px",
+        maxWidth: "740px",
+        textTransform: "none"
+      },
+      {
+        id: "ft",
+        name: "Financial Times",
+        fontFamily: '"Cormorant Garamond", Garamond, serif',
+        fontWeight: 700,
+        fontSize: "46px",
+        lineHeight: "1.18",
+        letterSpacing: "-0.6px",
+        maxWidth: "710px",
+        textTransform: "none"
+      },
+      {
+        id: "axios",
+        name: "Axios",
+        fontFamily: '"Inter", sans-serif',
+        fontWeight: 800,
+        fontSize: "38px",
+        lineHeight: "1.22",
+        letterSpacing: "-0.9px",
+        maxWidth: "680px",
+        textTransform: "none"
+      },
+      {
+        id: "nyt",
+        name: "New York Times",
+        fontFamily: '"Lora", Georgia, serif',
+        fontWeight: 700,
+        fontSize: "42px",
+        lineHeight: "1.22",
+        letterSpacing: "-0.5px",
+        maxWidth: "700px",
+        textTransform: "none"
+      },
+      {
+        id: "verge",
+        name: "The Verge",
+        fontFamily: '"Syne", sans-serif',
+        fontWeight: 800,
+        fontSize: "44px",
+        lineHeight: "1.12",
+        letterSpacing: "-1.5px",
+        maxWidth: "720px",
+        textTransform: "none"
+      },
+      {
+        id: "arial",
+        name: "Arial Proposal",
+        fontFamily: 'Arial, "Helvetica Neue", sans-serif',
+        fontWeight: 700,
+        fontSize: "38px",
+        lineHeight: "1.25",
+        letterSpacing: "-0.5px",
+        maxWidth: "700px",
+        textTransform: "none"
+      },
+      {
+        id: "inter",
+        name: "Inter Proposal",
+        fontFamily: '"Inter", sans-serif',
+        fontWeight: 700,
+        fontSize: "40px",
+        lineHeight: "1.20",
+        letterSpacing: "-0.8px",
+        maxWidth: "700px",
+        textTransform: "none"
+      },
+      {
+        id: "ibm",
+        name: "IBM Plex Sans",
+        fontFamily: '"IBM Plex Sans", sans-serif',
+        fontWeight: 600,
+        fontSize: "40px",
+        lineHeight: "1.25",
+        letterSpacing: "-0.5px",
+        maxWidth: "710px",
+        textTransform: "none"
+      },
+      {
+        id: "newsreader",
+        name: "Newsreader",
+        fontFamily: '"Newsreader", serif',
+        fontWeight: 700,
+        fontSize: "44px",
+        lineHeight: "1.20",
+        letterSpacing: "-0.7px",
+        maxWidth: "720px",
+        textTransform: "none"
+      },
+      {
+        id: "source",
+        name: "Source Sans",
+        fontFamily: '"Source Sans 3", sans-serif',
+        fontWeight: 700,
+        fontSize: "39px",
+        lineHeight: "1.24",
+        letterSpacing: "-0.4px",
+        maxWidth: "700px",
+        textTransform: "none"
+      },
+      {
+        id: "literata",
+        name: "Literata",
+        fontFamily: '"Literata", serif',
+        fontWeight: 700,
+        fontSize: "42px",
+        lineHeight: "1.22",
+        letterSpacing: "-0.5px",
+        maxWidth: "710px",
+        textTransform: "none"
+      },
+      {
+        id: "fraunces",
+        name: "Fraunces Expressive",
+        fontFamily: '"Fraunces", serif',
+        fontWeight: 800,
+        fontSize: "44px",
+        lineHeight: "1.18",
+        letterSpacing: "-1px",
+        maxWidth: "720px",
+        textTransform: "none"
+      },
+      {
+        id: "bodoni",
+        name: "Bodoni Modern",
+        fontFamily: '"Bodoni Moda", serif',
+        fontWeight: 800,
+        fontSize: "46px",
+        lineHeight: "1.15",
+        letterSpacing: "-0.8px",
+        maxWidth: "730px",
+        textTransform: "none"
+      }
+    ];
+
+    let currentIndex = 0;
+    let currentMode = 'single'; // 'single' or 'split'
+
+    /* ============ PRESET SELECTION HANDLERS ============ */
+    function selectPreset(index, btnElement) {
+      currentIndex = index;
+      const p = PRESETS[index];
+      if (!p) return;
+
+      // Update Single Preview Headline
+      const headline = document.getElementById('headlineTarget');
+      headline.style.fontFamily = p.fontFamily;
+      headline.style.fontWeight = p.fontWeight;
+      headline.style.fontSize = p.fontSize;
+      headline.style.lineHeight = p.lineHeight;
+      headline.style.letterSpacing = p.letterSpacing;
+      headline.style.maxWidth = p.maxWidth;
+      headline.style.textTransform = p.textTransform;
+
+      // Update Split Right Pane Headline & Badge
+      const splitHeadline = document.getElementById('splitHeadlineTarget');
+      splitHeadline.style.fontFamily = p.fontFamily;
+      splitHeadline.style.fontWeight = p.fontWeight;
+      splitHeadline.style.fontSize = p.fontSize;
+      splitHeadline.style.lineHeight = p.lineHeight;
+      splitHeadline.style.letterSpacing = p.letterSpacing;
+      splitHeadline.style.maxWidth = p.maxWidth;
+      splitHeadline.style.textTransform = p.textTransform;
+
+      document.getElementById('splitRightBadge').innerText = `B: ${p.name.toUpperCase()}`;
+
+      // Update Floating Typo Panel
+      const fontName = p.fontFamily.split(',')[0].replace(/"/g, '');
+      document.getElementById('panelFont').innerText = fontName;
+      document.getElementById('panelWeight').innerText = p.fontWeight;
+      document.getElementById('panelSize').innerText = p.fontSize;
+      document.getElementById('panelLH').innerText = p.lineHeight;
+      document.getElementById('panelLS').innerText = p.letterSpacing;
+
+      // Update Active Button Pill
+      document.querySelectorAll('.seg-btn').forEach((b, i) => {
+        if (i === index) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+
+      // Reset dropdown if main preset selected
+      if (index < 8) {
+        document.getElementById('morePresetSelect').value = "";
+      }
+    }
+
+    function selectDropdownPreset(valStr) {
+      const idx = parseInt(valStr, 10);
+      selectPreset(idx, null);
+    }
+
+    /* ============ MODE TOGGLE (SINGLE VS SPLIT) ============ */
+    function setMode(mode) {
+      currentMode = mode;
+      const singleContainer = document.getElementById('singleArticleContainer');
+      const splitContainer = document.getElementById('splitContainer');
+      const btnSingle = document.getElementById('btnSingleMode');
+      const btnSplit = document.getElementById('btnSplitMode');
+
+      if (mode === 'single') {
+        singleContainer.style.display = 'block';
+        splitContainer.classList.remove('active');
+        btnSingle.classList.add('active');
+        btnSplit.classList.remove('active');
+      } else {
+        singleContainer.style.display = 'none';
+        splitContainer.classList.add('active');
+        btnSplit.classList.add('active');
+        btnSingle.classList.remove('active');
+      }
+    }
+
+    /* ============ SYNCHRONIZED SCROLLING FOR SPLIT MODE ============ */
+    const paneLeft = document.getElementById('paneLeft');
+    const paneRight = document.getElementById('paneRight');
+    let isSyncing = false;
+
+    paneLeft.addEventListener('scroll', () => {
+      if (currentMode !== 'split' || isSyncing) return;
+      isSyncing = true;
+      paneRight.scrollTop = paneLeft.scrollTop;
+      setTimeout(() => isSyncing = false, 30);
+    });
+
+    paneRight.addEventListener('scroll', () => {
+      if (currentMode !== 'split' || isSyncing) return;
+      isSyncing = true;
+      paneLeft.scrollTop = paneRight.scrollTop;
+      setTimeout(() => isSyncing = false, 30);
+    });
+
+    /* ============ KEYBOARD SHORTCUTS ============ */
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+      if (e.key === 'ArrowRight') {
+        let next = (currentIndex + 1) % PRESETS.length;
+        selectPreset(next, document.querySelectorAll('.seg-btn')[next]);
+      } else if (e.key === 'ArrowLeft') {
+        let prev = (currentIndex - 1 + PRESETS.length) % PRESETS.length;
+        selectPreset(prev, document.querySelectorAll('.seg-btn')[prev]);
+      } else if (e.key >= '1' && e.key <= '8') {
+        let idx = parseInt(e.key, 10) - 1;
+        selectPreset(idx, document.querySelectorAll('.seg-btn')[idx]);
+      } else if (e.key === 'Tab' || e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'single' ? 'split' : 'single');
+      }
+    });
+
+    /* ============ COPY CSS SNIPPET ============ */
+    function copyActiveCss() {
+      const p = PRESETS[currentIndex];
+      const cssText = `/* WEVOX Headline Preset: ${p.name} */\nfont-family: ${p.fontFamily};\nfont-weight: ${p.fontWeight};\nfont-size: ${p.fontSize};\nline-height: ${p.lineHeight};\nletter-spacing: ${p.letterSpacing};\nmax-width: ${p.maxWidth};`;
+      navigator.clipboard.writeText(cssText).then(() => {
+        alert(`Copied CSS for ${p.name} to clipboard!\n\n${cssText}`);
+      });
+    }
+
+    function copyLink(btn) {
+      navigator.clipboard.writeText(window.location.href);
+      btn.style.color = 'var(--accent)';
+      setTimeout(() => btn.style.color = '', 1500);
+    }
+  </script>
+</body>
+</html>
