@@ -290,6 +290,9 @@ select.inp{cursor:pointer}
       <div class="sb-label">People</div>
       <div class="nav-item" data-nav="creators"><span class="nav-ico">👤</span>Creators</div>
       <div class="nav-item" data-nav="contacts"><span class="nav-ico">📬</span>Messages<span class="nav-badge" id="badge-contacts">0</span></div>
+      <div class="sb-label">Pages</div>
+      <div class="nav-item" data-nav="about"><span class="nav-ico">📄</span>About Page</div>
+      <div class="nav-item" data-nav="community"><span class="nav-ico">👥</span>Community Page</div>
       <div class="sb-label">System</div>
       <div class="nav-item" data-nav="settings"><span class="nav-ico">⚙️</span>Settings</div>
     </nav>
@@ -372,6 +375,158 @@ select.inp{cursor:pointer}
       </section>
 
       <!-- SETTINGS -->
+      
+      <section class="section" id="sec-about">
+        <div class="section-head"><h1 class="section-title">About Page CMS</h1></div>
+        
+        <div class="card">
+          <div class="card-title mb-3">Hero Section</div>
+          <div class="grid-2">
+            <div class="field"><label>Headline</label><input class="inp" id="abt-hero-head"></div>
+            <div class="field"><label>Subheadline</label><textarea class="inp" id="abt-hero-sub" rows="2"></textarea></div>
+          </div>
+          <div class="field mt-2">
+            <label>Hero Image</label>
+            <div style="display:flex;gap:10px;align-items:flex-end;">
+              <div style="flex:1;"><label>Image URL</label><input class="inp" id="abt-hero-img-url" placeholder="https://..."></div>
+              <div style="flex:1;">
+                <label>Upload to Cloudinary</label>
+                <div style="display:flex;gap:5px;">
+                  <input type="file" class="inp" id="abt-hero-img-file" accept="image/*" style="padding:6px">
+                  <button class="btn-ghost" onclick="doPageUpload('abt-hero-img-file', 'abt-hero-img-url', 'abt-hero-img-status')">Upload</button>
+                </div>
+                <div id="abt-hero-img-status" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div>
+              </div>
+            </div>
+            <img id="abt-hero-img-prev" style="max-height:100px;margin-top:10px;display:none;border-radius:4px;">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3">Why WEVOX</div>
+          <div class="grid-2">
+            <div class="field"><label>Title</label><input class="inp" id="abt-why-title"></div>
+            <div class="field"><label>Content</label><textarea class="inp" id="abt-why-content" rows="4"></textarea></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3">Vision & Mission</div>
+          <div class="grid-2">
+            <div class="field"><label>Vision Title</label><input class="inp" id="abt-vis-title"></div>
+            <div class="field"><label>Vision Content</label><textarea class="inp" id="abt-vis-content" rows="3"></textarea></div>
+            <div class="field"><label>Mission Title</label><input class="inp" id="abt-mis-title"></div>
+            <div class="field"><label>Mission Content</label><textarea class="inp" id="abt-mis-content" rows="3"></textarea></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3">Founder's Note</div>
+          <div class="grid-2">
+            <div class="field"><label>Name</label><input class="inp" id="abt-fnd-name"></div>
+            <div class="field"><label>Role</label><input class="inp" id="abt-fnd-role"></div>
+            <div class="field" style="grid-column: span 2"><label>Content</label><textarea class="inp" id="abt-fnd-content" rows="3"></textarea></div>
+          </div>
+          <div class="field mt-2">
+            <label>Founder Image</label>
+            <div style="display:flex;gap:10px;align-items:flex-end;">
+              <div style="flex:1;"><label>Image URL</label><input class="inp" id="abt-fnd-img-url" placeholder="https://..."></div>
+              <div style="flex:1;">
+                <label>Upload</label>
+                <div style="display:flex;gap:5px;">
+                  <input type="file" class="inp" id="abt-fnd-img-file" accept="image/*" style="padding:6px">
+                  <button class="btn-ghost" onclick="doPageUpload('abt-fnd-img-file', 'abt-fnd-img-url', 'abt-fnd-img-status')">Upload</button>
+                </div>
+                <div id="abt-fnd-img-status" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div>
+              </div>
+            </div>
+            <img id="abt-fnd-img-prev" style="max-height:100px;margin-top:10px;display:none;border-radius:4px;">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3">Join CTA</div>
+          <div class="grid-2">
+            <div class="field"><label>Headline</label><input class="inp" id="abt-cta-head"></div>
+            <div class="field"><label>Button Text</label><input class="inp" id="abt-cta-btn"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Editorial Pillars</span>
+            <button class="btn-sm" id="btn-add-pillar">+ Add Pillar</button>
+          </div>
+          <table class="table"><tbody id="abt-pillars-tbody"></tbody></table>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Editorial Standards</span>
+            <button class="btn-sm" id="btn-add-standard">+ Add Standard</button>
+          </div>
+          <table class="table"><tbody id="abt-standards-tbody"></tbody></table>
+        </div>
+
+        <button class="btn mt-2" id="save-about">Save About Page</button>
+      </section>
+
+      <section class="section" id="sec-community">
+        <div class="section-head"><h1 class="section-title">Community Page CMS</h1></div>
+        
+        <div class="card">
+          <div class="card-title mb-3">Hero Section</div>
+          <div class="grid-2">
+            <div class="field"><label>Headline</label><input class="inp" id="com-hero-head"></div>
+            <div class="field"><label>Subheadline</label><textarea class="inp" id="com-hero-sub" rows="2"></textarea></div>
+          </div>
+          <div class="field mt-2">
+            <label>Hero Image</label>
+            <div style="display:flex;gap:10px;align-items:flex-end;">
+              <div style="flex:1;"><label>Image URL</label><input class="inp" id="com-hero-img-url" placeholder="https://..."></div>
+              <div style="flex:1;">
+                <label>Upload to Cloudinary</label>
+                <div style="display:flex;gap:5px;">
+                  <input type="file" class="inp" id="com-hero-img-file" accept="image/*" style="padding:6px">
+                  <button class="btn-ghost" onclick="doPageUpload('com-hero-img-file', 'com-hero-img-url', 'com-hero-img-status')">Upload</button>
+                </div>
+                <div id="com-hero-img-status" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div>
+              </div>
+            </div>
+            <img id="com-hero-img-prev" style="max-height:100px;margin-top:10px;display:none;border-radius:4px;">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3">Community Introduction</div>
+          <div class="field"><label>Introduction Text</label><textarea class="inp" id="com-intro-text" rows="3"></textarea></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3">Join CTA</div>
+          <div class="grid-2">
+            <div class="field"><label>Headline</label><input class="inp" id="com-cta-head"></div>
+            <div class="field"><label>Button Text</label><input class="inp" id="com-cta-btn"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Community Values</span>
+            <button class="btn-sm" id="btn-add-value">+ Add Value</button>
+          </div>
+          <table class="table"><tbody id="com-values-tbody"></tbody></table>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-3">Featured Creators & Ordering</div>
+          <div class="field"><label>Comma-separated User IDs for Featured Contributors Grid (Order determines rendering order)</label><textarea class="inp" id="com-feat-creators" rows="2"></textarea></div>
+          <div class="field mt-2"><label>Comma-separated User IDs for PINNED Status (Highlights)</label><textarea class="inp" id="com-pin-creators" rows="2"></textarea></div>
+        </div>
+
+        <button class="btn mt-2" id="save-community">Save Community Page</button>
+      </section>
+
       <section class="section" id="sec-settings">
         <div class="section-head"><h1 class="section-title">Settings</h1></div>
         <div class="card">
@@ -426,7 +581,7 @@ select.inp{cursor:pointer}
    ============================================================ */
 const CATEGORIES=['Campus Fraud','Economy','Politics','Culture','Investigation','Field Reports','Documentary'];
 let currentUser=null;
-const state={pending:[],stories:[],videos:[],trending:[],picks:[],creators:[],contacts:[]};
+const state={pending:[],stories:[],videos:[],trending:[],picks:[],creators:[],contacts:[],about:null,community:null};
 
 /* ---------- tiny DOM helpers ---------- */
 const $=id=>document.getElementById(id);
@@ -459,8 +614,8 @@ $('logout-btn').addEventListener('click',()=>showConfirm('Logout','Sign out of t
 if(auth){auth.onAuthStateChanged(u=>{currentUser=u;if(u){$('login-page').classList.remove('show');$('app').classList.add('show');const init=(u.email||'A')[0].toUpperCase();$('sb-avatar').textContent=init;$('sb-email').textContent=u.email||'';const h=new Date().getHours();$('greeting').textContent=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+', Admin';initApp();}else{$('app').classList.remove('show');$('login-page').classList.add('show');}});}
 
 /* ---------- NAVIGATION (event delegation, single source) ---------- */
-const TITLES={dashboard:'Dashboard',pending:'Submissions',stories:'Stories',videos:'Videos',trending:'Trending',picks:"Editor's Picks",creators:'Creators',contacts:'Messages',settings:'Settings'};
-const LOADERS={pending:fetchPending,stories:fetchStories,videos:fetchVideos,trending:fetchTrending,picks:fetchPicks,creators:fetchCreators,contacts:fetchContacts,settings:loadConfig};
+const TITLES={dashboard:'Dashboard',pending:'Submissions',stories:'Stories',videos:'Videos',trending:'Trending',picks:"Editor's Picks",creators:'Creators',contacts:'Messages',settings:'Settings',about:'About Page',community:'Community Page'};
+const LOADERS={pending:fetchPending,stories:fetchStories,videos:fetchVideos,trending:fetchTrending,picks:fetchPicks,creators:fetchCreators,contacts:fetchContacts,settings:loadConfig,about:loadAbout,community:loadCommunity};
 function nav(section){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const sec=$('sec-'+section);if(sec)sec.classList.add('active');document.querySelectorAll('[data-nav="'+section+'"]').forEach(n=>{if(n.classList.contains('nav-item'))n.classList.add('active');});$('page-title').textContent=TITLES[section]||section;if(LOADERS[section])LOADERS[section]();closeSidebar();}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-nav]');if(t){nav(t.getAttribute('data-nav'));}});
 
@@ -1052,6 +1207,157 @@ async function markRead(id){try{await db.collection('contacts').doc(id).update({
 /* ============================================================
    SETTINGS
    ============================================================ */
+
+/* ==================== ABOUT & COMMUNITY CMS ==================== */
+let abtPillars = [];
+let abtStandards = [];
+let comValues = [];
+
+function renderList(list, tbodyId, typeName) {
+  const tb = $(tbodyId);
+  if (!tb) return;
+  if (!list.length) { tb.innerHTML = '<tr><td colspan="3" class="empty-cell">No items found.</td></tr>'; return; }
+  tb.innerHTML = list.map((item, idx) => `
+    <tr>
+      <td><strong>${esc(item.title)}</strong></td>
+      <td>${esc(item.description)}</td>
+      <td style="width:100px;">
+        <div class="row-actions">
+          <button class="btn-edit-o" onclick="editListItem('${typeName}', ${idx})">Edit</button>
+          <button class="btn-danger-o" onclick="deleteListItem('${typeName}', ${idx})">Del</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.editListItem = (typeName, idx) => {
+  const isP = typeName === 'pillar';
+  const isS = typeName === 'standard';
+  const isV = typeName === 'value';
+  const list = isP ? abtPillars : isS ? abtStandards : comValues;
+  const item = list[idx] || {};
+  
+  openModal('Edit ' + typeName, `
+    <div class="field"><label>Title</label><input class="inp" id="modal-item-title" value="${esc(item.title||'')}"></div>
+    ${isP || isV ? `<div class="field"><label>Icon (Emoji)</label><input class="inp" id="modal-item-icon" value="${esc(item.icon||'')}"></div>` : ''}
+    <div class="field"><label>Description</label><textarea class="inp" id="modal-item-desc" rows="3">${esc(item.description||'')}</textarea></div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn" id="modal-item-save">Save</button>
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+  
+  $('modal-item-save').onclick = () => {
+    list[idx] = {
+      title: $('modal-item-title').value,
+      description: $('modal-item-desc').value,
+      icon: $('modal-item-icon') ? $('modal-item-icon').value : ''
+    };
+    if (isP) renderList(abtPillars, 'abt-pillars-tbody', 'pillar');
+    else if (isS) renderList(abtStandards, 'abt-standards-tbody', 'standard');
+    else if (isV) renderList(comValues, 'com-values-tbody', 'value');
+    closeModal();
+  };
+};
+
+window.deleteListItem = (typeName, idx) => {
+  showConfirm('Delete Item', 'Are you sure?', () => {
+    if (typeName === 'pillar') { abtPillars.splice(idx,1); renderList(abtPillars, 'abt-pillars-tbody', 'pillar'); }
+    else if (typeName === 'standard') { abtStandards.splice(idx,1); renderList(abtStandards, 'abt-standards-tbody', 'standard'); }
+    else if (typeName === 'value') { comValues.splice(idx,1); renderList(comValues, 'com-values-tbody', 'value'); }
+  });
+};
+
+function setupAddBtn(btnId, typeName) {
+  const btn = $(btnId);
+  if(!btn) return;
+  btn.onclick = () => {
+    const list = typeName === 'pillar' ? abtPillars : typeName === 'standard' ? abtStandards : comValues;
+    list.push({ title: 'New Item', description: '' });
+    if(typeName==='pillar') renderList(abtPillars, 'abt-pillars-tbody', 'pillar');
+    if(typeName==='standard') renderList(abtStandards, 'abt-standards-tbody', 'standard');
+    if(typeName==='value') renderList(comValues, 'com-values-tbody', 'value');
+    window.editListItem(typeName, list.length - 1);
+  };
+}
+
+setTimeout(() => {
+  setupAddBtn('btn-add-pillar', 'pillar');
+  setupAddBtn('btn-add-standard', 'standard');
+  setupAddBtn('btn-add-value', 'value');
+}, 500);
+
+async function loadAbout() {
+  if(!db) return;
+  try {
+    const doc = await db.collection('pages').doc('about').get();
+    const d = doc.exists ? doc.data() : {};
+    
+    if(d.hero){ $('abt-hero-head').value = d.hero.headline||''; $('abt-hero-sub').value = d.hero.subheadline||''; $('abt-hero-img-url').value = d.hero.image||''; $('abt-hero-img-url').dispatchEvent(new Event('input')); }
+    if(d.whyWeVox){ $('abt-why-title').value = d.whyWeVox.title||''; $('abt-why-content').value = d.whyWeVox.content||''; }
+    if(d.vision){ $('abt-vis-title').value = d.vision.title||''; $('abt-vis-content').value = d.vision.content||''; }
+    if(d.mission){ $('abt-mis-title').value = d.mission.title||''; $('abt-mis-content').value = d.mission.content||''; }
+    if(d.founderNote){ $('abt-fnd-name').value = d.founderNote.name||''; $('abt-fnd-role').value = d.founderNote.role||''; $('abt-fnd-content').value = d.founderNote.content||''; $('abt-fnd-img-url').value = d.founderNote.image||''; $('abt-fnd-img-url').dispatchEvent(new Event('input')); }
+    if(d.introduction){ $('com-intro-text').value = d.introduction.content||''; }
+    if(d.joinCta){ $('abt-cta-head').value = d.joinCta.headline||''; $('abt-cta-btn').value = d.joinCta.buttonText||''; }
+    
+    abtPillars = d.editorialPillars || [];
+    abtStandards = d.editorialStandards || [];
+    renderList(abtPillars, 'abt-pillars-tbody', 'pillar');
+    renderList(abtStandards, 'abt-standards-tbody', 'standard');
+  } catch(e) { fsErr(e, 'loadAbout'); }
+}
+
+$('save-about')?.addEventListener('click', async () => {
+  try {
+    const data = {
+      hero: { headline: $('abt-hero-head').value, subheadline: $('abt-hero-sub').value, image: $('abt-hero-img-url').value },
+      whyWeVox: { title: $('abt-why-title').value, content: $('abt-why-content').value },
+      vision: { title: $('abt-vis-title').value, content: $('abt-vis-content').value },
+      mission: { title: $('abt-mis-title').value, content: $('abt-mis-content').value },
+      founderNote: { name: $('abt-fnd-name').value, role: $('abt-fnd-role').value, content: $('abt-fnd-content').value, image: $('abt-fnd-img-url').value },
+      introduction: { content: $('com-intro-text').value },
+      joinCta: { headline: $('abt-cta-head').value, buttonText: $('abt-cta-btn').value },
+      editorialPillars: abtPillars,
+      editorialStandards: abtStandards
+    };
+    await db.collection('pages').doc('about').set(data, { merge: true });
+    toast('About page saved!', 'success');
+  } catch(e) { fsErr(e, 'saveAbout'); }
+});
+
+async function loadCommunity() {
+  if(!db) return;
+  try {
+    const doc = await db.collection('pages').doc('community').get();
+    const d = doc.exists ? doc.data() : {};
+    
+    if(d.hero){ $('com-hero-head').value = d.hero.headline||''; $('com-hero-sub').value = d.hero.subheadline||''; $('com-hero-img-url').value = d.hero.image||''; $('com-hero-img-url').dispatchEvent(new Event('input')); }
+    if(d.joinCta){ $('com-cta-head').value = d.joinCta.headline||''; $('com-cta-btn').value = d.joinCta.buttonText||''; }
+    
+    $('com-feat-creators').value = (d.featuredCreators||[]).join(', ');
+    $('com-pin-creators').value = (d.pinnedCreators||[]).join(', ');
+    
+    comValues = d.communityValues || [];
+    renderList(comValues, 'com-values-tbody', 'value');
+  } catch(e) { fsErr(e, 'loadCommunity'); }
+}
+
+$('save-community')?.addEventListener('click', async () => {
+  try {
+    const data = {
+      hero: { headline: $('com-hero-head').value, subheadline: $('com-hero-sub').value, image: $('com-hero-img-url').value },
+      joinCta: { headline: $('com-cta-head').value, buttonText: $('com-cta-btn').value },
+      featuredCreators: $('com-feat-creators').value.split(',').map(s=>s.trim()).filter(Boolean),
+      pinnedCreators: $('com-pin-creators').value.split(',').map(s=>s.trim()).filter(Boolean),
+      communityValues: comValues
+    };
+    await db.collection('pages').doc('community').set(data, { merge: true });
+    toast('Community page saved!', 'success');
+  } catch(e) { fsErr(e, 'saveCommunity'); }
+});
+
 async function loadConfig(){if(!db)return;try{const hero=await db.collection('siteConfig').doc('hero').get();if(hero.exists){const d=hero.data();const map={eyebrow:'eyebrow',headline:'headline',s1v:'stat1Value',s1l:'stat1Label',s2v:'stat2Value',s2l:'stat2Label',s3v:'stat3Value',s3l:'stat3Label',s4v:'stat4Value',s4l:'stat4Label'};Object.keys(map).forEach(k=>{const el=$('set-'+k);if(el)el.value=d[map[k]]||'';});}const foot=await db.collection('siteConfig').doc('footer').get();if(foot.exists){const d=foot.data();const m={email:'email',tw:'twitter',yt:'youtube',ig:'instagram'};Object.keys(m).forEach(k=>{const el=$('set-'+k);if(el)el.value=d[m[k]]||'';});}}catch(e){fsErr(e,'loadConfig');}}
 $('save-hero').addEventListener('click',async()=>{const data={eyebrow:$('set-eyebrow').value,headline:$('set-headline').value,stat1Value:$('set-s1v').value,stat1Label:$('set-s1l').value,stat2Value:$('set-s2v').value,stat2Label:$('set-s2l').value,stat3Value:$('set-s3v').value,stat3Label:$('set-s3l').value,stat4Value:$('set-s4v').value,stat4Label:$('set-s4l').value};try{await db.collection('siteConfig').doc('hero').set(data,{merge:true});toast('Hero saved!','success');}catch(e){fsErr(e,'saveHero');}});
 $('save-footer').addEventListener('click',async()=>{const data={email:$('set-email').value,twitter:$('set-tw').value,youtube:$('set-yt').value,instagram:$('set-ig').value};try{await db.collection('siteConfig').doc('footer').set(data,{merge:true});toast('Footer saved!','success');}catch(e){fsErr(e,'saveFooter');}});
