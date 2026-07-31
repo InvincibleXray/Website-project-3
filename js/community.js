@@ -3,45 +3,99 @@ document.addEventListener("DOMContentLoaded", async () => {
   const checkDb = setInterval(async () => {
     if (typeof db !== 'undefined') {
       clearInterval(checkDb);
+      console.log("Community initialized");
       await initCommunity();
     }
   }, 100);
 });
 
 async function initCommunity() {
+  // 1. Fetch Manual "Meet the Community"
+  let meetMembers = [];
   try {
-    // 1. Fetch Manual "Meet the Community"
-    const pageDoc = await db.collection("pages").doc("community").get();
+    const pageDoc = await db.collection("community").doc("page").get();
     const pageData = pageDoc.exists ? pageDoc.data() : {};
-    const meetMembers = pageData.meetMembers || [];
+    meetMembers = pageData.meetMembers || [];
+    console.log("Meet Members loaded");
+  } catch (err) {
+    console.error("Collection: community | Document: page | Function: initCommunity (Meet Members) | Error:", err);
+  }
+  
+  // Safe execution of meet members render
+  try {
     renderMeetMembers(meetMembers);
+  } catch (err) {
+    console.error("Function: renderMeetMembers | Error:", err);
+  }
 
-    // 2. Fetch Auto-Generated Data
-    const [usersSnap, storiesSnap, videosSnap] = await Promise.all([
-      db.collection("users").get().catch(() => ({ docs: [] })),
-      db.collection("stories").where("status", "==", "published").get().catch(() => ({ docs: [] })),
-      db.collection("videos").where("status", "==", "published").get().catch(() => ({ docs: [] }))
-    ]);
+  // 2. Fetch Users Data Ordered by Points
+  let users = [];
+  try {
+    const usersSnap = await db.collection("users").orderBy("points", "desc").get().catch(async (e) => {
+      console.error("Collection: users | Document: N/A | Function: initCommunity (orderBy) | Error:", e);
+      // Fallback to normal get if index is missing
+      return await db.collection("users").get();
+    });
+    
+    users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const stories = storiesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const videos = videosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    // Compute stats per user
+    // Normalize properties
     users.forEach(u => {
-      u.myStories = stories.filter(s => s.authorId === u.id);
-      u.myVideos = videos.filter(v => v.authorId === u.id);
-      u.totalReads = [...u.myStories, ...u.myVideos].reduce((sum, item) => sum + (Number(item.reads) || 0), 0);
-      u.points = (u.myStories.length * 50) + (u.myVideos.length * 40) + (Math.floor(u.totalReads / 1000) * 10);
+      u.storiesCount = u.storiesCount || 0;
+      u.videosCount = u.videosCount || 0;
+      u.totalReads = u.totalReads || 0;
+      u.points = u.points || 0;
     });
 
-    renderTopPerformers(users, stories);
-    renderRankings(users);
-    renderCreatorProfile(users);
-
+    console.log("Users loaded");
   } catch (err) {
-    console.error("Failed to load community data:", err);
+    console.error("Collection: users | Document: N/A | Function: initCommunity (Users Fetch) | Error:", err);
   }
+
+  // Ensure DOM elements exist, if not create them
+  ensureDOMContainers();
+
+  // Safe execution of Top Performers render
+  try {
+    renderTopPerformers(users);
+    console.log("Top Performers rendered");
+  } catch (err) {
+    console.error("Function: renderTopPerformers | Error:", err);
+  }
+  
+  // Safe execution of Rankings render
+  try {
+    renderRankings(users);
+    console.log("Rankings rendered");
+  } catch (err) {
+    console.error("Function: renderRankings | Error:", err);
+  }
+  
+  // Safe execution of Creator Profile render
+  try {
+    renderCreatorProfile(users);
+    console.log("Creator Profile rendered");
+  } catch (err) {
+    console.error("Function: renderCreatorProfile | Error:", err);
+  }
+}
+
+function ensureDOMContainers() {
+  const containers = [
+    'cms-contributors-grid',
+    'cms-spotlight-grid',
+    'cms-leaderboard',
+    'cms-creator-profile'
+  ];
+  
+  containers.forEach(id => {
+    if (!document.getElementById(id)) {
+      const el = document.createElement('div');
+      el.id = id;
+      document.body.appendChild(el);
+      console.warn(`Created missing container: ${id}`);
+    }
+  });
 }
 
 function escapeHtml(str) {
@@ -89,38 +143,43 @@ function renderMeetMembers(members) {
   }).join("");
 }
 
-function renderTopPerformers(users, stories) {
+function renderTopPerformers(users) {
   const grid = document.getElementById("cms-spotlight-grid");
   if (!grid) return;
+  
+  if (!users || users.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);">No top performers yet. Publish some stories!</div>`;
+    return;
+  }
 
   // 1. Top Reporter (Most published stories)
-  let topReporter = users.reduce((prev, curr) => (curr.myStories.length > (prev ? prev.myStories.length : -1)) ? curr : prev, null);
+  let topReporter = users.reduce((prev, curr) => (curr.storiesCount > (prev ? prev.storiesCount : -1)) ? curr : prev, null);
   
   // 2. Rising Voice (Verified user with fewest stories but highest points per story)
   let risingVoice = null;
-  const verifiedUsers = users.filter(u => u.verified && u.myStories.length > 0 && u.myStories.length <= 5);
+  const verifiedUsers = users.filter(u => u.verified && u.storiesCount > 0 && u.storiesCount <= 5);
   if (verifiedUsers.length > 0) {
     risingVoice = verifiedUsers.reduce((prev, curr) => (curr.points > (prev ? prev.points : -1)) ? curr : prev, null);
   } else {
     // Fallback if no verified new users
-    const validUsers = users.filter(u => u.myStories.length > 0 && u.id !== (topReporter ? topReporter.id : ''));
+    const validUsers = users.filter(u => u.storiesCount > 0 && u.id !== (topReporter ? topReporter.id : ''));
     risingVoice = validUsers.length > 0 ? validUsers[Math.floor(Math.random() * validUsers.length)] : null;
   }
 
-  // 3. Most Viewed Story
-  let mostViewedStory = stories.reduce((prev, curr) => ((Number(curr.reads) || 0) > (prev ? (Number(prev.reads) || 0) : -1)) ? curr : prev, null);
+  // 3. Most Read Author
+  let mostReadAuthor = users.reduce((prev, curr) => (curr.totalReads > (prev ? prev.totalReads : -1)) ? curr : prev, null);
 
   // 4. Community Champion (Highest total points overall)
   let champion = users.reduce((prev, curr) => (curr.points > (prev ? prev.points : -1)) ? curr : prev, null);
 
   const cards = [];
 
-  if (topReporter && topReporter.myStories.length > 0) {
+  if (topReporter && topReporter.storiesCount > 0) {
     cards.push(`
       <div class="spotlight-card">
         <span class="pill-badge">TOP REPORTER</span>
         <div class="spotlight-name">${escapeHtml(topReporter.name || 'Anonymous')}</div>
-        <div class="spotlight-sub">${escapeHtml(topReporter.university || 'Independent')} · ${topReporter.myStories.length} Stories</div>
+        <div class="spotlight-sub">${escapeHtml(topReporter.college || topReporter.university || 'Independent')} · ${topReporter.storiesCount} Stories</div>
       </div>
     `);
   }
@@ -130,17 +189,17 @@ function renderTopPerformers(users, stories) {
       <div class="spotlight-card">
         <span class="pill-badge">RISING VOICE</span>
         <div class="spotlight-name">${escapeHtml(risingVoice.name || 'Anonymous')}</div>
-        <div class="spotlight-sub">${escapeHtml(risingVoice.university || 'Independent')} · ${formatNumber(risingVoice.totalReads)} Reads</div>
+        <div class="spotlight-sub">${escapeHtml(risingVoice.college || risingVoice.university || 'Independent')} · ${formatNumber(risingVoice.totalReads)} Reads</div>
       </div>
     `);
   }
 
-  if (mostViewedStory) {
+  if (mostReadAuthor && mostReadAuthor.totalReads > 0) {
     cards.push(`
       <div class="spotlight-card">
         <span class="pill-badge">MOST VIEWED</span>
-        <div class="spotlight-name">"${escapeHtml(mostViewedStory.title || 'Untitled')}"</div>
-        <div class="spotlight-sub">${formatNumber(mostViewedStory.reads)} Views</div>
+        <div class="spotlight-name">${escapeHtml(mostReadAuthor.name || 'Anonymous')}</div>
+        <div class="spotlight-sub">${formatNumber(mostReadAuthor.totalReads)} Total Views</div>
       </div>
     `);
   }
@@ -150,19 +209,28 @@ function renderTopPerformers(users, stories) {
       <div class="spotlight-card">
         <span class="pill-badge">CHAMPION</span>
         <div class="spotlight-name">${escapeHtml(champion.name || 'Anonymous')}</div>
-        <div class="spotlight-sub">${escapeHtml(champion.university || 'Independent')} · ${champion.points} Pts</div>
+        <div class="spotlight-sub">${escapeHtml(champion.college || champion.university || 'Independent')} · ${champion.points} Pts</div>
       </div>
     `);
   }
 
-  grid.innerHTML = cards.join("");
+  if (cards.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);">No top performers yet. Publish some stories!</div>`;
+  } else {
+    grid.innerHTML = cards.join("");
+  }
 }
 
 function renderRankings(users) {
   const lb = document.getElementById("cms-leaderboard");
   if (!lb) return;
+  
+  if (!users || users.length === 0) {
+    lb.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);">No rankings available yet.</div>`;
+    return;
+  }
 
-  const sorted = [...users].filter(u => u.points > 0).sort((a, b) => b.points - a.points).slice(0, 5);
+  const sorted = [...users].sort((a, b) => b.points - a.points).filter(u => u.points > 0).slice(0, 5);
 
   if (sorted.length === 0) {
     lb.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);">No rankings available yet.</div>`;
@@ -180,7 +248,7 @@ function renderRankings(users) {
       <div class="rank-row">
         <div class="rank-num">0${i + 1}</div>
         <div class="rank-name">${escapeHtml(u.name || 'Anonymous')}</div>
-        <div class="rank-college">${escapeHtml(u.university || 'Independent')}</div>
+        <div class="rank-college">${escapeHtml(u.college || u.university || 'Independent')}</div>
         <div class="rank-spacer"></div>
         ${badge}
       </div>
@@ -191,9 +259,14 @@ function renderRankings(users) {
 function renderCreatorProfile(users) {
   const container = document.getElementById("cms-creator-profile");
   if (!container) return;
+  
+  if (!users || users.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);">No active creators found.</div>`;
+    return;
+  }
 
-  // Filter users who have at least 1 point
-  const activeUsers = users.filter(u => u.points > 0);
+  // Filter users who have published at least one story or video
+  const activeUsers = users.filter(u => u.storiesCount > 0 || u.videosCount > 0);
   if (activeUsers.length === 0) {
     container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);">No active creators found.</div>`;
     return;
@@ -207,10 +280,10 @@ function renderCreatorProfile(users) {
 
   const creator = activeUsers[0];
   
-  // Find their rank
-  const sorted = [...users].filter(u => u.points > 0).sort((a, b) => b.points - a.points);
+  // Find their rank (users array is already assumed sorted if using orderBy)
+  const sorted = [...users].sort((a, b) => b.points - a.points).filter(u => u.points > 0);
   const rank = sorted.findIndex(u => u.id === creator.id) + 1;
-  const rankLabel = rank > 0 ? \`#\${rank}\` : 'Unranked';
+  const rankLabel = rank > 0 ? `#${rank}` : 'Unranked';
 
   let pill = '';
   if (rank === 1) pill = `<span class="gold-pill">GOLD</span>`;
@@ -231,11 +304,11 @@ function renderCreatorProfile(users) {
       <div class="profile-stats">
         <div class="profile-stat">
           <div class="profile-stat-label">Reports</div>
-          <div class="profile-stat-value">${creator.myStories.length}</div>
+          <div class="profile-stat-value">${creator.storiesCount}</div>
         </div>
         <div class="profile-stat">
           <div class="profile-stat-label">Videos</div>
-          <div class="profile-stat-value">${creator.myVideos.length}</div>
+          <div class="profile-stat-value">${creator.videosCount}</div>
         </div>
         <div class="profile-stat">
           <div class="profile-stat-label">Total Reads</div>

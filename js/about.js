@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const doc = await db.collection("pages").doc("about").get();
+    const doc = await db.collection("about").doc("page").get();
     if (!doc.exists) {
       // Fallback to existing static content
       return;

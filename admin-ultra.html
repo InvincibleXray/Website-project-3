@@ -678,6 +678,29 @@ function renderPending(){const el=$('pending-list');if(!el)return;if(!state.pend
     else{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.async=true;s.onload=hydrate;document.head.appendChild(s);}
   }
 }
+
+async function updateUserStats(authorId, type) {
+  if (!authorId) return;
+  try {
+    const userRef = db.collection('users').doc(authorId);
+    const userSnap = await userRef.get();
+    if (!userSnap.exists) {
+      console.warn("User document does not exist for authorId:", authorId);
+      return;
+    }
+    
+    const isStory = (type === 'STORY');
+    
+    await userRef.update({
+      storiesCount: isStory ? firebase.firestore.FieldValue.increment(1) : firebase.firestore.FieldValue.increment(0),
+      videosCount: !isStory ? firebase.firestore.FieldValue.increment(1) : firebase.firestore.FieldValue.increment(0),
+      points: isStory ? firebase.firestore.FieldValue.increment(50) : firebase.firestore.FieldValue.increment(40),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (err) {
+    console.warn("Failed to update user stats:", err);
+  }
+}
 async function approveSubmission(id,type){
   const cat=$('cat-'+id)&&$('cat-'+id).value;
   if(!cat){toast('Select a category first.','error');return;}
@@ -716,6 +739,12 @@ async function approveSubmission(id,type){
     }
     await db.collection(coll).add(base);
     await ref.update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    
+    // Automatically update the user's statistics, only on first approval
+    if (d.status !== 'approved' && d.authorId) {
+      await updateUserStats(d.authorId, type);
+    }
+    
     state.pending=state.pending.filter(p=>p.id!==id);
     const node=$('pend-'+id);if(node)node.remove();
     updateStats();renderDashRecent();
@@ -1257,7 +1286,7 @@ setTimeout(() => {
 async function loadAbout() {
   if(!db) return;
   try {
-    const doc = await db.collection('pages').doc('about').get();
+    const doc = await db.collection('about').doc('page').get();
     const d = doc.exists ? doc.data() : {};
     
     if(d.hero){ $('abt-hero-head').value = d.hero.headline||''; $('abt-hero-sub').value = d.hero.subheadline||''; $('abt-hero-img-url').value = d.hero.image||''; $('abt-hero-img-url').dispatchEvent(new Event('input')); }
@@ -1288,7 +1317,7 @@ $('save-about')?.addEventListener('click', async () => {
       editorialPillars: abtPillars,
       editorialStandards: abtStandards
     };
-    await db.collection('pages').doc('about').set(data, { merge: true });
+    await db.collection('about').doc('page').set(data, { merge: true });
     toast('About page saved!', 'success');
   } catch(e) { fsErr(e, 'saveAbout'); }
 });
@@ -1298,7 +1327,7 @@ let meetMembers = [];
 async function loadCommunity() {
   if(!db) return;
   try {
-    const doc = await db.collection('pages').doc('community').get();
+    const doc = await db.collection('community').doc('page').get();
     const d = doc.exists ? doc.data() : {};
     meetMembers = d.meetMembers || [];
     renderMeetMembers();
@@ -1437,7 +1466,7 @@ function openMemberModal(index) {
 async function saveMeetMembers() {
   try {
     toast('Saving...', 'info');
-    await db.collection('pages').doc('community').set({ meetMembers }, { merge: true });
+    await db.collection('community').doc('page').set({ meetMembers }, { merge: true });
     renderMeetMembers();
     toast('Community members saved.', 'success');
   } catch(e) { fsErr(e, 'saveMeetMembers'); }
