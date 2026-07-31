@@ -474,57 +474,23 @@ select.inp{cursor:pointer}
       <section class="section" id="sec-community">
         <div class="section-head"><h1 class="section-title">Community Page CMS</h1></div>
         
-        <div class="card">
-          <div class="card-title mb-3">Hero Section</div>
-          <div class="grid-2">
-            <div class="field"><label>Headline</label><input class="inp" id="com-hero-head"></div>
-            <div class="field"><label>Subheadline</label><textarea class="inp" id="com-hero-sub" rows="2"></textarea></div>
+        <div class="card p0">
+          <div class="card-title p3" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">
+            <span>Meet the Community</span>
+            <button class="btn-sm" id="btn-add-community-member">+ Add Member</button>
           </div>
-          <div class="field mt-2">
-            <label>Hero Image</label>
-            <div style="display:flex;gap:10px;align-items:flex-end;">
-              <div style="flex:1;"><label>Image URL</label><input class="inp" id="com-hero-img-url" placeholder="https://..."></div>
-              <div style="flex:1;">
-                <label>Upload to Cloudinary</label>
-                <div style="display:flex;gap:5px;">
-                  <input type="file" class="inp" id="com-hero-img-file" accept="image/*" style="padding:6px">
-                  <button class="btn-ghost" onclick="doPageUpload('com-hero-img-file', 'com-hero-img-url', 'com-hero-img-status')">Upload</button>
-                </div>
-                <div id="com-hero-img-status" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div>
-              </div>
-            </div>
-            <img id="com-hero-img-prev" style="max-height:100px;margin-top:10px;display:none;border-radius:4px;">
-          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Role & Bio</th>
+                <th>Order</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="com-members-tbody"></tbody>
+          </table>
         </div>
-
-        <div class="card">
-          <div class="card-title mb-3">Community Introduction</div>
-          <div class="field"><label>Introduction Text</label><textarea class="inp" id="com-intro-text" rows="3"></textarea></div>
-        </div>
-
-        <div class="card">
-          <div class="card-title mb-3">Join CTA</div>
-          <div class="grid-2">
-            <div class="field"><label>Headline</label><input class="inp" id="com-cta-head"></div>
-            <div class="field"><label>Button Text</label><input class="inp" id="com-cta-btn"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title mb-3" style="display:flex;justify-content:space-between;align-items:center;">
-            <span>Community Values</span>
-            <button class="btn-sm" id="btn-add-value">+ Add Value</button>
-          </div>
-          <table class="table"><tbody id="com-values-tbody"></tbody></table>
-        </div>
-
-        <div class="card">
-          <div class="card-title mb-3">Featured Creators & Ordering</div>
-          <div class="field"><label>Comma-separated User IDs for Featured Contributors Grid (Order determines rendering order)</label><textarea class="inp" id="com-feat-creators" rows="2"></textarea></div>
-          <div class="field mt-2"><label>Comma-separated User IDs for PINNED Status (Highlights)</label><textarea class="inp" id="com-pin-creators" rows="2"></textarea></div>
-        </div>
-
-        <button class="btn mt-2" id="save-community">Save Community Page</button>
       </section>
 
       <section class="section" id="sec-settings">
@@ -1327,36 +1293,155 @@ $('save-about')?.addEventListener('click', async () => {
   } catch(e) { fsErr(e, 'saveAbout'); }
 });
 
+let meetMembers = [];
+
 async function loadCommunity() {
   if(!db) return;
   try {
     const doc = await db.collection('pages').doc('community').get();
     const d = doc.exists ? doc.data() : {};
-    
-    if(d.hero){ $('com-hero-head').value = d.hero.headline||''; $('com-hero-sub').value = d.hero.subheadline||''; $('com-hero-img-url').value = d.hero.image||''; $('com-hero-img-url').dispatchEvent(new Event('input')); }
-    if(d.joinCta){ $('com-cta-head').value = d.joinCta.headline||''; $('com-cta-btn').value = d.joinCta.buttonText||''; }
-    
-    $('com-feat-creators').value = (d.featuredCreators||[]).join(', ');
-    $('com-pin-creators').value = (d.pinnedCreators||[]).join(', ');
-    
-    comValues = d.communityValues || [];
-    renderList(comValues, 'com-values-tbody', 'value');
+    meetMembers = d.meetMembers || [];
+    renderMeetMembers();
   } catch(e) { fsErr(e, 'loadCommunity'); }
 }
 
-$('save-community')?.addEventListener('click', async () => {
-  try {
-    const data = {
-      hero: { headline: $('com-hero-head').value, subheadline: $('com-hero-sub').value, image: $('com-hero-img-url').value },
-      joinCta: { headline: $('com-cta-head').value, buttonText: $('com-cta-btn').value },
-      featuredCreators: $('com-feat-creators').value.split(',').map(s=>s.trim()).filter(Boolean),
-      pinnedCreators: $('com-pin-creators').value.split(',').map(s=>s.trim()).filter(Boolean),
-      communityValues: comValues
-    };
-    await db.collection('pages').doc('community').set(data, { merge: true });
-    toast('Community page saved!', 'success');
-  } catch(e) { fsErr(e, 'saveCommunity'); }
+function renderMeetMembers() {
+  const tb = $('com-members-tbody');
+  if (!tb) return;
+  
+  // Sort by display order
+  meetMembers.sort((a, b) => (Number(a.displayOrder) || 0) - (Number(b.displayOrder) || 0));
+
+  if (!meetMembers.length) {
+    tb.innerHTML = '<tr><td colspan="4" class="empty-cell">No members added yet.</td></tr>';
+    return;
+  }
+  tb.innerHTML = meetMembers.map((m, i) => `
+    <tr>
+      <td>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <div style="width:40px; height:40px; border-radius:50%; background:var(--border); overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            ${m.image ? `<img src="${esc(m.image)}" style="width:100%;height:100%;object-fit:cover;">` : `<span style="font-weight:bold">${esc((m.name||'?').charAt(0))}</span>`}
+          </div>
+          <div>
+            <div class="t-title">${esc(m.name || '')}</div>
+            <div class="t-sub">${esc(m.college || '')}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div style="font-weight:600; font-size:13px;">${esc(m.role || '')}</div>
+        <div style="font-size:12px; color:var(--text-muted); max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(m.bio || '')}</div>
+      </td>
+      <td class="font-mono">${esc(m.displayOrder || '0')}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-edit-o" data-edit-member="${i}">Edit</button>
+          <button class="btn-danger-o" data-del-member="${i}">Del</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+$('com-members-tbody')?.addEventListener('click', e => {
+  const d = e.target.closest('[data-del-member]');
+  if (d) {
+    const idx = parseInt(d.getAttribute('data-del-member'));
+    showConfirm('Delete Member', 'Remove this member from Community?', async () => {
+      meetMembers.splice(idx, 1);
+      await saveMeetMembers();
+    }, '🗑️');
+  }
+  const ed = e.target.closest('[data-edit-member]');
+  if (ed) {
+    const idx = parseInt(ed.getAttribute('data-edit-member'));
+    openMemberModal(idx);
+  }
 });
+
+$('btn-add-community-member')?.addEventListener('click', () => openMemberModal(-1));
+
+function openMemberModal(index) {
+  const m = index >= 0 ? meetMembers[index] : { displayOrder: meetMembers.length * 10 };
+  openModal(index >= 0 ? 'Edit Member' : 'Add Member', `
+    <div class="grid-2">
+      <div class="field"><label>Name *</label><input class="inp" id="cm-name" value="${esc(m.name||'')}"></div>
+      <div class="field"><label>Role *</label><input class="inp" id="cm-role" value="${esc(m.role||'')}"></div>
+    </div>
+    <div class="grid-2 mt-2">
+      <div class="field"><label>College / Organization</label><input class="inp" id="cm-college" value="${esc(m.college||'')}"></div>
+      <div class="field"><label>Display Order</label><input type="number" class="inp" id="cm-order" value="${esc(m.displayOrder||'')}"></div>
+    </div>
+    <div class="field mt-2"><label>Bio</label><textarea class="inp" id="cm-bio" rows="2">${esc(m.bio||'')}</textarea></div>
+    <div class="grid-2 mt-2">
+      <div class="field"><label>Twitter URL</label><input class="inp" id="cm-tw" value="${esc(m.twitter||'')}"></div>
+      <div class="field"><label>Instagram URL</label><input class="inp" id="cm-ig" value="${esc(m.instagram||'')}"></div>
+    </div>
+    <div class="field mt-2">
+      <label>Profile Image URL</label>
+      <div style="display:flex;gap:10px;">
+        <input class="inp" id="cm-image" value="${esc(m.image||'')}" placeholder="https://..." style="flex:1;">
+        <input type="file" id="cm-file" style="display:none;" accept="image/*">
+        <button class="btn-ghost" onclick="document.getElementById('cm-file').click()">Upload</button>
+      </div>
+      <div id="cm-status" style="font-size:11px; color:var(--text-muted); margin-top:4px;"></div>
+    </div>
+    <div class="modal-foot mt-3">
+      <button class="btn-ghost" data-close-modal>Cancel</button>
+      <button class="btn" id="cm-save">Save</button>
+    </div>
+  `);
+
+  // Handle Firebase Storage upload
+  const fileInput = document.getElementById('cm-file');
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const status = document.getElementById('cm-status');
+    status.textContent = "Uploading to Firebase Storage...";
+    try {
+      const ref = firebase.storage().ref('community/' + Date.now() + '_' + file.name);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      document.getElementById('cm-image').value = url;
+      status.textContent = "Upload complete!";
+    } catch(err) {
+      status.textContent = "Error: " + err.message;
+    }
+  });
+
+  document.getElementById('cm-save').addEventListener('click', async () => {
+    const name = $('cm-name').value.trim();
+    if (!name) { toast('Name is required.', 'error'); return; }
+    
+    const newM = {
+      name,
+      role: $('cm-role').value.trim(),
+      college: $('cm-college').value.trim(),
+      displayOrder: parseInt($('cm-order').value) || 0,
+      bio: $('cm-bio').value.trim(),
+      twitter: $('cm-tw').value.trim(),
+      instagram: $('cm-ig').value.trim(),
+      image: $('cm-image').value.trim()
+    };
+    
+    if (index >= 0) meetMembers[index] = newM;
+    else meetMembers.push(newM);
+    
+    closeModal();
+    await saveMeetMembers();
+  });
+}
+
+async function saveMeetMembers() {
+  try {
+    toast('Saving...', 'info');
+    await db.collection('pages').doc('community').set({ meetMembers }, { merge: true });
+    renderMeetMembers();
+    toast('Community members saved.', 'success');
+  } catch(e) { fsErr(e, 'saveMeetMembers'); }
+}
 
 async function loadConfig(){if(!db)return;try{const hero=await db.collection('siteConfig').doc('hero').get();if(hero.exists){const d=hero.data();const map={eyebrow:'eyebrow',headline:'headline',s1v:'stat1Value',s1l:'stat1Label',s2v:'stat2Value',s2l:'stat2Label',s3v:'stat3Value',s3l:'stat3Label',s4v:'stat4Value',s4l:'stat4Label'};Object.keys(map).forEach(k=>{const el=$('set-'+k);if(el)el.value=d[map[k]]||'';});}const foot=await db.collection('siteConfig').doc('footer').get();if(foot.exists){const d=foot.data();const m={email:'email',tw:'twitter',yt:'youtube',ig:'instagram'};Object.keys(m).forEach(k=>{const el=$('set-'+k);if(el)el.value=d[m[k]]||'';});}}catch(e){fsErr(e,'loadConfig');}}
 $('save-hero').addEventListener('click',async()=>{const data={eyebrow:$('set-eyebrow').value,headline:$('set-headline').value,stat1Value:$('set-s1v').value,stat1Label:$('set-s1l').value,stat2Value:$('set-s2v').value,stat2Label:$('set-s2l').value,stat3Value:$('set-s3v').value,stat3Label:$('set-s3l').value,stat4Value:$('set-s4v').value,stat4Label:$('set-s4l').value};try{await db.collection('siteConfig').doc('hero').set(data,{merge:true});toast('Hero saved!','success');}catch(e){fsErr(e,'saveHero');}});

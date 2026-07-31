@@ -9,14 +9,53 @@
 
   if (!loginBtn || !avatarWrap || !avatarBtn || !signOutBtn) return;
 
-  firebase.auth().onAuthStateChanged(function (user) {
+  // Make avatarBtn support background image
+  avatarBtn.style.backgroundSize = "cover";
+  avatarBtn.style.backgroundPosition = "center";
+  avatarBtn.style.display = "flex";
+  avatarBtn.style.alignItems = "center";
+  avatarBtn.style.justifyContent = "center";
+
+  window.updateNavAvatar = function(url, initialsText) {
+    if (url) {
+      avatarBtn.style.backgroundImage = `url('${url}')`;
+      avatarBtn.textContent = "";
+    } else {
+      avatarBtn.style.backgroundImage = "none";
+      avatarBtn.textContent = initialsText || "?";
+    }
+  };
+
+  firebase.auth().onAuthStateChanged(async function (user) {
     if (user) {
       // Show avatar, hide Log In
       loginBtn.style.display = "none";
       avatarWrap.style.display = "block";
-      // Set initials from displayName or email
+      
       const name = user.displayName || user.email || "?";
-      avatarBtn.textContent = name.charAt(0).toUpperCase();
+      const userInitials = name.charAt(0).toUpperCase();
+      
+      window.updateNavAvatar(user.photoURL, userInitials);
+      
+      if (typeof db !== "undefined") {
+        try {
+          const doc = await db.collection("users").doc(user.uid).get();
+          if (doc.exists) {
+            const data = doc.data();
+            if (data.avatar) {
+              window.updateNavAvatar(data.avatar, userInitials);
+            } else if (!data.avatar && user.photoURL) {
+              if (data.photoURL !== user.photoURL) {
+                db.collection("users").doc(user.uid).set({ photoURL: user.photoURL }, { merge: true });
+              }
+              window.updateNavAvatar(user.photoURL, userInitials);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load user avatar:", err);
+        }
+      }
+
     } else {
       // Show Log In, hide avatar
       loginBtn.style.display = "";

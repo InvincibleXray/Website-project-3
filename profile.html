@@ -213,7 +213,7 @@
       </nav>
       <div class="nav-right">
         <a href="submit.html" class="btn-submit">Submit Story</a>
-        <div class="nav-avatar" id="navAvatar" hidden>W</div>
+        <div class="nav-avatar" id="navAvatar" hidden style="background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">W</div>
         <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
       </div>
     </div>
@@ -273,7 +273,7 @@
       <section class="dash-header">
         <div class="container">
           <div class="dash-id">
-            <div class="dash-avatar" id="dashAvatar">A</div>
+            <div class="dash-avatar" id="dashAvatar" style="background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">W</div>
             <div class="dash-id-text">
               <div class="dash-eyebrow">My Newsroom</div>
               <div class="dash-name">
@@ -335,6 +335,18 @@
       <h2 id="modalTitle">Complete Your Profile</h2>
       <p class="modal-sub" id="modalSub">A few quick details help editors recognize and verify your work.</p>
       <div class="auth-error" id="modalError" hidden></div>
+      <div class="field" style="display:flex; align-items:center; gap: 16px; margin-bottom: 24px;">
+        <div id="m-photo-preview" style="width: 60px; height: 60px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-headline); font-size: 24px; font-weight: 700; color: var(--text-primary); overflow: hidden; background-size: cover; background-position: center;"></div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="margin-bottom:0">Profile Photo</label>
+          <div style="display:flex; gap: 8px;">
+            <button type="button" class="btn-ghost" id="m-photo-btn" style="padding: 4px 10px; font-size: 12px;">Change Photo</button>
+            <button type="button" class="btn-ghost" id="m-photo-remove" style="padding: 4px 10px; font-size: 12px; color: var(--accent); border-color: var(--accent); display:none;">Remove</button>
+            <span id="m-photo-status" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); align-self: center;"></span>
+          </div>
+          <input type="file" id="m-photo-input" accept="image/jpeg, image/png, image/webp" style="display:none;" />
+        </div>
+      </div>
       <div class="field">
         <label for="m-name">Full Name <span style="color:var(--accent)">*</span></label>
         <input type="text" id="m-name" placeholder="Ananya Krishnan" />
@@ -394,6 +406,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   <script src="js/firebase.js"></script>
   <script src="js/navbar.js"></script>
 
@@ -578,8 +591,21 @@
 
       const displayUni = user.university || "Independent";
       $("dashName").textContent = user.name || "Reporter";
-      $("dashAvatar").textContent = initials(user.name);
-      $("navAvatar").textContent = initials(user.name);
+      
+      const userAvatar = user.avatar || (currentFbUser ? currentFbUser.photoURL : null);
+      const userInit = initials(user.name);
+      if (userAvatar) {
+        $("dashAvatar").style.backgroundImage = `url('${userAvatar}')`;
+        $("dashAvatar").textContent = "";
+        $("navAvatar").style.backgroundImage = `url('${userAvatar}')`;
+        $("navAvatar").textContent = "";
+      } else {
+        $("dashAvatar").style.backgroundImage = "none";
+        $("dashAvatar").textContent = userInit;
+        $("navAvatar").style.backgroundImage = "none";
+        $("navAvatar").textContent = userInit;
+      }
+      
       $("dashUni").textContent = `${displayUni} • Joined ${user.joined || new Date().getFullYear()}`;
       $("verifiedBadge").hidden = !user.verified;
 
@@ -682,12 +708,79 @@
     }
 
     /* ============ PROFILE MODAL ============ */
+    let currentPhotoDataUrl = null;
+    let currentPhotoRemoved = false;
+
+    $("m-photo-btn").addEventListener("click", () => $("m-photo-input").click());
+
+    $("m-photo-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        $("m-photo-status").textContent = "File too large. Max 5MB.";
+        $("m-photo-status").style.color = "var(--accent)";
+        return;
+      }
+      $("m-photo-status").textContent = "Processing...";
+      $("m-photo-status").style.color = "var(--text-muted)";
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const size = 256;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          const scale = Math.max(size / img.width, size / img.height);
+          const x = (size - img.width * scale) / 2;
+          const y = (size - img.height * scale) / 2;
+          ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+          currentPhotoDataUrl = canvas.toDataURL("image/webp", 0.9);
+          currentPhotoRemoved = false;
+          $("m-photo-preview").style.backgroundImage = `url(${currentPhotoDataUrl})`;
+          $("m-photo-preview").textContent = "";
+          $("m-photo-remove").style.display = "inline-block";
+          $("m-photo-status").textContent = "Ready.";
+          $("m-photo-status").style.color = "var(--text-muted)";
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    $("m-photo-remove").addEventListener("click", () => {
+      currentPhotoRemoved = true;
+      currentPhotoDataUrl = null;
+      $("m-photo-preview").style.backgroundImage = "none";
+      const u = currentUserDoc || {};
+      $("m-photo-preview").textContent = initials(u.name || $("m-name").value || "?");
+      $("m-photo-remove").style.display = "none";
+      $("m-photo-status").textContent = "Photo removed.";
+      $("m-photo-status").style.color = "var(--text-muted)";
+    });
+
     function openProfileModal(isFirstTime = false) {
       const u = currentUserDoc || {};
       $("m-name").value = u.name || "";
       $("m-uni").value = u.university || "";
       $("m-phone").value = u.phone || "";
       $("m-bio").value = u.bio || "";
+      
+      currentPhotoDataUrl = null;
+      currentPhotoRemoved = false;
+      const displayAvatar = u.avatar || (currentFbUser ? currentFbUser.photoURL : null);
+      if (displayAvatar) {
+        $("m-photo-preview").style.backgroundImage = `url('${displayAvatar}')`;
+        $("m-photo-preview").textContent = "";
+        $("m-photo-remove").style.display = "inline-block";
+      } else {
+        $("m-photo-preview").style.backgroundImage = "none";
+        $("m-photo-preview").textContent = initials(u.name || "?");
+        $("m-photo-remove").style.display = "none";
+      }
+      $("m-photo-status").textContent = "";
+
       $("modalTitle").textContent = isFirstTime ? "Complete Your Profile" : "Edit Profile";
       $("modalSub").textContent = isFirstTime
         ? "A few quick details help editors recognize and verify your work."
@@ -728,16 +821,42 @@
 
       if (firebaseReady && currentFbUser) {
         const patch = { name, university: uni, phone, bio };
+        
+        try {
+          if (currentPhotoRemoved) {
+             patch.avatar = null;
+          } else if (currentPhotoDataUrl) {
+             $("modalSave").textContent = "Uploading photo…";
+             const ref = firebase.storage().ref(`avatars/${currentFbUser.uid}.webp`);
+             await ref.putString(currentPhotoDataUrl, "data_url");
+             patch.avatar = await ref.getDownloadURL();
+          }
+        } catch (err) {
+          console.error("Upload error", err);
+          $("modalError").textContent = "Photo upload failed. Please try again.";
+          $("modalError").hidden = false;
+          $("modalSave").disabled = false;
+          $("modalSave").textContent = "Save Profile";
+          return;
+        }
+
         const ok = await updateUserDoc(currentFbUser.uid, patch);
         if (ok) {
           currentUserDoc = { ...currentUserDoc, ...patch };
           // Update Firebase Auth displayName too
           try { await currentFbUser.updateProfile({ displayName: name }); } catch (e) {}
-          // Re-render dashboard with new data
           const [storiesSnap, videosSnap] = await Promise.all([
             db.collection("stories").where("authorId", "==", currentFbUser.uid).get().catch(() => ({ docs: [] })),
             db.collection("videos").where("authorId", "==", currentFbUser.uid).get().catch(() => ({ docs: [] }))
           ]);
+          
+          if (patch.avatar !== undefined) {
+             const batch = db.batch();
+             storiesSnap.docs.forEach(d => batch.update(d.ref, { authorAvatar: patch.avatar }));
+             videosSnap.docs.forEach(d => batch.update(d.ref, { authorAvatar: patch.avatar }));
+             try { await batch.commit(); } catch(e) { console.error("Batch update failed", e); }
+          }
+          
           renderDashboard(currentUserDoc, storiesSnap.docs.map(d => d.data()), videosSnap.docs.map(d => d.data()));
           closeProfileModal();
 
