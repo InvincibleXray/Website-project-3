@@ -50,6 +50,24 @@
               }
               window.updateNavAvatar(user.photoURL, userInitials);
             }
+          } else {
+            // Profile doesn't exist, create it automatically!
+            const newProfile = {
+              uid: user.uid,
+              name: user.displayName || "",
+              email: user.email || "",
+              avatar: user.photoURL || "",
+              college: "",
+              role: "reporter",
+              verified: false,
+              storiesCount: 0,
+              videosCount: 0,
+              totalReads: 0,
+              points: 0,
+              joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            await db.collection("users").doc(user.uid).set(newProfile);
+            console.log("Success: Automatic Firestore user profile created for " + user.uid);
           }
         } catch (err) {
           console.error("Failed to load user avatar:", err);
